@@ -111,26 +111,26 @@
     sparkleCell.alphaSpeed = -0.12;
     sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
 
-    CAEmitterLayer *firefliesEmitterLayer = [CAEmitterLayer layer];
-    firefliesEmitterLayer.emitterPosition = CGPointMake(self.backgroundImageView.layer.position.x, self.backgroundImageView.layer.position.y);
-    firefliesEmitterLayer.emitterSize = CGSizeMake(self.backgroundImageView.bounds.size.width, self.backgroundImageView.bounds.size.height);
-    firefliesEmitterLayer.emitterShape = kCAEmitterLayerRectangle;
-
-    CAEmitterCell *firefliesCell = [CAEmitterCell emitterCell];
-    firefliesCell.birthRate = 50;
-    firefliesCell.lifetime = 2;
-    firefliesCell.emissionLongitude = M_PI*2;
-    firefliesCell.velocity = 10;
-    firefliesCell.velocityRange = 100;
-    firefliesCell.alphaSpeed = 0.35;
-    firefliesCell.alphaRange = 0.2;
-    firefliesCell.scale = 0.2;
-    firefliesCell.scaleSpeed = .3;
-    firefliesCell.scaleRange = 2;
-    firefliesCell.contents = (__bridge id)[[UIImage imageNamed:@"spark.png"] CGImage];
-    firefliesCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
-
-    firefliesEmitterLayer.emitterCells = @[firefliesCell];
+//    CAEmitterLayer *firefliesEmitterLayer = [CAEmitterLayer layer];
+//    firefliesEmitterLayer.emitterPosition = CGPointMake(self.backgroundImageView.layer.position.x, self.backgroundImageView.layer.position.y);
+//    firefliesEmitterLayer.emitterSize = CGSizeMake(self.backgroundImageView.bounds.size.width, self.backgroundImageView.bounds.size.height);
+//    firefliesEmitterLayer.emitterShape = kCAEmitterLayerRectangle;
+//
+//    CAEmitterCell *firefliesCell = [CAEmitterCell emitterCell];
+//    firefliesCell.birthRate = 50;
+//    firefliesCell.lifetime = 2;
+//    firefliesCell.emissionLongitude = M_PI*2;
+//    firefliesCell.velocity = 10;
+//    firefliesCell.velocityRange = 100;
+//    firefliesCell.alphaSpeed = 0.35;
+//    firefliesCell.alphaRange = 0.2;
+//    firefliesCell.scale = 0.2;
+//    firefliesCell.scaleSpeed = .3;
+//    firefliesCell.scaleRange = 2;
+//    firefliesCell.contents = (__bridge id)[[UIImage imageNamed:@"spark.png"] CGImage];
+//    firefliesCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
+//
+//    firefliesEmitterLayer.emitterCells = @[firefliesCell];
     self.emitterLayer.emitterCells = @[sparkleCell];
 
 //    [self.backgroundImageView.layer addSublayer:firefliesEmitterLayer];

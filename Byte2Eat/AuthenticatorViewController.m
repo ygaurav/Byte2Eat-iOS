@@ -40,6 +40,35 @@
     [self.backgroundView addMotionEffect:interpolationHorizontal];
     [self.backgroundView addMotionEffect:interpolationVertical];
 
+
+    _leftEmitterLayer = [CAEmitterLayer layer];
+    _leftEmitterLayer.emitterPosition = CGPointMake(_errorLabel.center.x, _errorLabel.center.y);
+    _leftEmitterLayer.emitterZPosition = 10.0;
+    _leftEmitterLayer.emitterSize = CGSizeMake(0, 5);
+    _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
+
+    CAEmitterLayer *rightEmitterLayer = [CAEmitterLayer layer];
+    rightEmitterLayer.emitterPosition = CGPointMake(_errorLabel.center.x + _errorLabel.bounds.size.width/2, _errorLabel.center.y);
+    rightEmitterLayer.emitterZPosition = 10.0;
+    rightEmitterLayer.emitterSize = CGSizeMake(0, 5);
+    rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
+
+    CAEmitterCell*leftEmitterCell = [CAEmitterCell emitterCell];
+    leftEmitterCell.birthRate = 100;
+    leftEmitterCell.emissionLongitude = M_PI*179/180;
+    leftEmitterCell.lifetime = 1;
+    leftEmitterCell.velocity = 100;
+    leftEmitterCell.velocityRange = 40;
+    leftEmitterCell.emissionRange = M_PI * 2;
+    leftEmitterCell.spin = 3;
+    leftEmitterCell.spinRange = 6;
+    leftEmitterCell.xAcceleration = 100;
+    leftEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
+    leftEmitterCell.scale = 0.03;
+    leftEmitterCell.alphaSpeed = -0.12;
+    leftEmitterCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+
+    _leftEmitterLayer.emitterCells = @[leftEmitterCell];
 }
 
 - (void)didReceiveMemoryWarning
@@ -62,6 +91,7 @@
     if(userName.length >0){
         [self disableUserInput];
         _errorLabel.text = @"";
+        [_scrollView.layer addSublayer:self.leftEmitterLayer];
         NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15];
         [request setHTTPMethod:@"GET"];
@@ -72,6 +102,7 @@
 }
 
 - (void)showError:(NSString *)message {
+    [_leftEmitterLayer removeFromSuperlayer];
     NSShadow *shadow = [[NSShadow alloc] init];
     shadow.shadowColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.7];
     shadow.shadowBlurRadius = 2.0;
@@ -179,7 +210,7 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     [self enableUserInput];
-    NSString *message = [NSString stringWithFormat:@"%@. %@", error.localizedDescription, @"Please try again later."];
+    NSString *message = [NSString stringWithFormat:@"%@ %@", error.localizedDescription, @"Please try again later."];
     [self showError:message];
 }
 @end

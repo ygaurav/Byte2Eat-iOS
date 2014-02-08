@@ -113,6 +113,7 @@
                         <outlet property="backgroundView" destination="3cp-er-HkM" id="QW5-bq-bkO"/>
                         <outlet property="errorLabel" destination="g54-fp-FG4" id="JdT-Cx-oNZ"/>
                         <outlet property="loginButton" destination="Y0y-Ld-VRC" id="Bdv-UN-kqA"/>
+                        <outlet property="scrollView" destination="Uvz-Zb-qcs" id="501-xk-GTZ"/>
                         <outlet property="userNameTextField" destination="VTt-0b-3kk" id="9w5-nb-6pZ"/>
                         <segue destination="vXZ-lx-hvc" kind="modal" identifier="goToOrderScreen" id="zbc-Tj-b6b"/>
                     </connections>
