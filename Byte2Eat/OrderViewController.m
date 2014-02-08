@@ -8,6 +8,7 @@
 
 #import "OrderViewController.h"
 #import "UIImage+ImageEffects.h"
+#import "Constants.h"
 
 @implementation OrderViewController
 
@@ -138,12 +139,12 @@
 - (void)setUserData {
 
     _pricePerUnit = [NSNumber numberWithInt:10];
-    _remainingBalance = [NSNumber numberWithInt:100];
-    _userName = @"Gaurav";
+    NSString *name = [_userInfo objectForKey:keyUserName];
+    _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
     _itemName = @"Bhelpuri";
+    _remainingBalance = [_userInfo objectForKey:keyBalance];
     _currentOrderNumber = [NSNumber numberWithInt:1];
-    
-
+    _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
 }
 
 - (void)setBackgroundImage {
@@ -265,11 +266,9 @@
 #pragma mark NSURLConnection Delegate Methods
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    _userData = [[NSMutableData alloc] init];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [_userData appendData:data];
     NSError *error = nil;
     NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
     NSLog(@"Count : %i", jsonArray.count);

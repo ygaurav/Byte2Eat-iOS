@@ -22,22 +22,21 @@
 @property (weak, nonatomic) IBOutlet UIButton *logoutButton;
 @property (weak, nonatomic) IBOutlet UILabel *aajKhaneMeinKyaHai;
 
-@property (nonatomic) NSMutableData *userData;
 @property (nonatomic) NSNumber *remainingBalance;
 @property (nonatomic) NSString *userName;
 @property (nonatomic) NSString *itemName;
 @property (nonatomic) NSNumber *pricePerUnit;
 @property (nonatomic) NSNumber *totalCost;
 @property (nonatomic) NSString *todayTotalOrder;
-
 @property (nonatomic) NSNumber *currentOrderNumber;
+
 @property (nonatomic, strong) NSShadow *shadow;
 @property (nonatomic, strong) NSShadow *blueShadow;
 @property (nonatomic, strong) NSShadow *greenShadow;
 @property (nonatomic, strong) NSShadow *redShadow;
-
-
 @property (nonatomic) CAEmitterLayer *emitterLayer;
+
+@property (nonatomic, weak) NSDictionary *userInfo;
 
 - (IBAction)onLogout:(UIButton *)sender;
 

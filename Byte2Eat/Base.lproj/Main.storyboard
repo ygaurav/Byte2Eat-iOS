@@ -36,6 +36,12 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Error Occured" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g54-fp-FG4">
+                                        <rect key="frame" x="115" y="189" width="91" height="17"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Username" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="VTt-0b-3kk">
                                         <rect key="frame" x="0.0" y="279" width="320" height="40"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -44,7 +50,10 @@
                                             <constraint firstAttribute="width" constant="320" id="Mga-p5-8mu"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <textInputTraits key="textInputTraits"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="fww-Kk-YZf" id="jVg-Vc-Gdh"/>
+                                        </connections>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Y0y-Ld-VRC" userLabel="LoginButton">
                                         <rect key="frame" x="0.0" y="329" width="320" height="40"/>
@@ -73,9 +82,12 @@
                                     <constraint firstItem="Y0y-Ld-VRC" firstAttribute="leading" secondItem="VTt-0b-3kk" secondAttribute="leading" id="FYs-xa-W0f"/>
                                     <constraint firstAttribute="centerX" secondItem="dfZ-Sy-o0d" secondAttribute="centerX" id="Fhv-4s-Pvv"/>
                                     <constraint firstAttribute="centerX" secondItem="7Un-5c-2T3" secondAttribute="centerX" id="JFV-JO-iwT"/>
+                                    <constraint firstItem="g54-fp-FG4" firstAttribute="top" secondItem="dfZ-Sy-o0d" secondAttribute="bottom" constant="30" id="JZR-91-6uU"/>
                                     <constraint firstAttribute="trailing" secondItem="Y0y-Ld-VRC" secondAttribute="trailing" id="OZc-rO-LLG"/>
                                     <constraint firstItem="Y0y-Ld-VRC" firstAttribute="top" secondItem="VTt-0b-3kk" secondAttribute="bottom" constant="10" id="STE-TG-gdJ"/>
                                     <constraint firstAttribute="centerX" secondItem="VTt-0b-3kk" secondAttribute="centerX" id="U8a-W7-bz2"/>
+                                    <constraint firstItem="dfZ-Sy-o0d" firstAttribute="top" secondItem="Uvz-Zb-qcs" secondAttribute="top" constant="129" id="UgJ-Ey-6vn"/>
+                                    <constraint firstAttribute="centerX" secondItem="g54-fp-FG4" secondAttribute="centerX" id="WGI-QO-WkU"/>
                                     <constraint firstItem="Y0y-Ld-VRC" firstAttribute="trailing" secondItem="VTt-0b-3kk" secondAttribute="trailing" id="XRQ-NL-yda"/>
                                     <constraint firstItem="dfZ-Sy-o0d" firstAttribute="top" secondItem="84P-U6-qDo" secondAttribute="bottom" constant="10" id="ZLs-wL-xeb"/>
                                     <constraint firstItem="VTt-0b-3kk" firstAttribute="top" secondItem="dfZ-Sy-o0d" secondAttribute="bottom" constant="120" id="a3r-RU-TDw"/>
@@ -99,6 +111,7 @@
                     </view>
                     <connections>
                         <outlet property="backgroundView" destination="3cp-er-HkM" id="QW5-bq-bkO"/>
+                        <outlet property="errorLabel" destination="g54-fp-FG4" id="JdT-Cx-oNZ"/>
                         <outlet property="loginButton" destination="Y0y-Ld-VRC" id="Bdv-UN-kqA"/>
                         <outlet property="userNameTextField" destination="VTt-0b-3kk" id="9w5-nb-6pZ"/>
                         <segue destination="vXZ-lx-hvc" kind="modal" identifier="goToOrderScreen" id="zbc-Tj-b6b"/>
