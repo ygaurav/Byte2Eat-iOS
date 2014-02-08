@@ -28,6 +28,8 @@
 - (void)styleStaticData {
 
     self.orderButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.logoutButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.logoutButton.layer.cornerRadius = 3;
     self.shadow = [[NSShadow alloc] init];
     self.shadow.shadowBlurRadius = 3.0;
     self.shadow.shadowColor = [UIColor blackColor];
@@ -114,25 +116,23 @@
     firefliesEmitterLayer.emitterShape = kCAEmitterLayerRectangle;
 
     CAEmitterCell *firefliesCell = [CAEmitterCell emitterCell];
-    firefliesCell.birthRate = 170;
-    firefliesCell.lifetime = 5;
+    firefliesCell.birthRate = 50;
+    firefliesCell.lifetime = 2;
     firefliesCell.emissionLongitude = M_PI*2;
     firefliesCell.velocity = 10;
     firefliesCell.velocityRange = 100;
     firefliesCell.alphaSpeed = 0.35;
     firefliesCell.alphaRange = 0.2;
     firefliesCell.scale = 0.2;
-    firefliesCell.scaleSpeed = .45;
-    firefliesCell.scaleRange = 0;
-    firefliesCell.spin = 0;
-    firefliesCell.spinRange = 0;
-    firefliesCell.contents = (id)[UIImage imageNamed:@"spark.png"];
+    firefliesCell.scaleSpeed = .3;
+    firefliesCell.scaleRange = 2;
+    firefliesCell.contents = (__bridge id)[[UIImage imageNamed:@"spark.png"] CGImage];
+    firefliesCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
 
     firefliesEmitterLayer.emitterCells = @[firefliesCell];
     self.emitterLayer.emitterCells = @[sparkleCell];
 
-
-//    [self.view.layer addSublayer:emitterLayer];
+//    [self.backgroundImageView.layer addSublayer:firefliesEmitterLayer];
 }
 
 - (void)setUserData {
@@ -233,5 +233,58 @@
 //    [alert show];
 
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (IBAction)onLogout:(UIButton *)sender {
+//    [UIView animateWithDuration:.3
+//                          delay:0
+//         usingSpringWithDamping:0.3
+//          initialSpringVelocity:4
+//                        options:UIViewAnimationOptionCurveLinear
+//                     animations:^{
+//                         [self.logoutButton setBounds:
+//                                 CGRectMake(
+//                                         self.logoutButton.center.x,
+//                                         self.logoutButton.center.y,
+//                                         self.logoutButton.bounds.size.width*1.3,
+//                                         self.logoutButton.bounds.size.height*1.3)];
+//                     } completion:^(BOOL finished){
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WTF !"
+//                                                        message:@"Logout !! Are you crazy ? We are trying to track you !" delegate:self
+//                                              cancelButtonTitle:@"Cancel"
+//                                              otherButtonTitles:@"OK", nil];
+//        [alert show];
+//    }];
+
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:@"http://10.37.1.148:70/api/esms/user/gaurav"] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20*1000];
+    [request setHTTPMethod:@"GET"];
+
+    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+
+}
+
+#pragma mark NSURLConnection Delegate Methods
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    _userData = [[NSMutableData alloc] init];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [_userData appendData:data];
+    NSError *error = nil;
+    NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    NSLog(@"Count : %i", jsonArray.count);
+
+}
+
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
+                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
+    return nil;
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSLog(@"Seriously what happend : %@", error.domain);
 }
 @end

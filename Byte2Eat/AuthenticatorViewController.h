@@ -9,7 +9,7 @@
 
 @class TransitionManager;
 
-@interface AuthenticatorViewController : UIViewController <UIViewControllerTransitioningDelegate>
+@interface AuthenticatorViewController : UIViewController <UIViewControllerTransitioningDelegate, NSURLConnectionDelegate>
 
 @property (weak, nonatomic) IBOutlet UIImageView *backgroundView;
 @property (weak, nonatomic) IBOutlet UIButton *loginButton;
