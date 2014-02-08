@@ -24,6 +24,8 @@
     _loginButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
 
     self.transitionManager = [[TransitionManager alloc]init];
+    self.transitionManager.appearing = YES;
+    self.transitionManager.duration = .5;
 
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
     interpolationHorizontal.minimumRelativeValue = @-20.0;
@@ -60,16 +62,27 @@
     }];
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                    presentingController:(UIViewController *)presenting
+
                                                                        sourceController:(UIViewController *)source{
-    self.transitionManager.transitionTo = MODAL;
+    self.transitionManager.appearing = YES;
     return self.transitionManager;
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
 {
-    self.transitionManager.transitionTo = INITIAL;
+    self.transitionManager.appearing = NO;
     return self.transitionManager;
 }
 @end

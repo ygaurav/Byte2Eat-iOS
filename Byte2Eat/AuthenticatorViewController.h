@@ -6,7 +6,6 @@
 //  Copyright (c) 2014 spiderlogic. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 
 @class TransitionManager;
 
