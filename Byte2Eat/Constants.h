@@ -14,5 +14,9 @@ extern NSString *const keyBalance;
 extern NSString *const keyTodaysOrderQty;
 extern NSString *const keyResponseMessage;
 extern NSString *const keyURLUserAuth;
+extern NSString *const keyURLDailyMenu;
+extern NSString *const keyMenuId;
+extern NSString *const keyItemName;
+extern NSString *const keyItemPrice;
 
 @end

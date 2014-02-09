@@ -36,6 +36,9 @@
 @property (nonatomic, strong) NSShadow *redShadow;
 @property (nonatomic) CAEmitterLayer *emitterLayer;
 
+@property (nonatomic) CAEmitterLayer *leftEmitterLayer;
+@property (nonatomic) CAEmitterLayer *rightEmitterLayer;
+
 @property (nonatomic, weak) NSDictionary *userInfo;
 
 - (IBAction)onLogout:(UIButton *)sender;

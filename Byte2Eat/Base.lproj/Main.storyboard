@@ -36,8 +36,8 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Error Occured" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g54-fp-FG4">
-                                        <rect key="frame" x="115" y="189" width="91" height="17"/>
+                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Error Occured" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="320" translatesAutoresizingMaskIntoConstraints="NO" id="g54-fp-FG4">
+                                        <rect key="frame" x="0.0" y="189" width="320" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <nil key="highlightedColor"/>
@@ -78,6 +78,7 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="centerX" secondItem="84P-U6-qDo" secondAttribute="centerX" id="6Xy-iA-Hi9"/>
+                                    <constraint firstItem="g54-fp-FG4" firstAttribute="leading" secondItem="Uvz-Zb-qcs" secondAttribute="leading" id="9kC-Ds-IcQ"/>
                                     <constraint firstAttribute="bottom" secondItem="7Un-5c-2T3" secondAttribute="bottom" constant="20" id="Eki-lP-5ml"/>
                                     <constraint firstItem="Y0y-Ld-VRC" firstAttribute="leading" secondItem="VTt-0b-3kk" secondAttribute="leading" id="FYs-xa-W0f"/>
                                     <constraint firstAttribute="centerX" secondItem="dfZ-Sy-o0d" secondAttribute="centerX" id="Fhv-4s-Pvv"/>
@@ -93,6 +94,7 @@
                                     <constraint firstItem="VTt-0b-3kk" firstAttribute="top" secondItem="dfZ-Sy-o0d" secondAttribute="bottom" constant="120" id="a3r-RU-TDw"/>
                                     <constraint firstItem="84P-U6-qDo" firstAttribute="top" secondItem="Uvz-Zb-qcs" secondAttribute="top" constant="60" id="fRt-gH-Je5"/>
                                     <constraint firstAttribute="bottom" secondItem="Y0y-Ld-VRC" secondAttribute="bottom" constant="200" id="qER-lX-9dZ"/>
+                                    <constraint firstAttribute="trailing" secondItem="g54-fp-FG4" secondAttribute="trailing" id="wds-XF-ZJR"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
@@ -113,6 +115,7 @@
                         <outlet property="backgroundView" destination="3cp-er-HkM" id="QW5-bq-bkO"/>
                         <outlet property="errorLabel" destination="g54-fp-FG4" id="JdT-Cx-oNZ"/>
                         <outlet property="loginButton" destination="Y0y-Ld-VRC" id="Bdv-UN-kqA"/>
+                        <outlet property="loginLabel" destination="dfZ-Sy-o0d" id="cte-4n-Lkp"/>
                         <outlet property="scrollView" destination="Uvz-Zb-qcs" id="501-xk-GTZ"/>
                         <outlet property="userNameTextField" destination="VTt-0b-3kk" id="9w5-nb-6pZ"/>
                         <segue destination="vXZ-lx-hvc" kind="modal" identifier="goToOrderScreen" id="zbc-Tj-b6b"/>

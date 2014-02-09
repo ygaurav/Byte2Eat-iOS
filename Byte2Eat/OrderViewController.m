@@ -18,7 +18,91 @@
 
     [self setUserData];
     [self styleStaticData];
-    [self setBackgroundImage];
+    [self setRandomBackgroundImage];
+    [self setUpAnimations];
+    [self fetchTodayMenu];
+
+}
+
+- (void)fetchTodayMenu {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:keyURLDailyMenu] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
+    [request setHTTPMethod:@"GET"];
+    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+}
+
+- (void)setUpAnimations {
+    _leftEmitterLayer = [CAEmitterLayer layer];
+    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y);
+    _leftEmitterLayer.emitterZPosition = 10.0;
+    _leftEmitterLayer.emitterSize = CGSizeMake(5, 5);
+    _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
+
+    _rightEmitterLayer = [CAEmitterLayer layer];
+    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + 160, self.LabelDailyMenuItemName.center.y);
+    _rightEmitterLayer.emitterZPosition = 10.0;
+    _rightEmitterLayer.emitterSize = CGSizeMake(5, 5);
+    _rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
+
+    CAEmitterCell*leftEmitterCell = [CAEmitterCell emitterCell];
+    leftEmitterCell.birthRate = 0;
+    leftEmitterCell.emissionLongitude = M_PI*2;
+    leftEmitterCell.lifetime = 2;
+    leftEmitterCell.velocity = 100;
+    leftEmitterCell.velocityRange = 40;
+    leftEmitterCell.emissionRange = M_PI*8/180;
+    leftEmitterCell.spin = 3;
+    leftEmitterCell.spinRange = 6;
+    leftEmitterCell.xAcceleration = 100;
+    leftEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
+    leftEmitterCell.scale = 0.03;
+    leftEmitterCell.alphaSpeed = -0.12;
+    leftEmitterCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+    [leftEmitterCell setName:@"left"];
+
+    CAEmitterCell *rightEmitterCell = [CAEmitterCell emitterCell];
+    rightEmitterCell.birthRate = 0;
+    rightEmitterCell.emissionLongitude = -M_PI*179/180;
+    rightEmitterCell.lifetime = 2;
+    rightEmitterCell.velocity = 100;
+    rightEmitterCell.velocityRange = 40;
+    rightEmitterCell.emissionRange = M_PI*8/180;
+    rightEmitterCell.spin = 3;
+    rightEmitterCell.spinRange = 6;
+    rightEmitterCell.xAcceleration = -100;
+    rightEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
+    rightEmitterCell.scale = 0.03;
+    rightEmitterCell.alphaSpeed = -0.12;
+    rightEmitterCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
+    [rightEmitterCell setName:@"right"];
+
+    _leftEmitterLayer.emitterCells = @[leftEmitterCell];
+    _rightEmitterLayer.emitterCells = @[rightEmitterCell];
+
+    [_scrollView.layer addSublayer:self.leftEmitterLayer];
+    [_scrollView.layer addSublayer:self.rightEmitterLayer];
+
+    self.emitterLayer = [CAEmitterLayer layer];
+    self.emitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x, _LabelTotalCost.layer.position.y + 60);
+    self.emitterLayer.emitterZPosition = 10.0;
+    self.emitterLayer.emitterSize = CGSizeMake(_LabelTotalCost.bounds.size.width + 5, _LabelTotalCost.bounds.size.height + 5);
+    self.emitterLayer.emitterShape = kCAEmitterLayerSphere;
+
+    CAEmitterCell*sparkleCell = [CAEmitterCell emitterCell];
+    sparkleCell.birthRate = 100;
+    sparkleCell.emissionLongitude = M_PI * 2;
+    sparkleCell.lifetime = 0.4;
+    sparkleCell.velocity = 30;
+    sparkleCell.velocityRange = 40;
+    sparkleCell.emissionRange = M_PI * 2;
+    sparkleCell.spin = 3;
+    sparkleCell.spinRange = 6;
+    sparkleCell.yAcceleration = 60;
+    sparkleCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
+    sparkleCell.scale = 0.03;
+    sparkleCell.alphaSpeed = -0.12;
+    sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+
+    self.emitterLayer.emitterCells = @[sparkleCell];
 
 }
 
@@ -40,7 +124,6 @@
     self.blueShadow.shadowBlurRadius = 3.0;
     self.blueShadow.shadowColor = [UIColor colorWithRed:60 green:71 blue:210 alpha:1];
     self.blueShadow.shadowOffset = CGSizeMake(0, 0);
-//    blueShadow.shadowColor = [UIColor blueColor];
 
     self.redShadow = [[NSShadow alloc] init];
     self.redShadow.shadowBlurRadius = 3.0;
@@ -51,7 +134,6 @@
     self.greenShadow.shadowBlurRadius = 3.0;
     self.greenShadow.shadowColor = [UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1];
     self.greenShadow.shadowOffset = CGSizeMake(0, 0);
-//    greenShadow.shadowColor = [UIColor greenColor];
 
     UIFont *font = [UIFont systemFontOfSize:40];
 
@@ -90,64 +172,21 @@
     [_LabelTotalCost setAttributedText:totalCostString];
 
 
-    self.emitterLayer = [CAEmitterLayer layer];
-    self.emitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x, _LabelTotalCost.layer.position.y + 60);
-    self.emitterLayer.emitterZPosition = 10.0;
-    self.emitterLayer.emitterSize = CGSizeMake(_LabelTotalCost.bounds.size.width + 5, _LabelTotalCost.bounds.size.height + 5);
-    self.emitterLayer.emitterShape = kCAEmitterLayerSphere;
-
-    CAEmitterCell*sparkleCell = [CAEmitterCell emitterCell];
-    sparkleCell.birthRate = 100;
-    sparkleCell.emissionLongitude = M_PI * 2;
-    sparkleCell.lifetime = 0.4;
-    sparkleCell.velocity = 30;
-    sparkleCell.velocityRange = 40;
-    sparkleCell.emissionRange = M_PI * 2;
-    sparkleCell.spin = 3;
-    sparkleCell.spinRange = 6;
-    sparkleCell.yAcceleration = 60;
-    sparkleCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
-    sparkleCell.scale = 0.03;
-    sparkleCell.alphaSpeed = -0.12;
-    sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
-
-//    CAEmitterLayer *firefliesEmitterLayer = [CAEmitterLayer layer];
-//    firefliesEmitterLayer.emitterPosition = CGPointMake(self.backgroundImageView.layer.position.x, self.backgroundImageView.layer.position.y);
-//    firefliesEmitterLayer.emitterSize = CGSizeMake(self.backgroundImageView.bounds.size.width, self.backgroundImageView.bounds.size.height);
-//    firefliesEmitterLayer.emitterShape = kCAEmitterLayerRectangle;
-//
-//    CAEmitterCell *firefliesCell = [CAEmitterCell emitterCell];
-//    firefliesCell.birthRate = 50;
-//    firefliesCell.lifetime = 2;
-//    firefliesCell.emissionLongitude = M_PI*2;
-//    firefliesCell.velocity = 10;
-//    firefliesCell.velocityRange = 100;
-//    firefliesCell.alphaSpeed = 0.35;
-//    firefliesCell.alphaRange = 0.2;
-//    firefliesCell.scale = 0.2;
-//    firefliesCell.scaleSpeed = .3;
-//    firefliesCell.scaleRange = 2;
-//    firefliesCell.contents = (__bridge id)[[UIImage imageNamed:@"spark.png"] CGImage];
-//    firefliesCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
-//
-//    firefliesEmitterLayer.emitterCells = @[firefliesCell];
-    self.emitterLayer.emitterCells = @[sparkleCell];
-
-//    [self.backgroundImageView.layer addSublayer:firefliesEmitterLayer];
+    
 }
 
 - (void)setUserData {
 
-    _pricePerUnit = [NSNumber numberWithInt:10];
+    _pricePerUnit = [NSNumber numberWithInt:0];
+    _itemName = @"fetching item...";
     NSString *name = [_userInfo objectForKey:keyUserName];
     _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
-    _itemName = @"Bhelpuri";
     _remainingBalance = [_userInfo objectForKey:keyBalance];
     _currentOrderNumber = [NSNumber numberWithInt:1];
     _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
 }
 
-- (void)setBackgroundImage {
+- (void)setRandomBackgroundImage {
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit) fromDate:[NSDate date]];
 
@@ -256,11 +295,6 @@
 //        [alert show];
 //    }];
 
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:@"http://10.37.1.148:70/api/esms/user/gaurav"] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:20*1000];
-    [request setHTTPMethod:@"GET"];
-
-    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
-
 }
 
 #pragma mark NSURLConnection Delegate Methods
@@ -269,10 +303,41 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [self enableUserInput];
     NSError *error = nil;
     NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    NSLog(@"Count : %i", jsonArray.count);
+    BOOL itemExists = ![((NSNumber *)[jsonArray objectForKey:keyMenuId]) isEqualToNumber:[NSNumber numberWithInt:1]];
+    if(itemExists){
+        NSString *itemName = (NSString *)[jsonArray objectForKey:keyItemName];
+        NSNumber *menuId = (NSNumber *)[jsonArray objectForKey:keyMenuId];
+        NSNumber *itemPrice = (NSNumber *)[jsonArray objectForKey:keyItemPrice];
+        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+        [self setTodayMenu:jsonArray];
+        //TODO : Thank you screen or Update DailyMenu
+    }else{
+        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+        [self showError:response];
+        NSLog(@"%@",response);
+    }
 
+}
+
+- (void)setTodayMenu:(NSDictionary *)dictionary {
+    [_LabelDailyMenuItemName setText:[NSString stringWithFormat:@"%@",[dictionary objectForKey:keyItemName]]];
+    [_LabelPricePerUnit setText:[NSString stringWithFormat:@"%@",[dictionary objectForKey:keyItemPrice]]];
+    [_LabelTotalCost setText:[NSString stringWithFormat:@"%i", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+}
+
+- (void)showError:(NSString *)response {
+    //TODO : show error in some way
+}
+
+- (void)enableUserInput {
+    [self.view setUserInteractionEnabled:YES];
+}
+
+-(void)disableUserInput{
+    [self.view setUserInteractionEnabled:NO];
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection

@@ -42,24 +42,24 @@
 
 
     _leftEmitterLayer = [CAEmitterLayer layer];
-    _leftEmitterLayer.emitterPosition = CGPointMake(_errorLabel.center.x, _errorLabel.center.y);
+    _leftEmitterLayer.emitterPosition = CGPointMake(self.loginLabel.center.x - 160, self.loginLabel.center.y + 55);
     _leftEmitterLayer.emitterZPosition = 10.0;
-    _leftEmitterLayer.emitterSize = CGSizeMake(0, 5);
+    _leftEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
 
-    CAEmitterLayer *rightEmitterLayer = [CAEmitterLayer layer];
-    rightEmitterLayer.emitterPosition = CGPointMake(_errorLabel.center.x + _errorLabel.bounds.size.width/2, _errorLabel.center.y);
-    rightEmitterLayer.emitterZPosition = 10.0;
-    rightEmitterLayer.emitterSize = CGSizeMake(0, 5);
-    rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
+    _rightEmitterLayer = [CAEmitterLayer layer];
+    _rightEmitterLayer.emitterPosition = CGPointMake(self.loginLabel.center.x + 160, self.loginLabel.center.y + 55);
+    _rightEmitterLayer.emitterZPosition = 10.0;
+    _rightEmitterLayer.emitterSize = CGSizeMake(5, 5);
+    _rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
 
     CAEmitterCell*leftEmitterCell = [CAEmitterCell emitterCell];
-    leftEmitterCell.birthRate = 100;
-    leftEmitterCell.emissionLongitude = M_PI*179/180;
-    leftEmitterCell.lifetime = 1;
+    leftEmitterCell.birthRate = 0;
+    leftEmitterCell.emissionLongitude = M_PI*2;
+    leftEmitterCell.lifetime = 2;
     leftEmitterCell.velocity = 100;
     leftEmitterCell.velocityRange = 40;
-    leftEmitterCell.emissionRange = M_PI * 2;
+    leftEmitterCell.emissionRange = M_PI*8/180;
     leftEmitterCell.spin = 3;
     leftEmitterCell.spinRange = 6;
     leftEmitterCell.xAcceleration = 100;
@@ -67,8 +67,29 @@
     leftEmitterCell.scale = 0.03;
     leftEmitterCell.alphaSpeed = -0.12;
     leftEmitterCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+    [leftEmitterCell setName:@"left"];
+
+    CAEmitterCell *rightEmitterCell = [CAEmitterCell emitterCell];
+    rightEmitterCell.birthRate = 0;
+    rightEmitterCell.emissionLongitude = -M_PI*179/180;
+    rightEmitterCell.lifetime = 2;
+    rightEmitterCell.velocity = 100;
+    rightEmitterCell.velocityRange = 40;
+    rightEmitterCell.emissionRange = M_PI*8/180;
+    rightEmitterCell.spin = 3;
+    rightEmitterCell.spinRange = 6;
+    rightEmitterCell.xAcceleration = -100;
+    rightEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
+    rightEmitterCell.scale = 0.03;
+    rightEmitterCell.alphaSpeed = -0.12;
+    rightEmitterCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
+    [rightEmitterCell setName:@"right"];
 
     _leftEmitterLayer.emitterCells = @[leftEmitterCell];
+    _rightEmitterLayer.emitterCells = @[rightEmitterCell];
+
+    [_scrollView.layer addSublayer:self.leftEmitterLayer];
+    [_scrollView.layer addSublayer:self.rightEmitterLayer];
 }
 
 - (void)didReceiveMemoryWarning
@@ -88,21 +109,31 @@
     NSString *userName = _userNameTextField.text;
 
     userName = [userName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    NSRange whiteSpaceRange = [userName rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]];
+
     if(userName.length >0){
-        [self disableUserInput];
-        _errorLabel.text = @"";
-        [_scrollView.layer addSublayer:self.leftEmitterLayer];
-        NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15];
-        [request setHTTPMethod:@"GET"];
-        [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
-    }else{
+        if (whiteSpaceRange.location != NSNotFound) {
+            [self showError:@"Username cannot have space"];
+        }else{
+            [self disableUserInput];
+            _errorLabel.text = @"";
+
+            [self emitterBirthrateTo:100];
+            NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
+            [request setHTTPMethod:@"GET"];
+            [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+        }
+    }
+    else{
         [self showError:@"Username cannot be empty" ];
     }
 }
 
 - (void)showError:(NSString *)message {
-    [_leftEmitterLayer removeFromSuperlayer];
+    [self emitterBirthrateTo:0];
+
     NSShadow *shadow = [[NSShadow alloc] init];
     shadow.shadowColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.7];
     shadow.shadowBlurRadius = 2.0;
@@ -125,6 +156,11 @@
                          animations:^{
                              [_errorLabel setCenter:point];
                          } completion:nil];
+}
+
+- (void)emitterBirthrateTo:(int)birthRate {
+    [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
+    [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
 }
 
 - (void)goToOrderScreen:(NSDictionary *)userInfo {
@@ -186,7 +222,6 @@
         [self showError:response];
         NSLog(@"%@",response);
     }
-
 }
 
 - (void)enableUserInput {
@@ -206,6 +241,7 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     [self enableUserInput];
+    [self emitterBirthrateTo:0];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

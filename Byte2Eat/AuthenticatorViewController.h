@@ -17,9 +17,10 @@
 @property(nonatomic, strong) TransitionManager *transitionManager;
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UILabel *loginLabel;
 
 @property (nonatomic) CAEmitterLayer *leftEmitterLayer;
-@property (nonatomic) CAEmitterLayer *rightEmitterlayer;
+@property (nonatomic) CAEmitterLayer *rightEmitterLayer;
 
 - (IBAction)onLoginButtonTap:(UIButton *)sender;
 
