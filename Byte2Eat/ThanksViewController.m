@@ -16,7 +16,6 @@
     [super viewDidLoad];
 
 
-    self.thanksButtonOutlet.backgroundColor = [UIColor colorWithRed:0 green:0 blue:1 alpha:0.3];
 
     NSShadow *blueShadow = [[NSShadow alloc] init];
     blueShadow.shadowBlurRadius = 3.0;
@@ -26,7 +25,7 @@
     NSMutableAttributedString *thanksbutton = [[NSMutableAttributedString alloc] initWithString:@"Thanks, so are you guys"];
     NSRange range = NSMakeRange(0, [thanksbutton length]);
     [thanksbutton addAttribute:NSShadowAttributeName value:blueShadow range:range];
-    [thanksbutton addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:20] range:range];
+    [thanksbutton addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:25] range:range];
     [self.thanksButtonOutlet setAttributedTitle:thanksbutton forState:UIControlStateNormal];
 
     CAEmitterLayer *emitterLayer = [CAEmitterLayer layer];

@@ -19,6 +19,8 @@ extern NSString *const keyURLUserAuth;
 extern NSString *const keyURLDailyMenu;
 extern NSString *const keyURLOrderHistory;
 
+extern int const keyAlertOrderConfirm;
+
 extern NSString *const keyMenuId;
 extern NSString *const keyItemName;
 extern NSString *const keyItemPrice;

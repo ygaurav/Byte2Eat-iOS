@@ -19,6 +19,8 @@ NSString *const keyItemPrice = @"ItemPrice";
 NSString *const keyOrderHistory = @"OrderHistory";
 NSString *const keyBoolValue = @"BoolValue";
 
+int const keyAlertOrderConfirm = 1;
+
 NSString *const keyURLUserAuth = @"http://10.37.1.148:70/api/esms/user/%@";
 NSString *const keyURLDailyMenu = @"http://10.37.1.148:70/api/esms/menu";
 NSString *const keyURLOrderHistory = @"http://10.37.1.148:70/api/esms/orders/%@";

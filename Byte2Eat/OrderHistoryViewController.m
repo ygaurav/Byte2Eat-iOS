@@ -33,13 +33,15 @@
     self.shadow.shadowBlurRadius = 3.0;
     self.shadow.shadowColor = [UIColor blackColor];
     self.shadow.shadowOffset = CGSizeMake(0, 0);
+    self.operationLabel.text = @"";
+
 
     NSShadow *blueShadow = [[NSShadow alloc] init];
     blueShadow.shadowColor = [UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:0.5];
     blueShadow.shadowOffset = CGSizeMake(0, 0);
     blueShadow.shadowBlurRadius = 3.0;
 
-    self.doneButton.backgroundColor = [UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:0.3];
+    self.doneButton.backgroundColor = [UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:.6];
     NSMutableAttributedString *doneButton = [[NSMutableAttributedString alloc] initWithString:@"Done"];
     [doneButton addAttribute:NSShadowAttributeName value:blueShadow range:NSMakeRange(0, doneButton.length)];
     [doneButton addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:1] range:NSMakeRange(0, doneButton.length)];
@@ -134,19 +136,16 @@
     isFetchingHistory = YES;
     [self changeEmitterBirthrateTo:100];
 
-    if (!isFirstFetch) {
-        NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@"fetching history..."];
-        [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:NSMakeRange(0, historyTitle.length)];
-        [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];
-        [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:1 green:1 blue:1 alpha:1] range:NSMakeRange(0, historyTitle.length)];
-        [historyTitle addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-3.0] range:NSMakeRange(0, [historyTitle length])];
-        CATransition *animation = [CATransition animation];
-        animation.duration = 1.0;
-        animation.type = kCATransitionFade;
-        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-        [_historyTitleLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
-        [_historyTitleLabel setAttributedText:historyTitle];
-    }
+    NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@"fetching data..."];
+    [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0 green:0 blue:1 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+    CATransition *animation = [CATransition animation];
+    animation.duration = 1.0;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    [_operationLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
+    [_operationLabel setAttributedText:historyTitle];
 
     NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,userName];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:orderHistoryURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
@@ -309,7 +308,38 @@
 }
 
 - (void)showError:(NSString *)response {
-    //TODO : show error in some way
+
+    NSShadow *redShadow = [[NSShadow alloc] init];
+    redShadow.shadowBlurRadius = 2.0;
+    redShadow.shadowOffset = CGSizeMake(0, 0);
+    UIColor *redColor = [UIColor colorWithRed:220/256.0 green:92/256.0 blue:75/256.0 alpha:1];
+    redShadow.shadowColor = redColor;
+
+    NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ Try again later.",response]];
+    [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSShadowAttributeName value:redShadow range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:220/256.0 green:92/256.0 blue:75/256.0 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+    CATransition *animation = [CATransition animation];
+    animation.duration = 1.0;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    [_operationLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
+    [_operationLabel setAttributedText:historyTitle];
+
+    [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+}
+
+- (void)removeErrorMessage:(NSTimer *)timer {
+    NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@""];
+    [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:220/256.0 green:92/256.0 blue:75/256.0 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+    CATransition *animation = [CATransition animation];
+    animation.duration = 1.0;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    [_operationLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
+    [_operationLabel setAttributedText:historyTitle];
+    [timer invalidate];
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection
@@ -325,17 +355,28 @@
 }
 
 - (void)setTitleBack {
-    NSMutableAttributedString *history = [[NSMutableAttributedString alloc] initWithString:@"Order History"];
-    NSRange range = NSMakeRange(0, [history length]);
-    [history addAttribute:NSShadowAttributeName value:self.shadow range:range];
-    [history addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:range];
-    [_historyTitleLabel setAttributedText:history];
+//    NSMutableAttributedString *history = [[NSMutableAttributedString alloc] initWithString:@"Order History"];
+//    NSRange range = NSMakeRange(0, [history length]);
+//    [history addAttribute:NSShadowAttributeName value:self.shadow range:range];
+//    [history addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:range];
+//    [_historyTitleLabel setAttributedText:history];
+//    CATransition *animation = [CATransition animation];
+//    animation.duration = 1.0;
+//    animation.type = kCATransitionFade;
+//    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+//    [_historyTitleLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
+//    [_historyTitleLabel setAttributedText:history];
+
+    NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@""];
+    [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0 green:0 blue:1 alpha:1] range:NSMakeRange(0, historyTitle.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
     animation.type = kCATransitionFade;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    [_historyTitleLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
-    [_historyTitleLabel setAttributedText:history];
+    [_operationLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
+    [_operationLabel setAttributedText:historyTitle];
 }
 
 - (void)changeEmitterBirthrateTo:(int)birthRate {
@@ -347,6 +388,7 @@
     isFetchingHistory = NO;
     [self changeEmitterBirthrateTo:0];
     [self setTitleBack];
+    [self showError:error.localizedDescription];
     NSLog(@"Seriously what happend : %@", error.domain);
 }
 

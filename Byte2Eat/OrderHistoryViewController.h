@@ -14,6 +14,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *historyTitleLabel;
 @property(nonatomic, strong) NSShadow *shadow;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
+@property (weak, nonatomic) IBOutlet UILabel *operationLabel;
 - (IBAction)onDoneTap:(UIButton *)sender;
 
 - (void)setUser:(NSString *)name;

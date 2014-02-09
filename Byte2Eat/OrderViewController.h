@@ -9,7 +9,7 @@
 
 @class TransitionManager;
 
-@interface OrderViewController : UIViewController  <UIPickerViewDataSource, UIPickerViewDelegate, NSURLConnectionDelegate, UIViewControllerTransitioningDelegate>
+@interface OrderViewController : UIViewController  <UITextViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, NSURLConnectionDelegate, UIViewControllerTransitioningDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *LabelRemainingBalance;
 @property (weak, nonatomic) IBOutlet UILabel *LabelUserName;

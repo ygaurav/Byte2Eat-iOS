@@ -80,6 +80,7 @@
     [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
+
 - (void)setUpAnimations {
     _leftEmitterLayer = [CAEmitterLayer layer];
     _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y+15);
@@ -134,25 +135,30 @@
     self.emitterLayer = [CAEmitterLayer layer];
     self.emitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x, _LabelTotalCost.layer.position.y + 60);
     self.emitterLayer.emitterZPosition = 10.0;
-    self.emitterLayer.emitterSize = CGSizeMake(_LabelTotalCost.bounds.size.width + 5, _LabelTotalCost.bounds.size.height + 5);
-    self.emitterLayer.emitterShape = kCAEmitterLayerSphere;
+//    self.emitterLayer.emitterSize = CGSizeMake(_LabelTotalCost.bounds.size.width + 5, _LabelTotalCost.bounds.size.height + 5);
+    self.emitterLayer.emitterSize = CGSizeMake(5, 5);
+    self.emitterLayer.emitterShape = kCAEmitterLayerPoint;
+    self.emitterLayer.emitterMode = kCAEmitterLayerPoints;
 
     CAEmitterCell*sparkleCell = [CAEmitterCell emitterCell];
-    sparkleCell.birthRate = 100;
+    sparkleCell.birthRate = 0;
     sparkleCell.emissionLongitude = M_PI * 2;
     sparkleCell.lifetime = 0.4;
-    sparkleCell.velocity = 30;
+    sparkleCell.velocity = 100;
     sparkleCell.velocityRange = 40;
     sparkleCell.emissionRange = M_PI * 2;
     sparkleCell.spin = 3;
     sparkleCell.spinRange = 6;
-    sparkleCell.yAcceleration = 60;
+    sparkleCell.yAcceleration = 0;
+    sparkleCell.xAcceleration = 0;
     sparkleCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     sparkleCell.scale = 0.03;
     sparkleCell.alphaSpeed = -0.12;
     sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+    [sparkleCell setName:@"sparkle"];
 
     self.emitterLayer.emitterCells = @[sparkleCell];
+    [self.scrollView.layer addSublayer:self.emitterLayer];
 
 }
 
@@ -297,16 +303,21 @@
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     _currentOrderNumber = [NSNumber numberWithInteger:row + 1];
 
-    [self.scrollView.layer addSublayer:self.emitterLayer];
-    [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(removeEmitter:) userInfo:nil repeats:NO];
+    [_emitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
 }
 
-- (void)removeEmitter:(NSTimer *)timer {
+- (void)updateTotalCost:(NSTimer *)timer {
     NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
+    CATransition *animation = [CATransition animation];
+    animation.duration = 1.0;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [_LabelTotalCost.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelTotalCost setAttributedText:totalCostString];
 
-    [self.emitterLayer removeFromSuperlayer];
+    [_emitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.sparkle.birthRate"];
     [timer invalidate];
 }
 
@@ -360,7 +371,21 @@
                      animations:^{
                          [_errorLabel setCenter:point];
                          [_errorLabel setAlpha:1];
+                     } completion:^(BOOL finished){
+        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+    }];
+}
+
+- (void)removeErrorMessage:(NSTimer *)timer {
+    [UIView animateWithDuration:1
+                          delay:0
+                        options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         _errorLabel.alpha = 0;
                      } completion:nil];
+
+
+    [timer invalidate];
 }
 
 - (void)enableUserInput {
@@ -373,34 +398,33 @@
 
 
 - (IBAction)onOrder:(UIButton *)sender {
-//    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
-//            message:@"Today's order \n ---------- \n " delegate:self
-//  cancelButtonTitle:@"Cancel"
-//          otherButtonTitles:@"OK", nil];
-//    [alert show];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
+            message:@"Today's order \n ---------- \n " delegate:self
+  cancelButtonTitle:@"Cancel"
+          otherButtonTitles:@"OK", nil];
+    [alert setTag:keyAlertOrderConfirm];
+    [alert show];
 
-    [self goToThankYouScreen];
     [self changeEmitterBirthrateTo:100];
-//    [self disableUserInput];
-//
-//    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:keyURLPostOrder]];
-//    request.HTTPMethod = @"POST";
-//    request.timeoutInterval = 10;
-//    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-//    NSError *error;
-//    NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
-//    [order setObject:_currentOrderNumber forKey:@"Quantity"];
-//    [order setObject:_userId forKey:@"UserId"];
-//    [order setObject:_dailyMenuId forKey:@"DailyMenuid"];
-//    [order setObject:@"iPhone" forKey:@"DeviceInfo"];
-//    NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
-//    request.HTTPBody = requestBodyData;
-//    NSLog(@"%@",requestBodyData);
-//    NSLog(@"%@",request);
-//    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-
-//    [self dismissViewControllerAnimated:YES completion:nil];
+    [self disableUserInput];
 }
+
+- (void)postOrderRequest {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:keyURLPostOrder]];
+    request.HTTPMethod = @"POST";
+    request.timeoutInterval = 10;
+    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+    NSError *error;
+    NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
+    [order setObject:_currentOrderNumber forKey:@"Quantity"];
+    [order setObject:_userId forKey:@"UserId"];
+    [order setObject:_dailyMenuId forKey:@"DailyMenuid"];
+    [order setObject:@"iPhone" forKey:@"DeviceInfo"];
+    NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
+    request.HTTPBody = requestBodyData;
+    [[NSURLConnection alloc] initWithRequest:request delegate:self];
+}
+
 - (IBAction)onOrderHistory:(UIButton *)sender {
     self.transitionManager.scaleFactor = 0.9;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
@@ -412,7 +436,6 @@
     }];
 }
 - (IBAction) onLogout:(UIButton *)sender {
-    //TODO : logout
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -423,6 +446,7 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     NSError *error = nil;
+    [self changeEmitterBirthrateTo:0];
     if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]) {
         [self enableUserInput];
         NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -504,6 +528,14 @@
 {
     self.transitionManager.appearing = NO;
     return self.transitionManager;
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if(alertView.tag == keyAlertOrderConfirm){
+        if(buttonIndex == 1){
+            [self postOrderRequest];
+        }
+    }
 }
 
 @end

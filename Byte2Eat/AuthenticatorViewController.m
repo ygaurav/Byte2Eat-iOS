@@ -175,7 +175,9 @@
                          animations:^{
                              [_errorLabel setCenter:point];
                              [_errorLabel setAlpha:1];
-                         } completion:nil];
+                         } completion:^(BOOL finished){
+        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+    }];
 }
 
 - (void)changeEmitterBirthrateTo:(int)birthRate {
@@ -216,6 +218,18 @@
 {
     self.transitionManager.appearing = NO;
     return self.transitionManager;
+}
+
+- (void)removeErrorMessage:(NSTimer *)timer {
+    [UIView animateWithDuration:1
+                          delay:0
+                        options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         _errorLabel.alpha = 0;
+                     } completion:nil];
+
+
+    [timer invalidate];
 }
 
 
