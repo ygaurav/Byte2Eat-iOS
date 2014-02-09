@@ -10,12 +10,14 @@
 #import "UIImage+ImageEffects.h"
 #import "Constants.h"
 
-@implementation OrderViewController
+@implementation OrderViewController{
+    BOOL isFetchingMenu;
+}
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad{
     [super viewDidLoad];
 
+    isFetchingMenu = NO;
     [self setUserData];
     [self styleStaticData];
     [self setRandomBackgroundImage];
@@ -24,7 +26,39 @@
 
 }
 
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self becomeFirstResponder];
+}
+
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
+    if (motion == UIEventSubtypeMotionShake){
+        if (isFetchingMenu) return;
+        NSLog(@"Shake detected. Refreshing menu..");
+        [self fetchTodayMenu];
+    }
+}
+
 - (void)fetchTodayMenu {
+    isFetchingMenu = YES;
+    [self changeEmitterBirthrateTo:100];
+
+    NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"fetching today's menu"];
+    [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
+    CATransition *animation = [CATransition animation];
+    animation.duration = 1.0;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
+    [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:keyURLDailyMenu] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
     [request setHTTPMethod:@"GET"];
     [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
@@ -32,13 +66,13 @@
 
 - (void)setUpAnimations {
     _leftEmitterLayer = [CAEmitterLayer layer];
-    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y);
+    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y+15);
     _leftEmitterLayer.emitterZPosition = 10.0;
     _leftEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
 
     _rightEmitterLayer = [CAEmitterLayer layer];
-    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + 160, self.LabelDailyMenuItemName.center.y);
+    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + 160, self.LabelDailyMenuItemName.center.y+15);
     _rightEmitterLayer.emitterZPosition = 10.0;
     _rightEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
@@ -106,6 +140,12 @@
 
 }
 
+- (void)changeEmitterBirthrateTo:(int)birthRate {
+    [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
+    [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+}
+
+
 - (NSUInteger)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
 }
@@ -143,19 +183,11 @@
     [khanemein addAttribute:NSFontAttributeName value:font range:range];
     [_aajKhaneMeinKyaHai setAttributedText:khanemein];
 
-    NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
-    [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
-    [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
-
     NSMutableAttributedString *userKaNaam = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Hi, %@", _userName]];
     [userKaNaam addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, userKaNaam.length)];
     [_LabelUserName setAttributedText:userKaNaam];
-    
-    NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",_pricePerUnit]];
-    [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
-    [_LabelPricePerUnit setAttributedText:pricePerUnitString];
+
+    [_LabelTotalOrder setText:[NSString stringWithFormat:@"%@",_todayTotalOrder]];
 
     NSMutableAttributedString *remainingBalanceString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",_remainingBalance]];
     if([_remainingBalance compare:[NSNumber numberWithInt:0]] == NSOrderedAscending ){
@@ -166,19 +198,12 @@
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1] range:NSMakeRange(0, remainingBalanceString.length)];
     }
     [_LabelRemainingBalance setAttributedText:remainingBalanceString];
-
-    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
-    [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
-    [_LabelTotalCost setAttributedText:totalCostString];
-
-
-    
 }
 
 - (void)setUserData {
 
     _pricePerUnit = [NSNumber numberWithInt:0];
-    _itemName = @"fetching item...";
+    _itemName = @"";
     NSString *name = [_userInfo objectForKey:keyUserName];
     _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
     _remainingBalance = [_userInfo objectForKey:keyBalance];
@@ -294,7 +319,7 @@
 //                                              otherButtonTitles:@"OK", nil];
 //        [alert show];
 //    }];
-
+    [self fetchTodayMenu];
 }
 
 #pragma mark NSURLConnection Delegate Methods
@@ -323,9 +348,24 @@
 }
 
 - (void)setTodayMenu:(NSDictionary *)dictionary {
-    [_LabelDailyMenuItemName setText:[NSString stringWithFormat:@"%@",[dictionary objectForKey:keyItemName]]];
-    [_LabelPricePerUnit setText:[NSString stringWithFormat:@"%@",[dictionary objectForKey:keyItemPrice]]];
-    [_LabelTotalCost setText:[NSString stringWithFormat:@"%i", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:[dictionary objectForKey:keyItemName]];
+    [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
+    CATransition *animation = [CATransition animation];
+    animation.duration = 1.0;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
+    [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+
+    NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]]];
+    [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
+    [_LabelPricePerUnit setAttributedText:pricePerUnitString];
+
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
+    [_LabelTotalCost setAttributedText:totalCostString];
 }
 
 - (void)showError:(NSString *)response {
@@ -346,9 +386,28 @@
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    isFetchingMenu = NO;
+    [self changeEmitterBirthrateTo:0];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    isFetchingMenu = NO;
+    [self changeEmitterBirthrateTo:0];
+    if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
+        [self showError:@"Some error occurred. Try again."];
+        NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
+        [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
+        CATransition *animation = [CATransition animation];
+        animation.duration = 1.0;
+        animation.type = kCATransitionFade;
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+        [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
+        [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+    } else {
+    }
     NSLog(@"Seriously what happend : %@", error.domain);
 }
 @end

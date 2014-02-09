@@ -119,7 +119,7 @@
             [self disableUserInput];
             _errorLabel.text = @"";
 
-            [self emitterBirthrateTo:100];
+            [self changeEmitterBirthrateTo:100];
             NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
             [request setHTTPMethod:@"GET"];
@@ -132,7 +132,7 @@
 }
 
 - (void)showError:(NSString *)message {
-    [self emitterBirthrateTo:0];
+    [self changeEmitterBirthrateTo:0];
 
     NSShadow *shadow = [[NSShadow alloc] init];
     shadow.shadowColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.7];
@@ -147,6 +147,7 @@
 
     CGPoint point = _errorLabel.center;
     [_errorLabel setCenter:CGPointMake(point.x, point.y - 100)];
+    [_errorLabel setAlpha:0];
 
     [UIView animateWithDuration:.5
                               delay:0
@@ -155,10 +156,11 @@
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
                              [_errorLabel setCenter:point];
+                             [_errorLabel setAlpha:1];
                          } completion:nil];
 }
 
-- (void)emitterBirthrateTo:(int)birthRate {
+- (void)changeEmitterBirthrateTo:(int)birthRate {
     [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
     [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
 }
@@ -241,7 +243,7 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     [self enableUserInput];
-    [self emitterBirthrateTo:0];
+    [self changeEmitterBirthrateTo:0];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

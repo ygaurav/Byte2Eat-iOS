@@ -27,7 +27,7 @@
 @property (nonatomic) NSString *itemName;
 @property (nonatomic) NSNumber *pricePerUnit;
 @property (nonatomic) NSNumber *totalCost;
-@property (nonatomic) NSString *todayTotalOrder;
+@property (nonatomic) NSNumber *todayTotalOrder;
 @property (nonatomic) NSNumber *currentOrderNumber;
 
 @property (nonatomic, strong) NSShadow *shadow;
