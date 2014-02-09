@@ -29,6 +29,24 @@
     self.transitionManager.appearing = YES;
     self.transitionManager.duration = .5;
 
+    NSShadow *shadow = [[NSShadow alloc] init];
+    shadow.shadowBlurRadius = 3.0;
+    shadow.shadowColor = [UIColor blackColor];
+    shadow.shadowOffset = CGSizeMake(0, 0);
+
+    NSMutableAttributedString *byte2eatHeader = [[NSMutableAttributedString alloc] initWithString:@"Byte2Eat"];
+    NSRange range = NSMakeRange(0, [byte2eatHeader length]);
+    [byte2eatHeader addAttribute:NSShadowAttributeName value:shadow range:range];
+    [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:50] range:range];
+    [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:50] range:range];
+    [self.byte2eatHeader setAttributedText:byte2eatHeader];
+
+    NSMutableAttributedString *loginSubheading = [[NSMutableAttributedString alloc] initWithString:@"Login"];
+    [loginSubheading addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, loginSubheading.length)];
+    [loginSubheading addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
+    [loginSubheading addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
+    [self.loginSubheading setAttributedText:loginSubheading];
+
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
     interpolationHorizontal.minimumRelativeValue = @-20.0;
     interpolationHorizontal.maximumRelativeValue = @20.0;

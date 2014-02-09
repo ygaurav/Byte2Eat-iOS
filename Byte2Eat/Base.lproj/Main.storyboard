@@ -113,9 +113,11 @@
                     </view>
                     <connections>
                         <outlet property="backgroundView" destination="3cp-er-HkM" id="QW5-bq-bkO"/>
+                        <outlet property="byte2eatHeader" destination="84P-U6-qDo" id="itw-b8-gOS"/>
                         <outlet property="errorLabel" destination="g54-fp-FG4" id="JdT-Cx-oNZ"/>
                         <outlet property="loginButton" destination="Y0y-Ld-VRC" id="Bdv-UN-kqA"/>
                         <outlet property="loginLabel" destination="dfZ-Sy-o0d" id="cte-4n-Lkp"/>
+                        <outlet property="loginSubheading" destination="dfZ-Sy-o0d" id="hCi-fp-Ji1"/>
                         <outlet property="scrollView" destination="Uvz-Zb-qcs" id="501-xk-GTZ"/>
                         <outlet property="userNameTextField" destination="VTt-0b-3kk" id="9w5-nb-6pZ"/>
                         <segue destination="vXZ-lx-hvc" kind="modal" identifier="goToOrderScreen" id="zbc-Tj-b6b"/>
@@ -396,49 +398,49 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zmo-R2-AYq">
-                                                    <rect key="frame" x="64" y="59" width="14" height="15"/>
+                                                    <rect key="frame" x="69" y="59" width="14" height="15"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Price" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ULE-Gx-c91">
-                                                    <rect key="frame" x="83" y="59" width="30" height="15"/>
+                                                    <rect key="frame" x="89" y="59" width="30" height="15"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rs 20" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Pf-dX-YYb">
-                                                    <rect key="frame" x="118" y="59" width="32" height="15"/>
+                                                    <rect key="frame" x="133" y="59" width="32" height="15"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Item Cost" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2ns-n5-ZfN">
-                                                    <rect key="frame" x="155" y="59" width="55" height="15"/>
+                                                    <rect key="frame" x="184" y="59" width="55" height="15"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rs 200" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uNJ-zi-063">
-                                                    <rect key="frame" x="215" y="59" width="39" height="15"/>
+                                                    <rect key="frame" x="240" y="59" width="39" height="15"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="6Pf-dX-YYb" firstAttribute="leading" secondItem="ULE-Gx-c91" secondAttribute="trailing" constant="5" id="15y-2K-ifO"/>
                                                 <constraint firstItem="Swa-LW-EFm" firstAttribute="leading" secondItem="JiQ-KC-tmt" secondAttribute="leading" constant="11" id="27y-TF-uN5"/>
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="baseline" secondItem="ULE-Gx-c91" secondAttribute="baseline" id="2oq-cw-MZb"/>
+                                                <constraint firstItem="ULE-Gx-c91" firstAttribute="leading" secondItem="9UH-Xw-NHq" secondAttribute="trailing" constant="30" id="57l-Nm-MI7"/>
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="baseline" secondItem="uNJ-zi-063" secondAttribute="baseline" id="5RW-Dp-dFS"/>
-                                                <constraint firstItem="zmo-R2-AYq" firstAttribute="leading" secondItem="9UH-Xw-NHq" secondAttribute="trailing" constant="5" id="BkE-il-hXH"/>
+                                                <constraint firstItem="uNJ-zi-063" firstAttribute="leading" secondItem="6Pf-dX-YYb" secondAttribute="trailing" constant="75" id="8EL-RE-iuI"/>
+                                                <constraint firstItem="zmo-R2-AYq" firstAttribute="leading" secondItem="9UH-Xw-NHq" secondAttribute="trailing" constant="10" id="BaP-a5-ElT"/>
                                                 <constraint firstItem="Swa-LW-EFm" firstAttribute="leading" secondItem="9UH-Xw-NHq" secondAttribute="leading" id="C6N-ox-e4E"/>
-                                                <constraint firstItem="ULE-Gx-c91" firstAttribute="leading" secondItem="zmo-R2-AYq" secondAttribute="trailing" constant="5" id="JnC-B2-Wf0"/>
                                                 <constraint firstItem="Swa-LW-EFm" firstAttribute="top" secondItem="JiQ-KC-tmt" secondAttribute="top" constant="20" id="LWP-wT-4Iy"/>
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="top" secondItem="Swa-LW-EFm" secondAttribute="bottom" constant="15" id="One-MU-yvC"/>
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="baseline" secondItem="zmo-R2-AYq" secondAttribute="baseline" id="dQ0-OF-AOX"/>
-                                                <constraint firstItem="2ns-n5-ZfN" firstAttribute="leading" secondItem="6Pf-dX-YYb" secondAttribute="trailing" constant="5" id="dkM-uQ-8Zo"/>
-                                                <constraint firstItem="uNJ-zi-063" firstAttribute="leading" secondItem="2ns-n5-ZfN" secondAttribute="trailing" constant="5" id="jag-Yw-Dgf"/>
+                                                <constraint firstItem="2ns-n5-ZfN" firstAttribute="leading" secondItem="ULE-Gx-c91" secondAttribute="trailing" constant="65" id="fU9-lx-3uT"/>
+                                                <constraint firstItem="6Pf-dX-YYb" firstAttribute="leading" secondItem="zmo-R2-AYq" secondAttribute="trailing" constant="50" id="gQa-pz-VDx"/>
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="baseline" secondItem="6Pf-dX-YYb" secondAttribute="baseline" id="ra5-SR-hdt"/>
                                                 <constraint firstItem="7Nb-KX-hMy" firstAttribute="baseline" secondItem="Swa-LW-EFm" secondAttribute="baseline" id="uOI-q7-63K"/>
                                                 <constraint firstAttribute="trailing" secondItem="7Nb-KX-hMy" secondAttribute="trailing" constant="16" id="vT2-5N-kO6"/>

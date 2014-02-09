@@ -24,7 +24,7 @@
     orderHistory = [[NSMutableArray alloc] init];
     [self setData];
 
-//    [self fetchOrderHistory];
+    [self fetchOrderHistory];
     [self setUpAnimations];
 }
 

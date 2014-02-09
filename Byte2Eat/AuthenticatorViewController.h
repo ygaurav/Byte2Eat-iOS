@@ -18,6 +18,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *loginLabel;
+@property (weak, nonatomic) IBOutlet UILabel *byte2eatHeader;
+@property (weak, nonatomic) IBOutlet UILabel *loginSubheading;
 
 @property (nonatomic) CAEmitterLayer *leftEmitterLayer;
 @property (nonatomic) CAEmitterLayer *rightEmitterLayer;
