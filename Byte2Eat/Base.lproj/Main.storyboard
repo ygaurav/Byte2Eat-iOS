@@ -357,10 +357,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="viy-dy-N9B">
-                                <rect key="frame" x="-20" y="-20" width="360" height="608"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Order History" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DLd-EJ-Vta">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="57"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -462,19 +458,29 @@
                                     <outlet property="delegate" destination="wGH-M3-Nza" id="drD-XK-Xcu"/>
                                 </connections>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vAe-SN-FYB">
+                                <rect key="frame" x="0.0" y="534" width="320" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <inset key="contentEdgeInsets" minX="0.0" minY="5" maxX="0.0" maxY="5"/>
+                                <state key="normal" title="Done">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="onDoneTap:" destination="wGH-M3-Nza" eventType="touchUpInside" id="dQS-3m-ncg"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="viy-dy-N9B" secondAttribute="trailing" constant="-20" id="CPZ-Ns-a43"/>
-                            <constraint firstItem="7HU-Dh-OYf" firstAttribute="top" secondItem="viy-dy-N9B" secondAttribute="bottom" constant="-20" id="P8U-qE-MX1"/>
-                            <constraint firstItem="viy-dy-N9B" firstAttribute="centerY" secondItem="3Nq-77-Kt8" secondAttribute="centerY" id="U3L-jG-xQH"/>
-                            <constraint firstAttribute="centerX" secondItem="viy-dy-N9B" secondAttribute="centerX" id="qBi-yQ-oXd"/>
-                            <constraint firstItem="cbH-k9-6ml" firstAttribute="top" secondItem="viy-dy-N9B" secondAttribute="bottom" constant="-588" id="rfu-IO-SUT"/>
-                            <constraint firstItem="viy-dy-N9B" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" constant="-20" id="up1-im-8VY"/>
+                            <constraint firstAttribute="trailing" secondItem="vAe-SN-FYB" secondAttribute="trailing" id="4qH-he-40A"/>
+                            <constraint firstItem="vAe-SN-FYB" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="JbO-fQ-soZ"/>
+                            <constraint firstItem="7HU-Dh-OYf" firstAttribute="top" secondItem="vAe-SN-FYB" secondAttribute="bottom" id="nSP-tF-Xha"/>
                         </constraints>
                     </view>
                     <nil key="simulatedStatusBarMetrics"/>
                     <connections>
+                        <outlet property="doneButton" destination="vAe-SN-FYB" id="C7g-pd-YCl"/>
                         <outlet property="historyTitleLabel" destination="DLd-EJ-Vta" id="dGY-jd-7U2"/>
                         <outlet property="tableView" destination="pV3-PY-VOG" id="XHg-WY-Rr3"/>
                     </connections>

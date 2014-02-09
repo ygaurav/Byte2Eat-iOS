@@ -43,7 +43,7 @@
               initialSpringVelocity:6
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
-                                toView.transform = CGAffineTransformMakeScale(1, 1);
+                                toView.transform = CGAffineTransformMakeScale(self.scaleFactor, self.scaleFactor);
                                 fromView.alpha = 0.5;
                          } completion:^(BOOL finished){
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]] ;

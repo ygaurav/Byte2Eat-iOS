@@ -12,6 +12,7 @@
 @interface TransitionManager : NSObject <UIViewControllerAnimatedTransitioning>
 
 @property (nonatomic, assign, getter = isAppearing) BOOL appearing;
+@property (nonatomic, assign) float scaleFactor;
 @property (nonatomic, assign) NSTimeInterval duration;
 
 

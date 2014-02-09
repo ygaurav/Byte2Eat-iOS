@@ -10,6 +10,7 @@
 #import "UIImage+ImageEffects.h"
 #import "Constants.h"
 #import "OrderHistoryViewController.h"
+#import "TransitionManager.h"
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
@@ -205,7 +206,8 @@
 
 - (void)setUserData {
 
-    _pricePerUnit = [NSNumber numberWithInt:0];
+    self.transitionManager = [[TransitionManager alloc] init];
+    _pricePerUnit = (NSNumber *)[_userInfo objectForKey:keyItemPrice];
     _itemName = @"";
     NSString *name = [_userInfo objectForKey:keyUserName];
     _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
@@ -285,6 +287,7 @@
 
 - (void)removeEmitter:(NSTimer *)timer {
     NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    NSLog(@"%i--=-==--= %i", [_currentOrderNumber integerValue], [_pricePerUnit integerValue]);
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     [_LabelTotalCost setAttributedText:totalCostString];
 
@@ -349,8 +352,8 @@
         NSNumber *menuId = (NSNumber *)[jsonArray objectForKey:keyMenuId];
         NSNumber *itemPrice = (NSNumber *)[jsonArray objectForKey:keyItemPrice];
         NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+        NSLog(@"%@---%@---%@---%@", itemName, menuId, itemPrice, response);
         [self setTodayMenu:jsonArray];
-        //TODO : Thank you screen or Update DailyMenu
     }else{
         NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
         [self showError:response];
@@ -370,6 +373,8 @@
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+
+    _pricePerUnit = (NSNumber *)[dictionary objectForKey:keyItemPrice];
 
     NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]]];
     [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
@@ -422,4 +427,20 @@
     }
     NSLog(@"Seriously what happend : %@", error.domain);
 }
+
+- (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+                                                                   presentingController:(UIViewController *)presenting
+
+                                                                       sourceController:(UIViewController *)source{
+    self.transitionManager.appearing = YES;
+    self.transitionManager.scaleFactor = 0.9;
+    return self.transitionManager;
+}
+
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
+    self.transitionManager.appearing = NO;
+    return self.transitionManager;
+}
+
 @end

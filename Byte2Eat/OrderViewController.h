@@ -7,6 +7,8 @@
 //
 
 
+@class TransitionManager;
+
 @interface OrderViewController : UIViewController  <UIPickerViewDataSource, UIPickerViewDelegate, NSURLConnectionDelegate, UIViewControllerTransitioningDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *LabelRemainingBalance;
@@ -41,6 +43,7 @@
 @property (nonatomic) CAEmitterLayer *rightEmitterLayer;
 
 @property (nonatomic, weak) NSDictionary *userInfo;
+@property (nonatomic,strong) TransitionManager *transitionManager;
 
 - (IBAction)onLogout:(UIButton *)sender;
 - (IBAction)onOrder:(UIButton *)sender;

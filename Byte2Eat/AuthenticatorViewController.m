@@ -207,6 +207,7 @@
 
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
+    self.transitionManager.scaleFactor = 1;
     return self.transitionManager;
 }
 
@@ -233,7 +234,6 @@
         NSString *userName = (NSString *)[jsonArray objectForKey:keyUserName];
         NSNumber *balance = (NSNumber *)[jsonArray objectForKey:keyBalance];
         NSNumber *todayNumberOfOrders = (NSNumber *)[jsonArray objectForKey:keyTodaysOrderQty];
-        NSNumber *userId = (NSNumber *)[jsonArray objectForKey:keyUserId];
         NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
         NSLog(@" %@ , %@ , %@ , %@, %@", userName, userId,balance,todayNumberOfOrders,response);
         [self goToOrderScreen:jsonArray];

@@ -24,7 +24,6 @@
     orderHistory = [[NSMutableArray alloc] init];
     [self setData];
 
-    [self fetchOrderHistory];
     [self setUpAnimations];
 }
 
@@ -34,7 +33,10 @@
     self.shadow.shadowBlurRadius = 3.0;
     self.shadow.shadowColor = [UIColor blackColor];
     self.shadow.shadowOffset = CGSizeMake(0, 0);
-    
+
+    self.doneButton.backgroundColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.3];
+    self.doneButton.layer.zPosition = 1000;
+
     NSMutableAttributedString *history = [[NSMutableAttributedString alloc] initWithString:@"Order History"];
     NSRange range = NSMakeRange(0, [history length]);
     [history addAttribute:NSShadowAttributeName value:self.shadow range:range];
@@ -45,6 +47,10 @@
     _historyTitleLabel.layer.shadowOpacity = 0.5;
     _historyTitleLabel.layer.shadowOffset = CGSizeMake(0, 0);
     _historyTitleLabel.layer.shadowRadius = 4;
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    [self fetchOrderHistory:YES ];
 }
 
 - (void)setUpAnimations {
@@ -110,26 +116,28 @@
             return;
         }else{
             NSLog(@"Shake detected. Refreshing history..");
-            [self fetchOrderHistory];
+            [self fetchOrderHistory:NO ];
         }
     }
 }
 
-- (void)fetchOrderHistory {
+- (void)fetchOrderHistory:(bool)isFirstFetch {
     isFetchingHistory = YES;
     [self changeEmitterBirthrateTo:100];
 
-    NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@"fetching history..."];
-    [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:NSMakeRange(0, historyTitle.length)];
-    [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];
-    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:1 green:1 blue:1 alpha:1] range:NSMakeRange(0, historyTitle.length)];
-    [historyTitle addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-3.0] range:NSMakeRange(0, [historyTitle length])];
-    CATransition *animation = [CATransition animation];
-    animation.duration = 1.0;
-    animation.type = kCATransitionFade;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    [_historyTitleLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
-    [_historyTitleLabel setAttributedText:historyTitle];
+    if (!isFirstFetch) {
+        NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@"fetching history..."];
+        [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:NSMakeRange(0, historyTitle.length)];
+        [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];
+        [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:1 green:1 blue:1 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+        [historyTitle addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-3.0] range:NSMakeRange(0, [historyTitle length])];
+        CATransition *animation = [CATransition animation];
+        animation.duration = 1.0;
+        animation.type = kCATransitionFade;
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+        [_historyTitleLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
+        [_historyTitleLabel setAttributedText:historyTitle];
+    }
 
     NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,userName];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:orderHistoryURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
@@ -333,6 +341,10 @@
     NSLog(@"Seriously what happend : %@", error.domain);
 }
 
+
+- (IBAction)onDoneTap:(UIButton *)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 - (void)setUser:(NSString *)name {
     userName = name;
