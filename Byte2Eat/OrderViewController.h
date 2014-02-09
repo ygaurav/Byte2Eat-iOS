@@ -32,6 +32,8 @@
 @property (nonatomic) NSNumber *totalCost;
 @property (nonatomic) NSNumber *todayTotalOrder;
 @property (nonatomic) NSNumber *currentOrderNumber;
+@property (nonatomic) NSNumber *userId;
+@property (nonatomic) NSNumber *dailyMenuId;
 
 @property (nonatomic, strong) NSShadow *shadow;
 @property (nonatomic, strong) NSShadow *blueShadow;

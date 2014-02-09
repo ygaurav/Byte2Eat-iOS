@@ -34,8 +34,17 @@
     self.shadow.shadowColor = [UIColor blackColor];
     self.shadow.shadowOffset = CGSizeMake(0, 0);
 
-    self.doneButton.backgroundColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.3];
-    self.doneButton.layer.zPosition = 1000;
+    NSShadow *blueShadow = [[NSShadow alloc] init];
+    blueShadow.shadowColor = [UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:0.5];
+    blueShadow.shadowOffset = CGSizeMake(0, 0);
+    blueShadow.shadowBlurRadius = 3.0;
+
+    self.doneButton.backgroundColor = [UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:0.3];
+    NSMutableAttributedString *doneButton = [[NSMutableAttributedString alloc] initWithString:@"Done"];
+    [doneButton addAttribute:NSShadowAttributeName value:blueShadow range:NSMakeRange(0, doneButton.length)];
+    [doneButton addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:1] range:NSMakeRange(0, doneButton.length)];
+    [doneButton addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:20] range:NSMakeRange(0, doneButton.length)];
+    [self.doneButton setAttributedTitle:doneButton forState:UIControlStateNormal];
 
     NSMutableAttributedString *history = [[NSMutableAttributedString alloc] initWithString:@"Order History"];
     NSRange range = NSMakeRange(0, [history length]);

@@ -39,9 +39,13 @@
 
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
     if (motion == UIEventSubtypeMotionShake){
-        if (isFetchingMenu) return;
-        NSLog(@"Shake detected. Refreshing menu..");
-        [self fetchTodayMenu];
+        if (isFetchingMenu){
+            NSLog(@"Shake detected. Already fetching...");
+            return;
+        }else{
+            NSLog(@"Shake detected. Refreshing menu..");
+            [self fetchTodayMenu];
+        }
     }
 }
 
@@ -214,6 +218,7 @@
     _remainingBalance = [_userInfo objectForKey:keyBalance];
     _currentOrderNumber = [NSNumber numberWithInt:1];
     _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
+    _userId = [_userInfo objectForKey:keyUserId];
 }
 
 - (void)setRandomBackgroundImage {
@@ -287,12 +292,37 @@
 
 - (void)removeEmitter:(NSTimer *)timer {
     NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
-    NSLog(@"%i--=-==--= %i", [_currentOrderNumber integerValue], [_pricePerUnit integerValue]);
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     [_LabelTotalCost setAttributedText:totalCostString];
 
     [self.emitterLayer removeFromSuperlayer];
     [timer invalidate];
+}
+
+- (void)setTodayMenu:(NSDictionary *)dictionary {
+    _dailyMenuId = [dictionary objectForKey:keyMenuId];
+    _itemName = [dictionary objectForKey:keyItemName];
+    NSLog(@"---- %@",_dailyMenuId);
+    NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
+    [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
+    CATransition *animation = [CATransition animation];
+    animation.duration = 1.0;
+    animation.type = kCATransitionFade;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
+    [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+
+    _pricePerUnit = (NSNumber *)[dictionary objectForKey:keyItemPrice];
+
+    NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]]];
+    [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
+    [_LabelPricePerUnit setAttributedText:pricePerUnitString];
+
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
+    [_LabelTotalCost setAttributedText:totalCostString];
 }
 
 
@@ -303,7 +333,22 @@
 //          otherButtonTitles:@"OK", nil];
 //    [alert show];
 
-    [self dismissViewControllerAnimated:YES completion:nil];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:keyURLPostOrder]];
+    request.HTTPMethod = @"POST";
+    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+    NSError *error;
+    NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
+    [order setObject:_currentOrderNumber forKey:@"Quantity"];
+    [order setObject:_userId forKey:@"UserId"];
+    [order setObject:_dailyMenuId forKey:@"DailyMenuid"];
+    [order setObject:@"iPhone" forKey:@"DeviceInfo"];
+    NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
+    request.HTTPBody = requestBodyData;
+    NSLog(@"%@",requestBodyData);
+    NSLog(@"%@",request);
+    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+
+//    [self dismissViewControllerAnimated:YES completion:nil];
 }
 - (IBAction)onOrderHistory:(UIButton *)sender {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
@@ -343,47 +388,26 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self enableUserInput];
     NSError *error = nil;
-    NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    BOOL itemExists = ![((NSNumber *)[jsonArray objectForKey:keyMenuId]) isEqualToNumber:[NSNumber numberWithInt:1]];
-    if(itemExists){
-        NSString *itemName = (NSString *)[jsonArray objectForKey:keyItemName];
-        NSNumber *menuId = (NSNumber *)[jsonArray objectForKey:keyMenuId];
-        NSNumber *itemPrice = (NSNumber *)[jsonArray objectForKey:keyItemPrice];
-        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
-        NSLog(@"%@---%@---%@---%@", itemName, menuId, itemPrice, response);
-        [self setTodayMenu:jsonArray];
-    }else{
-        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
-        [self showError:response];
-        NSLog(@"%@",response);
+    if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]) {
+        [self enableUserInput];
+        NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        BOOL itemExists = ![((NSNumber *)[jsonArray objectForKey:keyMenuId]) isEqualToNumber:[NSNumber numberWithInt:1]];
+        if(itemExists){
+            [self setTodayMenu:jsonArray];
+        }else{
+            NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+            [self showError:response];
+        }
+    } else {
+        [self enableUserInput];
+        NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        NSString *response = (NSString *) [responseDict objectForKey:keyResponseMessage];
+
     }
-
 }
 
-- (void)setTodayMenu:(NSDictionary *)dictionary {
-    NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:[dictionary objectForKey:keyItemName]];
-    [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
-    CATransition *animation = [CATransition animation];
-    animation.duration = 1.0;
-    animation.type = kCATransitionFade;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
-    [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
 
-    _pricePerUnit = (NSNumber *)[dictionary objectForKey:keyItemPrice];
-
-    NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]]];
-    [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
-    [_LabelPricePerUnit setAttributedText:pricePerUnitString];
-
-    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
-    [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
-    [_LabelTotalCost setAttributedText:totalCostString];
-}
 
 - (void)showError:(NSString *)response {
     //TODO : show error in some way
@@ -424,6 +448,7 @@
         [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
         [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
     } else {
+        [self showError:error.localizedDescription];
     }
     NSLog(@"Seriously what happend : %@", error.domain);
 }

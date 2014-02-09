@@ -22,6 +22,8 @@ extern NSString *const keyMenuId;
 extern NSString *const keyItemName;
 extern NSString *const keyItemPrice;
 extern NSString *const keyOrderHistory;
+extern NSString *const keyURLPostOrder;
+
 
 
 @end
