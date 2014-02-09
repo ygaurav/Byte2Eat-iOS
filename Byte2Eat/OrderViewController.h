@@ -24,6 +24,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *logoutButton;
 @property (weak, nonatomic) IBOutlet UILabel *aajKhaneMeinKyaHai;
 @property (weak, nonatomic) IBOutlet UIButton *orderHistoryButton;
+@property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 
 @property (nonatomic) NSNumber *remainingBalance;
 @property (nonatomic) NSString *userName;

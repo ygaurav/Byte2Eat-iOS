@@ -13,6 +13,7 @@ extern NSString *const keyUserName;
 extern NSString *const keyBalance;
 extern NSString *const keyTodaysOrderQty;
 extern NSString *const keyResponseMessage;
+extern NSString *const keyBoolValue;
 
 extern NSString *const keyURLUserAuth;
 extern NSString *const keyURLDailyMenu;

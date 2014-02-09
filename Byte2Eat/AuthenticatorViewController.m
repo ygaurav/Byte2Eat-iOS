@@ -184,6 +184,7 @@
 }
 
 - (void)goToOrderScreen:(NSDictionary *)userInfo {
+    [self.userNameTextField setText:@""];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     OrderViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderViewController"];
     modal.transitioningDelegate = self;

@@ -11,6 +11,7 @@
 #import "Constants.h"
 #import "OrderHistoryViewController.h"
 #import "TransitionManager.h"
+#import "ThanksViewController.h"
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
@@ -35,6 +36,15 @@
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self becomeFirstResponder];
+
+    [self fetchUserDetails];
+}
+
+- (void)fetchUserDetails {
+    NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, _userName];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
+    [request setHTTPMethod:@"GET"];
+//    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
@@ -211,6 +221,7 @@
 - (void)setUserData {
 
     self.transitionManager = [[TransitionManager alloc] init];
+    _errorLabel.text = @"";
     _pricePerUnit = (NSNumber *)[_userInfo objectForKey:keyItemPrice];
     _itemName = @"";
     NSString *name = [_userInfo objectForKey:keyUserName];
@@ -325,6 +336,41 @@
     [_LabelTotalCost setAttributedText:totalCostString];
 }
 
+- (void)showError:(NSString *)response {
+    NSShadow *shadow = [[NSShadow alloc] init];
+    shadow.shadowColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.7];
+    shadow.shadowBlurRadius = 2.0;
+    shadow.shadowOffset = CGSizeMake(0, 0);
+
+
+    NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:response];
+    [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
+    [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
+    [_errorLabel setAttributedText:error];
+
+    CGPoint point = _errorLabel.center;
+    [_errorLabel setCenter:CGPointMake(point.x, point.y - 100)];
+    [_errorLabel setAlpha:0];
+
+    [UIView animateWithDuration:.5
+                          delay:0
+         usingSpringWithDamping:0.3
+          initialSpringVelocity:8
+                        options:UIViewAnimationOptionCurveLinear
+                     animations:^{
+                         [_errorLabel setCenter:point];
+                         [_errorLabel setAlpha:1];
+                     } completion:nil];
+}
+
+- (void)enableUserInput {
+    [self.OrderNumberPicker setUserInteractionEnabled:YES];
+}
+
+-(void)disableUserInput{
+    [self.OrderNumberPicker setUserInteractionEnabled:NO];
+}
+
 
 - (IBAction)onOrder:(UIButton *)sender {
 //    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
@@ -333,24 +379,30 @@
 //          otherButtonTitles:@"OK", nil];
 //    [alert show];
 
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:keyURLPostOrder]];
-    request.HTTPMethod = @"POST";
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    NSError *error;
-    NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
-    [order setObject:_currentOrderNumber forKey:@"Quantity"];
-    [order setObject:_userId forKey:@"UserId"];
-    [order setObject:_dailyMenuId forKey:@"DailyMenuid"];
-    [order setObject:@"iPhone" forKey:@"DeviceInfo"];
-    NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
-    request.HTTPBody = requestBodyData;
-    NSLog(@"%@",requestBodyData);
-    NSLog(@"%@",request);
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    [self goToThankYouScreen];
+    [self changeEmitterBirthrateTo:100];
+//    [self disableUserInput];
+//
+//    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:keyURLPostOrder]];
+//    request.HTTPMethod = @"POST";
+//    request.timeoutInterval = 10;
+//    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+//    NSError *error;
+//    NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
+//    [order setObject:_currentOrderNumber forKey:@"Quantity"];
+//    [order setObject:_userId forKey:@"UserId"];
+//    [order setObject:_dailyMenuId forKey:@"DailyMenuid"];
+//    [order setObject:@"iPhone" forKey:@"DeviceInfo"];
+//    NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
+//    request.HTTPBody = requestBodyData;
+//    NSLog(@"%@",requestBodyData);
+//    NSLog(@"%@",request);
+//    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 
 //    [self dismissViewControllerAnimated:YES completion:nil];
 }
 - (IBAction)onOrderHistory:(UIButton *)sender {
+    self.transitionManager.scaleFactor = 0.9;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
     modal.transitioningDelegate = self;
@@ -359,27 +411,9 @@
     [self presentViewController:modal animated:YES completion:^{
     }];
 }
-- (IBAction)onLogout:(UIButton *)sender {
-//    [UIView animateWithDuration:.3
-//                          delay:0
-//         usingSpringWithDamping:0.3
-//          initialSpringVelocity:4
-//                        options:UIViewAnimationOptionCurveLinear
-//                     animations:^{
-//                         [self.logoutButton setBounds:
-//                                 CGRectMake(
-//                                         self.logoutButton.center.x,
-//                                         self.logoutButton.center.y,
-//                                         self.logoutButton.bounds.size.width*1.3,
-//                                         self.logoutButton.bounds.size.height*1.3)];
-//                     } completion:^(BOOL finished){
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WTF !"
-//                                                        message:@"Logout !! Are you crazy ? We are trying to track you !" delegate:self
-//                                              cancelButtonTitle:@"Cancel"
-//                                              otherButtonTitles:@"OK", nil];
-//        [alert show];
-//    }];
-    [self fetchTodayMenu];
+- (IBAction) onLogout:(UIButton *)sender {
+    //TODO : logout
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark NSURLConnection Delegate Methods
@@ -403,22 +437,22 @@
         [self enableUserInput];
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         NSString *response = (NSString *) [responseDict objectForKey:keyResponseMessage];
+        bool boolValue = (bool)[responseDict objectForKey:keyBoolValue];
+        if(boolValue){
+            [self goToThankYouScreen];
+        }
 
     }
 }
 
-
-
-- (void)showError:(NSString *)response {
-    //TODO : show error in some way
-}
-
-- (void)enableUserInput {
-    [self.view setUserInteractionEnabled:YES];
-}
-
--(void)disableUserInput{
-    [self.view setUserInteractionEnabled:NO];
+- (void)goToThankYouScreen {
+    self.transitionManager.scaleFactor = 1;
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    ThanksViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDThankYouController"];
+    modal.transitioningDelegate = self;
+    modal.modalPresentationStyle = UIModalPresentationCustom;
+    [self presentViewController:modal animated:YES completion:^{
+    }];
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection
@@ -436,7 +470,12 @@
     [self changeEmitterBirthrateTo:0];
     if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
         [self showError:@"Some error occurred. Try again."];
-        NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
+        NSMutableAttributedString *itemKaNaam=nil;
+        if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
+            itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
+        } else {
+            itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
+        }
         [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
@@ -458,7 +497,6 @@
 
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
-    self.transitionManager.scaleFactor = 0.9;
     return self.transitionManager;
 }
 

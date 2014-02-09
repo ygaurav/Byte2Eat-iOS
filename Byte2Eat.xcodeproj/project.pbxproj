@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7EB5E1142653EB00B9D293E2 /* ThanksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E2E083595EDC4380EF4E /* ThanksViewController.m */; };
 		7EB5E66388D02E8556807B6B /* Order.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E18F53AF60B83A042CE1 /* Order.m */; };
 		7EB5E84F3ED224DABBE249A1 /* OrderHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5EC21DFDB71B4F2D46947 /* OrderHistoryViewController.m */; };
 		7EB5E937A0DE3E0A63C88A50 /* OrderHistoryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E8F684B11091829D6114 /* OrderHistoryCell.m */; };
@@ -46,6 +47,8 @@
 /* Begin PBXFileReference section */
 		7EB5E075AE794702EBFE0810 /* Order.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Order.h; sourceTree = "<group>"; };
 		7EB5E18F53AF60B83A042CE1 /* Order.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Order.m; sourceTree = "<group>"; };
+		7EB5E2314D7D8EC13B9A16DC /* ThanksViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThanksViewController.h; sourceTree = "<group>"; };
+		7EB5E2E083595EDC4380EF4E /* ThanksViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThanksViewController.m; sourceTree = "<group>"; };
 		7EB5E71A7C92169B4E9D61A3 /* OrderHistoryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderHistoryCell.h; sourceTree = "<group>"; };
 		7EB5E71D35117F8D9B9F10E4 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		7EB5E8ED0C4C9235FBEC6C3E /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -163,6 +166,8 @@
 				7EB5EC21DFDB71B4F2D46947 /* OrderHistoryViewController.m */,
 				7EB5E71A7C92169B4E9D61A3 /* OrderHistoryCell.h */,
 				7EB5E8F684B11091829D6114 /* OrderHistoryCell.m */,
+				7EB5E2314D7D8EC13B9A16DC /* ThanksViewController.h */,
+				7EB5E2E083595EDC4380EF4E /* ThanksViewController.m */,
 			);
 			path = Byte2Eat;
 			sourceTree = "<group>";
@@ -306,6 +311,7 @@
 				7EB5EEF35BC1964D255AFB4D /* Constants.m in Sources */,
 				7EB5E84F3ED224DABBE249A1 /* OrderHistoryViewController.m in Sources */,
 				7EB5E937A0DE3E0A63C88A50 /* OrderHistoryCell.m in Sources */,
+				7EB5E1142653EB00B9D293E2 /* ThanksViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
