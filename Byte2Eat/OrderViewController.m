@@ -9,6 +9,7 @@
 #import "OrderViewController.h"
 #import "UIImage+ImageEffects.h"
 #import "Constants.h"
+#import "OrderHistoryViewController.h"
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
@@ -154,6 +155,8 @@
 
     self.orderButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.logoutButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.orderHistoryButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.orderHistoryButton.layer.cornerRadius = 3;
     self.logoutButton.layer.cornerRadius = 3;
     self.shadow = [[NSShadow alloc] init];
     self.shadow.shadowBlurRadius = 3.0;
@@ -298,6 +301,15 @@
 //    [alert show];
 
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (IBAction)onOrderHistory:(UIButton *)sender {
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
+    modal.transitioningDelegate = self;
+    modal.modalPresentationStyle = UIModalPresentationCustom;
+    [modal setUser:_userName];
+    [self presentViewController:modal animated:YES completion:^{
+    }];
 }
 - (IBAction)onLogout:(UIButton *)sender {
 //    [UIView animateWithDuration:.3

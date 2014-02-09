@@ -16,8 +16,10 @@ NSString *const keyResponseMessage = @"ResponseMessage";
 NSString *const keyMenuId = @"Id";
 NSString *const keyItemName = @"ItemName";
 NSString *const keyItemPrice = @"ItemPrice";
+NSString *const keyOrderHistory = @"OrderHistory";
 
 NSString *const keyURLUserAuth = @"http://10.37.1.148:70/api/esms/user/%@";
 NSString *const keyURLDailyMenu = @"http://10.37.1.148:70/api/esms/menu";
+NSString *const keyURLOrderHistory = @"http://10.37.1.148:70/api/esms/orders/%@";
 
 @end

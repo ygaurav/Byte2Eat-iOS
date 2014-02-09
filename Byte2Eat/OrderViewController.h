@@ -7,7 +7,7 @@
 //
 
 
-@interface OrderViewController : UIViewController  <UIPickerViewDataSource, UIPickerViewDelegate, NSURLConnectionDelegate>
+@interface OrderViewController : UIViewController  <UIPickerViewDataSource, UIPickerViewDelegate, NSURLConnectionDelegate, UIViewControllerTransitioningDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *LabelRemainingBalance;
 @property (weak, nonatomic) IBOutlet UILabel *LabelUserName;
@@ -21,6 +21,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *orderButton;
 @property (weak, nonatomic) IBOutlet UIButton *logoutButton;
 @property (weak, nonatomic) IBOutlet UILabel *aajKhaneMeinKyaHai;
+@property (weak, nonatomic) IBOutlet UIButton *orderHistoryButton;
 
 @property (nonatomic) NSNumber *remainingBalance;
 @property (nonatomic) NSString *userName;
@@ -42,7 +43,7 @@
 @property (nonatomic, weak) NSDictionary *userInfo;
 
 - (IBAction)onLogout:(UIButton *)sender;
-
 - (IBAction)onOrder:(UIButton *)sender;
+- (IBAction)onOrderHistory:(UIButton *)sender;
 
 @end
