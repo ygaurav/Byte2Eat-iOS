@@ -17,6 +17,7 @@
     NSMutableArray *orderHistory;
     CAEmitterLayer *_leftEmitterLayer;
     CAEmitterLayer *_rightEmitterLayer;
+    NSMutableArray *newerData;
 }
 
 - (void)viewDidLoad{
@@ -174,7 +175,6 @@
 
 - (void)configureOrderHistoryCell:(OrderHistoryCell *)historyCell order:(Order *)order {
     NSShadow *blueShadow = [[NSShadow alloc] init];
-//    UIColor *blueColor = [UIColor colorWithRed:14/256.0 green:122/256.0 blue:254/256.0 alpha:1];
     UIColor *blueColor = [UIColor colorWithRed:102/256.0 green:153/256.0 blue:255/256.0 alpha:1];
     blueShadow.shadowColor = blueColor;
     blueShadow.shadowOffset = CGSizeMake(0, 0);
@@ -217,10 +217,6 @@
     [date addAttribute:NSForegroundColorAttributeName value:redColor range:NSMakeRange(0, date.length)];
     [date addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, date.length)];
 
-//    historyCell.labelOrderDate.text = [self shortDateTimeString:order.orderDate];
-//    historyCell.labelItemPrice.text = [NSString stringWithFormat:@"Rs %@/-",order.Price];
-//    historyCell.labelOrderQty.text = [NSString stringWithFormat:@"%@",order.Quantity];
-//    historyCell.labelOrderCost.text = [NSString stringWithFormat:@"Rs %i/-", [order.Price integerValue]*[order.Quantity integerValue]];
     historyCell.labelItemName.attributedText = itemName;
     historyCell.labelItemPrice.attributedText = price;
     historyCell.labelOrderCost.attributedText = cost;
@@ -275,9 +271,10 @@
 - (void)setOrderHistory:(NSDictionary *)dictionary {
     NSArray *orderHistoryDictionary = [dictionary objectForKey:keyOrderHistory];
 
-    BOOL b = orderHistoryDictionary.count > orderHistory.count;
-    NSLog(@"--- New Records  %i", b);
-    if(b){
+    BOOL areThereNewRecords = orderHistoryDictionary.count > orderHistory.count || orderHistoryDictionary.count < orderHistory.count;
+    NSLog(@"--- New Records  %i", areThereNewRecords);
+    if(areThereNewRecords){
+        [orderHistory removeAllObjects];
         for(NSDictionary *order in orderHistoryDictionary){
             Order *orderDict = [[Order alloc] init];
             orderDict.Quantity = [order objectForKey:@"Quantity"];
@@ -286,16 +283,34 @@
             orderDict.ItemName = [dailyMenu objectForKey:@"ItemName"];
             orderDict.Price = [dailyMenu objectForKey:@"ItemPrice"];
 
+//            [newerData addObject:orderDict];
             [orderHistory addObject:orderDict];
         }
         [self updateTable];
     }
+//    else if([self updatedRecords].count > 0){
+//        [self updateTable];
+//    }
 }
 
+//- (NSMutableArray *)updatedRecords {
+//    NSMutableArray *array = [[NSMutableArray alloc] init];
+//    for(NSUInteger i = 0; i < newerData.count; i++){
+//        Order *o = [newerData objectAtIndex:i];
+//        for(NSUInteger j =0; j< orderHistory.count; j++){
+//            Order *order = [orderHistory objectAtIndex:j];
+//            if([order.orderDate isEqualToDate:o.orderDate] && [order.Quantity isEqualToNumber:o.Quantity]){
+//
+//            }
+//        }
+//    }
+//    return array
+//}
+
 - (void)updateTable {
+    NSMutableArray *array = [[NSMutableArray alloc] init];
     [self.tableView beginUpdates];
 
-    NSMutableArray *array = [[NSMutableArray alloc] init];
     [orderHistory enumerateObjectsUsingBlock:^(Order *order, NSUInteger index, BOOL *stop){
         NSIndexPath *path = [NSIndexPath indexPathForRow:index inSection:0];
         [array addObject:path];
@@ -355,18 +370,6 @@
 }
 
 - (void)setTitleBack {
-//    NSMutableAttributedString *history = [[NSMutableAttributedString alloc] initWithString:@"Order History"];
-//    NSRange range = NSMakeRange(0, [history length]);
-//    [history addAttribute:NSShadowAttributeName value:self.shadow range:range];
-//    [history addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:range];
-//    [_historyTitleLabel setAttributedText:history];
-//    CATransition *animation = [CATransition animation];
-//    animation.duration = 1.0;
-//    animation.type = kCATransitionFade;
-//    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-//    [_historyTitleLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
-//    [_historyTitleLabel setAttributedText:history];
-
     NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@""];
     [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
     [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];

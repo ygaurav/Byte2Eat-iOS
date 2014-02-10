@@ -44,7 +44,7 @@
     NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, _userName];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
     [request setHTTPMethod:@"GET"];
-//    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
@@ -55,6 +55,7 @@
         }else{
             NSLog(@"Shake detected. Refreshing menu..");
             [self fetchTodayMenu];
+            [self fetchUserDetails];
         }
     }
 }
@@ -215,7 +216,6 @@
 
     NSMutableAttributedString *remainingBalanceString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",_remainingBalance]];
     if([_remainingBalance compare:[NSNumber numberWithInt:0]] == NSOrderedAscending ){
-        [remainingBalanceString addAttribute:NSShadowAttributeName value:self.redShadow range:NSMakeRange(0, remainingBalanceString.length)];
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, remainingBalanceString.length)];
     }else{
         [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:NSMakeRange(0, remainingBalanceString.length)];
@@ -311,7 +311,7 @@
     NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     CATransition *animation = [CATransition animation];
-    animation.duration = 1.0;
+    animation.duration = 0.5;
     animation.type = kCATransitionFade;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [_LabelTotalCost.layer addAnimation:animation forKey:@"changeTextTransition"];
@@ -398,8 +398,10 @@
 
 
 - (IBAction)onOrder:(UIButton *)sender {
+    NSString *message = [NSString stringWithFormat:@"Toda's Order Summary \n\n Earlier Order Qty : %@ \nCurrent Order Qty : %@\n-------------------------------\nTotal order Qty: %u", _todayTotalOrder, _currentOrderNumber, [_todayTotalOrder unsignedIntValue] + [_currentOrderNumber unsignedIntValue]];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
-            message:@"Today's order \n ---------- \n " delegate:self
+            message:message 
+           delegate:self
   cancelButtonTitle:@"Cancel"
           otherButtonTitles:@"OK", nil];
     [alert setTag:keyAlertOrderConfirm];
@@ -445,9 +447,13 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    NSError *error = nil;
     [self changeEmitterBirthrateTo:0];
-    if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]) {
+    NSError *error = nil;
+    NSURL *url = connection.currentRequest.URL;
+    NSLog(@"URL : %@", url);
+    //TODO : if contains menu, user, order etc
+    if([[url absoluteString] rangeOfString:@"menu"].location != NSNotFound){
+        //Menu
         [self enableUserInput];
         NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         BOOL itemExists = ![((NSNumber *)[jsonArray objectForKey:keyMenuId]) isEqualToNumber:[NSNumber numberWithInt:1]];
@@ -457,16 +463,41 @@
             NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
             [self showError:response];
         }
-    } else {
+    }else if([[url absoluteString] rangeOfString:@"user"].location != NSNotFound){
+        //User
+        NSError *error = nil;
+        NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        BOOL userExists = ![((NSNumber *)[jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:0]];
+        NSNumber *userId = (NSNumber *)[jsonArray objectForKey:keyUserId];
+        NSLog(@"--- %d -- %@", userExists, userId);
+        if(userExists){
+            NSString *userName = (NSString *)[jsonArray objectForKey:keyUserName];
+            NSNumber *balance = (NSNumber *)[jsonArray objectForKey:keyBalance];
+            NSNumber *todayNumberOfOrders = (NSNumber *)[jsonArray objectForKey:keyTodaysOrderQty];
+            NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+            NSLog(@" %@ , %@ , %@ , %@, %@", userName, userId,balance,todayNumberOfOrders,response);
+            [self setUserInfo:jsonArray];
+        }else{
+            NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+            [self showError:response];
+            NSLog(@"%@",response);
+        }
+    }else{
+        //Order
         [self enableUserInput];
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         NSString *response = (NSString *) [responseDict objectForKey:keyResponseMessage];
-        bool boolValue = (bool)[responseDict objectForKey:keyBoolValue];
-        if(boolValue){
-            [self goToThankYouScreen];
-        }
+        NSNumber *boolValue = (NSNumber *)[responseDict objectForKey:keyBoolValue];
 
+        if([boolValue boolValue]){
+            [self goToThankYouScreen];
+        }else{
+            [self showError:response];
+        }
     }
+    
+
+
 }
 
 - (void)goToThankYouScreen {
@@ -505,7 +536,7 @@
         [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
         CATransition *animation = [CATransition animation];
-        animation.duration = 1.0;
+        animation.duration = .5;
         animation.type = kCATransitionFade;
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
         [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
@@ -534,6 +565,9 @@
     if(alertView.tag == keyAlertOrderConfirm){
         if(buttonIndex == 1){
             [self postOrderRequest];
+        }else if(buttonIndex ==0){
+            [self changeEmitterBirthrateTo:0];
+            [self enableUserInput];
         }
     }
 }
