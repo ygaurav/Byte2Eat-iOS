@@ -12,7 +12,16 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
+
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    notification.alertBody = @"Hungry Kya ! Team Bhoj is taking orders right now. Counter open till 1600 hrs only";
+    NSDateComponents *components = [[NSDateComponents alloc] init];
+    [components setHour:15];
+    [components setMinute:45];
+    notification.fireDate = [[NSCalendar currentCalendar] dateFromComponents:components];
+    notification.repeatInterval = NSCalendarUnitDay;
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
     return YES;
 }
 							
