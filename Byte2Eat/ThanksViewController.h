@@ -11,6 +11,8 @@
 @interface ThanksViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIButton *thanksButtonOutlet;
 @property (weak, nonatomic) IBOutlet UILabel *thanksLabel;
+
+
 - (IBAction)onThankTap:(UIButton *)sender;
 
 @end
