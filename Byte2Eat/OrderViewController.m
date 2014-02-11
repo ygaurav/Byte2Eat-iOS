@@ -448,13 +448,14 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     [self changeEmitterBirthrateTo:0];
+    [self enableUserInput];
     NSError *error = nil;
     NSURL *url = connection.currentRequest.URL;
     NSLog(@"URL : %@", url);
     //TODO : if contains menu, user, order etc
     if([[url absoluteString] rangeOfString:@"menu"].location != NSNotFound){
         //Menu
-        [self enableUserInput];
+
         NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         BOOL itemExists = ![((NSNumber *)[jsonArray objectForKey:keyMenuId]) isEqualToNumber:[NSNumber numberWithInt:1]];
         if(itemExists){
@@ -479,12 +480,10 @@
             [self setUserInfo:jsonArray];
         }else{
             NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
-            [self showError:response];
             NSLog(@"%@",response);
         }
     }else{
         //Order
-        [self enableUserInput];
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         NSString *response = (NSString *) [responseDict objectForKey:keyResponseMessage];
         NSNumber *boolValue = (NSNumber *)[responseDict objectForKey:keyBoolValue];
@@ -522,6 +521,7 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     isFetchingMenu = NO;
+    [self enableUserInput];
     [self changeEmitterBirthrateTo:0];
     if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
         [self showError:@"Some error occurred. Try again."];
