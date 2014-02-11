@@ -268,12 +268,12 @@
     [self.backgroundImageView setImage:image];
 
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
-    interpolationHorizontal.minimumRelativeValue = @-20.0;
-    interpolationHorizontal.maximumRelativeValue = @20.0;
+    interpolationHorizontal.minimumRelativeValue = @30.0;
+    interpolationHorizontal.maximumRelativeValue = @-30.0;
 
     UIInterpolatingMotionEffect *interpolationVertical = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
-    interpolationVertical.minimumRelativeValue = @-20.0;
-    interpolationVertical.maximumRelativeValue = @20.0;
+    interpolationVertical.minimumRelativeValue = @30.0;
+    interpolationVertical.maximumRelativeValue = @-30.0;
 
     [self.backgroundImageView addMotionEffect:interpolationHorizontal];
     [self.backgroundImageView addMotionEffect:interpolationVertical];
