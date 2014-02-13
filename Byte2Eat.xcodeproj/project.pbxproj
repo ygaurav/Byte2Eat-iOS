@@ -14,6 +14,7 @@
 		7EB5EEF35BC1964D255AFB4D /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E71D35117F8D9B9F10E4 /* Constants.m */; };
 		F4236A4A18A5DAE9001A4164 /* TransitionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F4236A4918A5DAE9001A4164 /* TransitionManager.m */; };
 		F428BBB818A5C07500522EF0 /* AuthenticatorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F428BBB718A5C07500522EF0 /* AuthenticatorViewController.m */; };
+		F4449EF518AB94BF0046313F /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F4449EF418AB94BF0046313F /* Default-568h@2x.png */; };
 		F47447DA18A545DF009CF205 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F47447D918A545DF009CF205 /* Foundation.framework */; };
 		F47447DC18A545DF009CF205 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F47447DB18A545DF009CF205 /* CoreGraphics.framework */; };
 		F47447DE18A545DF009CF205 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F47447DD18A545DF009CF205 /* UIKit.framework */; };
@@ -59,6 +60,7 @@
 		F4236A4918A5DAE9001A4164 /* TransitionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TransitionManager.m; sourceTree = "<group>"; };
 		F428BBB618A5C07500522EF0 /* AuthenticatorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthenticatorViewController.h; sourceTree = "<group>"; };
 		F428BBB718A5C07500522EF0 /* AuthenticatorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthenticatorViewController.m; sourceTree = "<group>"; };
+		F4449EF418AB94BF0046313F /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F47447D618A545DF009CF205 /* Byte2Eat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Byte2Eat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F47447D918A545DF009CF205 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F47447DB18A545DF009CF205 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -112,6 +114,7 @@
 		F47447CD18A545DF009CF205 = {
 			isa = PBXGroup;
 			children = (
+				F4449EF418AB94BF0046313F /* Default-568h@2x.png */,
 				F4ACC65B18A658C300F8560D /* fireflies.sks */,
 				F4ACC65C18A658C300F8560D /* spark.png */,
 				F47447DF18A545DF009CF205 /* Byte2Eat */,
@@ -282,6 +285,7 @@
 				F4ACC66818A65B6900F8560D /* snow.sks in Resources */,
 				F4ACC65D18A658C300F8560D /* fireflies.sks in Resources */,
 				F47447E418A545DF009CF205 /* InfoPlist.strings in Resources */,
+				F4449EF518AB94BF0046313F /* Default-568h@2x.png in Resources */,
 				F47447ED18A545DF009CF205 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

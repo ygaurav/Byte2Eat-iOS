@@ -52,6 +52,7 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                         <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                         <connections>
+                                            <action selector="onTextFieldTouch:" destination="fww-Kk-YZf" eventType="touchUpInside" id="Uuf-Dx-DR0"/>
                                             <outlet property="delegate" destination="fww-Kk-YZf" id="jVg-Vc-Gdh"/>
                                         </connections>
                                     </textField>
@@ -120,6 +121,7 @@
                         <outlet property="loginSubheading" destination="dfZ-Sy-o0d" id="hCi-fp-Ji1"/>
                         <outlet property="scrollView" destination="Uvz-Zb-qcs" id="501-xk-GTZ"/>
                         <outlet property="userNameTextField" destination="VTt-0b-3kk" id="9w5-nb-6pZ"/>
+                        <outlet property="versionLabel" destination="7Un-5c-2T3" id="GTQ-8p-9cR"/>
                         <segue destination="vXZ-lx-hvc" kind="modal" identifier="goToOrderScreen" id="zbc-Tj-b6b"/>
                     </connections>
                 </viewController>

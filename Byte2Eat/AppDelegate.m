@@ -16,6 +16,7 @@
 
     UILocalNotification *notification = [[UILocalNotification alloc] init];
     notification.alertBody = @"Hungry Kya ! Team Bhoj is taking orders right now. Counter open till 1600 hrs only";
+    notification.alertAction = @"order";
     NSDateComponents *components = [[NSDateComponents alloc] init];
     [components setHour:15];
     [components setMinute:45];

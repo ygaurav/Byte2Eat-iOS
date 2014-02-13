@@ -108,6 +108,23 @@
 
     [_scrollView.layer addSublayer:self.leftEmitterLayer];
     [_scrollView.layer addSublayer:self.rightEmitterLayer];
+
+    [self.userNameTextField addTarget:self action:@selector(onTextFieldTouch:) forControlEvents:UIControlEventAllEvents];
+
+
+    CATransform3D transform3D = CATransform3DIdentity;
+    transform3D = CATransform3DScale(transform3D, 5, 5, 5);
+//    transform3D.m34 = 1./-1200;
+    self.byte2eatHeader.layer.transform = transform3D;
+    self.loginSubheading.layer.transform = transform3D;
+    [UIView animateWithDuration:1
+                          delay:0
+                        options:UIViewAnimationCurveEaseOut
+                     animations:^{
+                             self.byte2eatHeader.layer.transform = CATransform3DIdentity;
+                         self.loginSubheading.layer.transform = CATransform3DIdentity;
+
+                     } completion:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -178,6 +195,7 @@
                          } completion:^(BOOL finished){
         [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
     }];
+
 }
 
 - (void)changeEmitterBirthrateTo:(int)birthRate {
@@ -197,8 +215,37 @@
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    NSLog(@"text field resigned");
     [textField resignFirstResponder];
+    [self.scrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+
+    NSString *userName = _userNameTextField.text;
+
+    userName = [userName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    NSRange whiteSpaceRange = [userName rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet]];
+
+    if(userName.length >0){
+        if (whiteSpaceRange.location != NSNotFound) {
+            [self showError:@"Username cannot have space"];
+        }else{
+            [self disableUserInput];
+            _errorLabel.text = @"";
+
+            [self changeEmitterBirthrateTo:100];
+            NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
+            [request setHTTPMethod:@"GET"];
+            [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+        }
+    }else{
+        [_userNameTextField setText:@""];
+    }
     return YES;
+}
+
+- (IBAction)onTextFieldTouch:(UITextField *)sender {
+    [self.scrollView setContentOffset:CGPointMake(0, 100) animated:YES];
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
@@ -284,4 +331,5 @@
     NSString *message = [NSString stringWithFormat:@"%@ %@", error.localizedDescription, @"Please try again later."];
     [self showError:message];
 }
+
 @end

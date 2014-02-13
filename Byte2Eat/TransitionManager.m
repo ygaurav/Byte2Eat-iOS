@@ -29,7 +29,6 @@
 
     if (self.appearing) {
         fromView.userInteractionEnabled = NO;
-
         toView.layer.cornerRadius = 5;
         toView.layer.masksToBounds = YES;
 
@@ -44,7 +43,6 @@
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
                                 toView.transform = CGAffineTransformMakeScale(self.scaleFactor, self.scaleFactor);
-                                fromView.alpha = 0.5;
                          } completion:^(BOOL finished){
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]] ;
         }];
@@ -57,7 +55,6 @@
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
                              fromView.transform = CGAffineTransformMakeScale(0.0, 0.0);
-                            toView.alpha = 1.0;
                          } completion:^(BOOL finished){
             [fromView removeFromSuperview];
             toView.userInteractionEnabled = YES;
