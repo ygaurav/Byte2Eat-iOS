@@ -36,7 +36,6 @@
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self becomeFirstResponder];
-
     [self fetchUserDetails];
 }
 
@@ -174,7 +173,6 @@
 }
 
 - (void)styleStaticData {
-
     self.orderButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.logoutButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.orderHistoryButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
@@ -268,12 +266,12 @@
     [self.backgroundImageView setImage:image];
 
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
-    interpolationHorizontal.minimumRelativeValue = @30.0;
-    interpolationHorizontal.maximumRelativeValue = @-30.0;
+    interpolationHorizontal.minimumRelativeValue = @40.0;
+    interpolationHorizontal.maximumRelativeValue = @-40.0;
 
     UIInterpolatingMotionEffect *interpolationVertical = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
-    interpolationVertical.minimumRelativeValue = @30.0;
-    interpolationVertical.maximumRelativeValue = @-30.0;
+    interpolationVertical.minimumRelativeValue = @40.0;
+    interpolationVertical.maximumRelativeValue = @-40.0;
 
     [self.backgroundImageView addMotionEffect:interpolationHorizontal];
     [self.backgroundImageView addMotionEffect:interpolationVertical];

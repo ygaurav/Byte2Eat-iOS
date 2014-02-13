@@ -17,9 +17,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    UIImage *uiImage = [UIImage imageNamed:@"slicedfruitcopy"];
-    UIImage *image = [uiImage applyLightEffect];
-    [self.backgroundView setImage:image];
+    [self setBackgroundImage];
 
     _userNameTextField.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     _loginButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
@@ -29,6 +27,20 @@
     self.transitionManager.appearing = YES;
     self.transitionManager.duration = .5;
 
+    [self setTitleStyles];
+    [self setMotionEffect];
+    [self setEmitterAnimation];
+    [self.userNameTextField addTarget:self action:@selector(onTextFieldTouch:) forControlEvents:UIControlEventAllEvents];
+    [self setTitleAnimation];
+}
+
+- (void)setBackgroundImage {
+    UIImage *uiImage = [UIImage imageNamed:@"slicedfruitcopy"];
+    UIImage *image = [uiImage applyLightEffect];
+    [self.backgroundView setImage:image];
+}
+
+- (void)setTitleStyles {
     NSShadow *shadow = [[NSShadow alloc] init];
     shadow.shadowBlurRadius = 3.0;
     shadow.shadowColor = [UIColor blackColor];
@@ -46,19 +58,38 @@
     [loginSubheading addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
     [loginSubheading addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
     [self.loginSubheading setAttributedText:loginSubheading];
+}
 
+- (void)setTitleAnimation {
+    CATransform3D transform3D = CATransform3DIdentity;
+    transform3D = CATransform3DScale(transform3D, 5, 5, 5);
+//    transform3D.m34 = 1./-1200;
+    self.byte2eatHeader.layer.transform = transform3D;
+    self.loginSubheading.layer.transform = transform3D;
+    [UIView animateWithDuration:1
+                          delay:0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                             self.byte2eatHeader.layer.transform = CATransform3DIdentity;
+                         self.loginSubheading.layer.transform = CATransform3DIdentity;
+
+                     } completion:nil];
+}
+
+- (void)setMotionEffect {
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
-    interpolationHorizontal.minimumRelativeValue = @30.0;
-    interpolationHorizontal.maximumRelativeValue = @-30.0;
+    interpolationHorizontal.minimumRelativeValue = @40.0;
+    interpolationHorizontal.maximumRelativeValue = @-40.0;
 
     UIInterpolatingMotionEffect *interpolationVertical = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
-    interpolationVertical.minimumRelativeValue = @30.0;
-    interpolationVertical.maximumRelativeValue = @-30.0;
+    interpolationVertical.minimumRelativeValue = @40.0;
+    interpolationVertical.maximumRelativeValue = @-40.0;
 
     [self.backgroundView addMotionEffect:interpolationHorizontal];
     [self.backgroundView addMotionEffect:interpolationVertical];
+}
 
-
+- (void)setEmitterAnimation {
     _leftEmitterLayer = [CAEmitterLayer layer];
     _leftEmitterLayer.emitterPosition = CGPointMake(self.loginLabel.center.x - 160, self.loginLabel.center.y + 55);
     _leftEmitterLayer.emitterZPosition = 10.0;
@@ -108,23 +139,6 @@
 
     [_scrollView.layer addSublayer:self.leftEmitterLayer];
     [_scrollView.layer addSublayer:self.rightEmitterLayer];
-
-    [self.userNameTextField addTarget:self action:@selector(onTextFieldTouch:) forControlEvents:UIControlEventAllEvents];
-
-
-    CATransform3D transform3D = CATransform3DIdentity;
-    transform3D = CATransform3DScale(transform3D, 5, 5, 5);
-//    transform3D.m34 = 1./-1200;
-    self.byte2eatHeader.layer.transform = transform3D;
-    self.loginSubheading.layer.transform = transform3D;
-    [UIView animateWithDuration:1
-                          delay:0
-                        options:UIViewAnimationCurveEaseOut
-                     animations:^{
-                             self.byte2eatHeader.layer.transform = CATransform3DIdentity;
-                         self.loginSubheading.layer.transform = CATransform3DIdentity;
-
-                     } completion:nil];
 }
 
 - (void)didReceiveMemoryWarning
