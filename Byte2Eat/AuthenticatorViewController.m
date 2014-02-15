@@ -72,8 +72,8 @@
                      animations:^{
                              self.byte2eatHeader.layer.transform = CATransform3DIdentity;
                          self.loginSubheading.layer.transform = CATransform3DIdentity;
-
                      } completion:nil];
+
 }
 
 - (void)setMotionEffect {
@@ -271,6 +271,7 @@
 
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
+    self.transitionManager.cornerRadius = 0;
     self.transitionManager.scaleFactor = 1;
     return self.transitionManager;
 }

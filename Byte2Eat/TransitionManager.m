@@ -29,7 +29,7 @@
 
     if (self.appearing) {
         fromView.userInteractionEnabled = NO;
-        toView.layer.cornerRadius = 5;
+        toView.layer.cornerRadius = _cornerRadius;
         toView.layer.masksToBounds = YES;
 
         // Set initial scale to zero

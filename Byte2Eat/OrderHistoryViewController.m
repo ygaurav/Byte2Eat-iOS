@@ -18,14 +18,21 @@
     CAEmitterLayer *_leftEmitterLayer;
     CAEmitterLayer *_rightEmitterLayer;
     NSMutableArray *newerData;
+    NSMutableData *totalData;
 }
 
 - (void)viewDidLoad{
     [super viewDidLoad];
     orderHistory = [[NSMutableArray alloc] init];
+    totalData = [[NSMutableData alloc] init];
     [self setData];
 
+
     [self setUpAnimations];
+}
+
+- (BOOL)prefersStatusBarHidden {
+    return YES;
 }
 
 - (void)setData {
@@ -148,7 +155,8 @@
     [_operationLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_operationLabel setAttributedText:historyTitle];
 
-    NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,userName];
+//    NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,userName];
+    NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,@"nishant"];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:orderHistoryURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
     [request setHTTPMethod:@"GET"];
     [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
@@ -224,6 +232,7 @@
     historyCell.labelOrderDate.attributedText = date;
 
     historyCell.alpha = 0.3;
+
 }
 
 - (NSString *)shortDateTimeString:(NSDate *)date {
@@ -232,24 +241,15 @@
     return [dateFormatter stringFromDate:date];
 }
 
-
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    NSLog(@"Response - %@",response);
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    NSError *error = nil;
-    NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    BOOL userExists = ![((NSNumber *)[jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:1]];
-    if(userExists){
-        if([self isThereAnyOrderHistory:jsonArray]){
-            [self setOrderHistory:jsonArray];
-        }
-    }else{
-        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
-        [self showError:response];
-        NSLog(@"%@",response);
+    NSLog(@"Received %d bytes of data",[data length]);
+    if (data != nil) {
+        [totalData appendData:data];
     }
-
 }
 
 - (NSDate*)dateWithJSONString:(NSString *)stringDate
@@ -265,7 +265,9 @@
 }
 
 - (BOOL)isThereAnyOrderHistory:(NSDictionary *)jsonArray {
-    return ((NSArray *) [jsonArray objectForKey:keyOrderHistory]).count > 0;
+    NSUInteger integer = ((NSArray *) [jsonArray objectForKey:keyOrderHistory]).count;
+    NSLog(@"Order History Count %u",integer);
+    return integer > 0;
 }
 
 - (void)setOrderHistory:(NSDictionary *)dictionary {
@@ -293,19 +295,21 @@
 //    }
 }
 
-//- (NSMutableArray *)updatedRecords {
-//    NSMutableArray *array = [[NSMutableArray alloc] init];
-//    for(NSUInteger i = 0; i < newerData.count; i++){
-//        Order *o = [newerData objectAtIndex:i];
-//        for(NSUInteger j =0; j< orderHistory.count; j++){
-//            Order *order = [orderHistory objectAtIndex:j];
-//            if([order.orderDate isEqualToDate:o.orderDate] && [order.Quantity isEqualToNumber:o.Quantity]){
-//
-//            }
-//        }
-//    }
-//    return array
-//}
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+//    CATransform3D rotation = CATransform3DMakeRotation(M_PI/2, 0, 0.5, 0);
+    CATransform3D rotation = CATransform3DMakeScale(.3, .3, .3);
+    cell.layer.transform = rotation;
+    cell.layer.anchorPoint = CGPointMake(0.5, 0.5);
+
+    [UIView animateWithDuration:1
+                          delay:0
+            usingSpringWithDamping:0.5
+            initialSpringVelocity:5
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         cell.layer.transform = CATransform3DIdentity;
+                     } completion:nil];
+}
 
 - (void)updateTable {
     NSMutableArray *array = [[NSMutableArray alloc] init];
@@ -357,16 +361,27 @@
     [timer invalidate];
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
-                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
     return nil;
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     isFetchingHistory = NO;
     [self changeEmitterBirthrateTo:0];
-
     [self setTitleBack];
+
+    NSError *error = nil;
+    NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:totalData options:NSJSONReadingMutableContainers error:&error];
+    BOOL userExists = ![((NSNumber *)[jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:1]];
+    if(userExists){
+        if([self isThereAnyOrderHistory:jsonArray]){
+            [self setOrderHistory:jsonArray];
+        }
+    }else{
+        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+        [self showError:response];
+        NSLog(@"%@",response);
+    }
 }
 
 - (void)setTitleBack {

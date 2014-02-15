@@ -437,7 +437,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NeV-JP-DhY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="955" y="444"/>
+            <point key="canvasLocation" x="965" y="288"/>
         </scene>
         <!--Order History View Controller-->
         <scene sceneID="4SM-ve-IZ4">
@@ -451,17 +451,21 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Order History" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DLd-EJ-Vta">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order History" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DLd-EJ-Vta">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="57"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="57" id="QxS-Jb-ubn"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="30"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="95" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="pV3-PY-VOG">
-                                <rect key="frame" x="0.0" y="57" width="320" height="511"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="95" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="pV3-PY-VOG">
+                                <rect key="frame" x="0.0" y="57" width="320" height="467"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="OrderHistoryCell" rowHeight="95" id="pR9-09-aJe" customClass="OrderHistoryCell">
                                         <rect key="frame" x="0.0" y="22" width="320" height="95"/>
@@ -543,6 +547,7 @@
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="baseline" secondItem="2ns-n5-ZfN" secondAttribute="baseline" id="yFS-xs-m6k"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <gestureRecognizers/>
                                         <connections>
                                             <outlet property="labelItemName" destination="Swa-LW-EFm" id="SmO-Bp-fC7"/>
                                             <outlet property="labelItemPrice" destination="6Pf-dX-YYb" id="sVR-h2-dWq"/>
@@ -579,8 +584,15 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="pV3-PY-VOG" secondAttribute="trailing" id="30N-B4-75t"/>
                             <constraint firstAttribute="trailing" secondItem="vAe-SN-FYB" secondAttribute="trailing" id="4qH-he-40A"/>
+                            <constraint firstItem="DLd-EJ-Vta" firstAttribute="top" secondItem="cbH-k9-6ml" secondAttribute="bottom" id="8iz-gV-hf4"/>
+                            <constraint firstAttribute="trailing" secondItem="DLd-EJ-Vta" secondAttribute="trailing" id="CHy-F9-b7B"/>
                             <constraint firstItem="vAe-SN-FYB" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="JbO-fQ-soZ"/>
+                            <constraint firstItem="DLd-EJ-Vta" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="ZFV-hs-ceI"/>
+                            <constraint firstItem="pV3-PY-VOG" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="aaU-va-Q1F"/>
+                            <constraint firstItem="pV3-PY-VOG" firstAttribute="top" secondItem="DLd-EJ-Vta" secondAttribute="bottom" id="hjb-Ll-jJz"/>
+                            <constraint firstItem="vAe-SN-FYB" firstAttribute="top" secondItem="pV3-PY-VOG" secondAttribute="bottom" id="mzd-Qt-xJ0"/>
                             <constraint firstItem="7HU-Dh-OYf" firstAttribute="top" secondItem="vAe-SN-FYB" secondAttribute="bottom" id="nSP-tF-Xha"/>
                         </constraints>
                     </view>
@@ -594,7 +606,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x9t-KF-4Ro" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="955" y="-231"/>
+            <point key="canvasLocation" x="965" y="-443"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

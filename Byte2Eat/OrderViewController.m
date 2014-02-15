@@ -80,7 +80,6 @@
     [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
-
 - (void)setUpAnimations {
     _leftEmitterLayer = [CAEmitterLayer layer];
     _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y+15);
@@ -132,19 +131,18 @@
     [_scrollView.layer addSublayer:self.leftEmitterLayer];
     [_scrollView.layer addSublayer:self.rightEmitterLayer];
 
-    self.emitterLayer = [CAEmitterLayer layer];
-    self.emitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x, _LabelTotalCost.layer.position.y + 60);
-    self.emitterLayer.emitterZPosition = 10.0;
-//    self.emitterLayer.emitterSize = CGSizeMake(_LabelTotalCost.bounds.size.width + 5, _LabelTotalCost.bounds.size.height + 5);
-    self.emitterLayer.emitterSize = CGSizeMake(5, 5);
-    self.emitterLayer.emitterShape = kCAEmitterLayerPoint;
-    self.emitterLayer.emitterMode = kCAEmitterLayerPoints;
+    self.sparkleEmitterLayer = [CAEmitterLayer layer];
+    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x + 2, _LabelTotalCost.layer.position.y + 63);
+    self.sparkleEmitterLayer.emitterZPosition = 10.0;
+    self.sparkleEmitterLayer.emitterSize = CGSizeMake(5, 5);
+    self.sparkleEmitterLayer.emitterShape = kCAEmitterLayerPoint;
+    self.sparkleEmitterLayer.emitterMode = kCAEmitterLayerPoints;
 
     CAEmitterCell*sparkleCell = [CAEmitterCell emitterCell];
     sparkleCell.birthRate = 0;
     sparkleCell.emissionLongitude = M_PI * 2;
     sparkleCell.lifetime = 0.4;
-    sparkleCell.velocity = 100;
+    sparkleCell.velocity = 60;
     sparkleCell.velocityRange = 40;
     sparkleCell.emissionRange = M_PI * 2;
     sparkleCell.spin = 3;
@@ -153,12 +151,12 @@
     sparkleCell.xAcceleration = 0;
     sparkleCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     sparkleCell.scale = 0.03;
-    sparkleCell.alphaSpeed = -0.12;
+    sparkleCell.alphaSpeed = -0.40;
     sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
     [sparkleCell setName:@"sparkle"];
 
-    self.emitterLayer.emitterCells = @[sparkleCell];
-    [self.scrollView.layer addSublayer:self.emitterLayer];
+    self.sparkleEmitterLayer.emitterCells = @[sparkleCell];
+    [self.scrollView.layer addSublayer:self.sparkleEmitterLayer];
 
 }
 
@@ -166,7 +164,6 @@
     [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
     [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
 }
-
 
 - (NSUInteger)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
@@ -293,7 +290,6 @@
     return 10;
 }
 
-
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
     return [NSString stringWithFormat:@"%i",row + 1];
 }
@@ -301,7 +297,7 @@
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     _currentOrderNumber = [NSNumber numberWithInteger:row + 1];
 
-    [_emitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
+    [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
     [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
 }
 
@@ -315,7 +311,7 @@
     [_LabelTotalCost.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelTotalCost setAttributedText:totalCostString];
 
-    [_emitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.sparkle.birthRate"];
+    [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.sparkle.birthRate"];
     [timer invalidate];
 }
 
@@ -394,21 +390,6 @@
     [self.OrderNumberPicker setUserInteractionEnabled:NO];
 }
 
-
-- (IBAction)onOrder:(UIButton *)sender {
-    NSString *message = [NSString stringWithFormat:@"Toda's Order Summary \n\n Earlier Order Qty : %@ \nCurrent Order Qty : %@\n-------------------------------\nTotal order Qty: %u", _todayTotalOrder, _currentOrderNumber, [_todayTotalOrder unsignedIntValue] + [_currentOrderNumber unsignedIntValue]];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
-            message:message 
-           delegate:self
-  cancelButtonTitle:@"Cancel"
-          otherButtonTitles:@"OK", nil];
-    [alert setTag:keyAlertOrderConfirm];
-    [alert show];
-
-    [self changeEmitterBirthrateTo:100];
-    [self disableUserInput];
-}
-
 - (void)postOrderRequest {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:keyURLPostOrder]];
     request.HTTPMethod = @"POST";
@@ -425,6 +406,19 @@
     [[NSURLConnection alloc] initWithRequest:request delegate:self];
 }
 
+- (IBAction)onOrder:(UIButton *)sender {
+    NSString *message = [NSString stringWithFormat:@"Toda's Order Summary \n\n Earlier Order Qty : %@ \nCurrent Order Qty : %@\n-------------------------------\nTotal order Qty: %u", _todayTotalOrder, _currentOrderNumber, [_todayTotalOrder unsignedIntValue] + [_currentOrderNumber unsignedIntValue]];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
+                                                    message:message
+                                                   delegate:self
+                                          cancelButtonTitle:@"Cancel"
+                                          otherButtonTitles:@"OK", nil];
+    [alert setTag:keyAlertOrderConfirm];
+    [alert show];
+
+    [self changeEmitterBirthrateTo:100];
+    [self disableUserInput];
+}
 - (IBAction)onOrderHistory:(UIButton *)sender {
     self.transitionManager.scaleFactor = 0.9;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
@@ -435,7 +429,7 @@
     [self presentViewController:modal animated:YES completion:^{
     }];
 }
-- (IBAction) onLogout:(UIButton *)sender {
+- (IBAction)onLogout:(UIButton *)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -507,8 +501,7 @@
     }];
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
-                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
     return nil;
 }
 
@@ -547,9 +540,10 @@
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                    presentingController:(UIViewController *)presenting
-
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
+    self.transitionManager.cornerRadius = 5;
+    self.transitionManager.scaleFactor = 1;
     return self.transitionManager;
 }
 
