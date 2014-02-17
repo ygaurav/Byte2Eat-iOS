@@ -11,13 +11,15 @@
 #import "TransitionManager.h"
 #import "OrderViewController.h"
 #import "Constants.h"
+#import "Utilities.h"
+#import "FileManager.h"
 
 @implementation AuthenticatorViewController
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self setBackgroundImage];
+
 
     _userNameTextField.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     _loginButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
@@ -30,8 +32,20 @@
     [self setTitleStyles];
     [self setMotionEffect];
     [self setEmitterAnimation];
+    [self setBackgroundImage];
     [self.userNameTextField addTarget:self action:@selector(onTextFieldTouch:) forControlEvents:UIControlEventAllEvents];
-    [self setTitleAnimation];
+    [self changeEmitterBirthrateTo:100];
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    if([Utilities isUserLoggedIn]){
+        [self goToOrderScreen:[Utilities getUserDetailsFromPlist]];
+        [self changeEmitterBirthrateTo:0];
+        return;
+    }else{
+        [self setTitleAnimation];
+        [self showError:@"Please log in to continue."];
+    }
 }
 
 - (void)setBackgroundImage {
@@ -78,12 +92,12 @@
 
 - (void)setMotionEffect {
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
-    interpolationHorizontal.minimumRelativeValue = @40.0;
-    interpolationHorizontal.maximumRelativeValue = @-40.0;
+    interpolationHorizontal.minimumRelativeValue = @30.0;
+    interpolationHorizontal.maximumRelativeValue = @-30.0;
 
     UIInterpolatingMotionEffect *interpolationVertical = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
-    interpolationVertical.minimumRelativeValue = @40.0;
-    interpolationVertical.maximumRelativeValue = @-40.0;
+    interpolationVertical.minimumRelativeValue = @30.0;
+    interpolationVertical.maximumRelativeValue = @-30.0;
 
     [self.backgroundView addMotionEffect:interpolationHorizontal];
     [self.backgroundView addMotionEffect:interpolationVertical];
@@ -308,11 +322,7 @@
     NSNumber *userId = (NSNumber *)[jsonArray objectForKey:keyUserId];
     NSLog(@"--- %d -- %@", userExists, userId);
     if(userExists){
-        NSString *userName = (NSString *)[jsonArray objectForKey:keyUserName];
-        NSNumber *balance = (NSNumber *)[jsonArray objectForKey:keyBalance];
-        NSNumber *todayNumberOfOrders = (NSNumber *)[jsonArray objectForKey:keyTodaysOrderQty];
-        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
-        NSLog(@" %@ , %@ , %@ , %@, %@", userName, userId,balance,todayNumberOfOrders,response);
+        [Utilities setUserDetailsInPlist:jsonArray];
         [self goToOrderScreen:jsonArray];
     }else{
         NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
@@ -320,6 +330,8 @@
         NSLog(@"%@",response);
     }
 }
+
+
 
 - (void)enableUserInput {
     [_userNameTextField setEnabled:YES];

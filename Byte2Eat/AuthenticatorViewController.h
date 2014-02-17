@@ -21,6 +21,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *loginSubheading;
 @property(nonatomic, strong) TransitionManager *transitionManager;
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
+@property (nonatomic, strong) NSDictionary *jsonArray;
 - (IBAction)onTextFieldTouch:(UITextField *)sender;
 
 @property (nonatomic) CAEmitterLayer *leftEmitterLayer;

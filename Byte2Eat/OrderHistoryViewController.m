@@ -10,6 +10,8 @@
 #import "Constants.h"
 #import "Order.h"
 #import "OrderHistoryCell.h"
+#import "AppDelegate.h"
+#import "OrderViewModel.h"
 
 @implementation OrderHistoryViewController {
     NSString *userName;
@@ -21,14 +23,39 @@
     NSMutableData *totalData;
 }
 
+@synthesize managedObjectContext;
+
 - (void)viewDidLoad{
     [super viewDidLoad];
     orderHistory = [[NSMutableArray alloc] init];
-    totalData = [[NSMutableData alloc] init];
+
     [self setData];
-
-
     [self setUpAnimations];
+
+    AppDelegate* appDelegate = (AppDelegate *) [UIApplication sharedApplication].delegate;
+    self.managedObjectContext = appDelegate.managedObjectContext;
+
+    orderHistory = [[self getSavedOrderHistory] mutableCopy];
+    NSLog(@"Saved Order count : %u", orderHistory.count);
+
+}
+
+-(NSArray*)getSavedOrderHistory
+{
+    // initializing NSFetchRequest
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+
+    //Setting Entity to be Queried
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Order"
+                                              inManagedObjectContext:self.managedObjectContext];
+    [fetchRequest setEntity:entity];
+    NSError* error;
+
+    // Query on managedObjectContext With Generated fetchRequest
+    NSArray *fetchedRecords = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+
+    // Returning Fetched Records
+    return fetchedRecords;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -143,6 +170,8 @@
 - (void)fetchOrderHistory:(bool)isFirstFetch {
     isFetchingHistory = YES;
     [self changeEmitterBirthrateTo:100];
+    newerData = [[NSMutableArray alloc] init];
+    totalData = [[NSMutableData alloc] init];
 
     NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@"fetching data..."];
     [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
@@ -155,8 +184,7 @@
     [_operationLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_operationLabel setAttributedText:historyTitle];
 
-//    NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,userName];
-    NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,@"nishant"];
+    NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory,userName];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:orderHistoryURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
     [request setHTTPMethod:@"GET"];
     [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
@@ -200,22 +228,22 @@
     UIColor *redColor = [UIColor colorWithRed:220/256.0 green:92/256.0 blue:75/256.0 alpha:1];
     redShadow.shadowColor = redColor;
 
-    NSMutableAttributedString *itemName = [[NSMutableAttributedString alloc] initWithString:order.ItemName];
+    NSMutableAttributedString *itemName = [[NSMutableAttributedString alloc] initWithString:order.itemName];
     [itemName addAttribute:NSShadowAttributeName value:blueShadow range:NSMakeRange(0, itemName.length)];
     [itemName addAttribute:NSForegroundColorAttributeName value:blueColor range:NSMakeRange(0, itemName.length)];
     [itemName addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:20] range:NSMakeRange(0, itemName.length)];
 
-    NSMutableAttributedString *price = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",order.Price]] ;
+    NSMutableAttributedString *price = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",order.price]] ;
     [price addAttribute:NSShadowAttributeName value:greenShadow range:NSMakeRange(0, price.length)];
     [price addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, price.length)];
     [price addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, price.length)];
 
-    NSMutableAttributedString *quantity = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@",order.Quantity]] ;
+    NSMutableAttributedString *quantity = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@",order.quantity]] ;
     [quantity addAttribute:NSShadowAttributeName value:greenShadow range:NSMakeRange(0, quantity.length)];
     [quantity addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, quantity.length)];
     [quantity addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, quantity.length)];
 
-    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [order.Price integerValue]*[order.Quantity integerValue]]] ;
+    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [order.price integerValue]*[order.quantity integerValue]]] ;
     [cost addAttribute:NSShadowAttributeName value:greenShadow range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, cost.length)];
@@ -265,38 +293,157 @@
 }
 
 - (BOOL)isThereAnyOrderHistory:(NSDictionary *)jsonArray {
-    NSUInteger integer = ((NSArray *) [jsonArray objectForKey:keyOrderHistory]).count;
-    NSLog(@"Order History Count %u",integer);
-    return integer > 0;
+//    NSUInteger integer = ((NSArray *) [jsonArray objectForKey:keyOrderHistory]).count;
+//    NSLog(@"Order History Count %u",integer);
+//    return integer > 0;
+    return YES;
 }
 
 - (void)setOrderHistory:(NSDictionary *)dictionary {
     NSArray *orderHistoryDictionary = [dictionary objectForKey:keyOrderHistory];
 
-    BOOL areThereNewRecords = orderHistoryDictionary.count > orderHistory.count || orderHistoryDictionary.count < orderHistory.count;
-    NSLog(@"--- New Records  %i", areThereNewRecords);
-    if(areThereNewRecords){
-        [orderHistory removeAllObjects];
-        for(NSDictionary *order in orderHistoryDictionary){
-            Order *orderDict = [[Order alloc] init];
-            orderDict.Quantity = [order objectForKey:@"Quantity"];
-            orderDict.orderDate = [self dateWithJSONString:(NSString *)[order objectForKey:@"OrderDate"]];
-            NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
-            orderDict.ItemName = [dailyMenu objectForKey:@"ItemName"];
-            orderDict.Price = [dailyMenu objectForKey:@"ItemPrice"];
+    //TODO : If no prior order history save as is. If not, then check each order for their displayOrder.
 
-//            [newerData addObject:orderDict];
-            [orderHistory addObject:orderDict];
+    if(orderHistory.count == 0){
+        //TODO : Save every order in history
+        NSLog(@"Saving order History for first time.");
+        NSNumber *displayOrder = [NSNumber numberWithInt:0];
+        for(NSDictionary *order in orderHistoryDictionary){
+            NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
+
+            NSManagedObjectContext *context = [self managedObjectContext];
+            NSManagedObject *orderObject = [NSEntityDescription
+                    insertNewObjectForEntityForName:@"Order"
+                             inManagedObjectContext:context];
+            [orderObject setValue:[order objectForKey:@"Quantity"] forKey:@"quantity"];
+            [orderObject setValue:[dailyMenu objectForKey:@"ItemName"] forKey:@"itemName"];
+            [orderObject setValue:[dailyMenu objectForKey:@"ItemPrice"] forKey:@"price"];
+            [orderObject setValue:[self dateWithJSONString:(NSString *)[order objectForKey:@"OrderDate"]] forKey:@"orderDate"];
+            [orderObject setValue:displayOrder forKey:@"displayOrder"];
+            NSError *error;
+            [context save:&error];
+            if(error){
+                NSLog(@"Error occured : %@",error.localizedDescription);
+            }else{
+                displayOrder =  [NSNumber numberWithInt:[displayOrder intValue] + 1];
+                NSLog(@"Order saved : %@",[dailyMenu objectForKey:@"ItemName"]);
+            }
         }
-        [self updateTable];
+        [self insertTableData];
+    }else{
+        NSLog(@"Updates to order history");
+        BOOL didRecordCountChange = orderHistoryDictionary.count > orderHistory.count || orderHistoryDictionary.count < orderHistory.count;
+        if(orderHistoryDictionary.count > orderHistory.count){
+            NSLog(@"%i New records in order history.", orderHistoryDictionary.count - orderHistory.count);
+        }
+        if(orderHistoryDictionary.count < orderHistory.count){
+            NSLog(@"%i Records were deleted", orderHistory.count - orderHistoryDictionary.count);
+        }
+        NSLog(@"Record Count changed  %i", didRecordCountChange);
+        didRecordCountChange = true;
+
+        if(didRecordCountChange){
+            NSNumber *displayOrder = [NSNumber numberWithChar:0];
+            for(NSDictionary *order in orderHistoryDictionary){
+                OrderViewModel *orderDict = [[OrderViewModel alloc] init];
+                orderDict.quantity = [order objectForKey:@"Quantity"];
+                orderDict.orderDate = [self dateWithJSONString:(NSString *)[order objectForKey:@"OrderDate"]];
+                NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
+                orderDict.itemName = [dailyMenu objectForKey:@"ItemName"];
+                orderDict.price = [dailyMenu objectForKey:@"ItemPrice"];
+                if (![[dailyMenu objectForKey:@"ItemName"] isEqualToString:@"Bhel"]) {
+                    [newerData addObject:orderDict];
+                }
+//                NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
+//
+//                NSManagedObjectContext *context = [self managedObjectContext];
+//                NSManagedObject *orderObject = [NSEntityDescription
+//                        insertNewObjectForEntityForName:@"Order"
+//                                 inManagedObjectContext:context];
+//                [orderObject setValue:[order objectForKey:@"Quantity"] forKey:@"quantity"];
+//                [orderObject setValue:[dailyMenu objectForKey:@"ItemName"] forKey:@"itemName"];
+//                [orderObject setValue:[dailyMenu objectForKey:@"Price"] forKey:@"price"];
+//                [orderObject setValue:[self dateWithJSONString:(NSString *)[order objectForKey:@"OrderDate"]] forKey:@"orderDate"];
+//                [orderObject setValue:displayOrder forKey:@"displayOrder"];
+//                NSError *error;
+//                [context save:&error];
+//                if(error){
+//                    NSLog(@"Error occured : %@",error.localizedDescription);
+//                }else{
+//                    displayOrder =  [NSNumber numberWithInt:[displayOrder intValue] + 1];
+//                    NSLog(@"Order saved : %@",[dailyMenu objectForKey:@"ItemName"]);
+//                }
+            }
+
+            OrderViewModel *new = [[OrderViewModel alloc] init];
+            new.quantity = [NSNumber numberWithInt:5];
+            new.itemName = @"Burger";
+            new.price = [NSNumber numberWithInt:25];
+            new.orderDate = [self dateWithJSONString:@"2014-02-20T00:00:00"];
+            [newerData insertObject:new atIndex:0];
+
+            NSMutableArray *array = [[NSMutableArray alloc] init];
+            [array addObject:new];
+
+            NSArray *deletedRowIndexPaths = [self getDeletedIndexPathsFrom:newerData comparedTo:orderHistory];
+            NSArray *insertedRowIndexPaths = [self getInsertedIndexPathsFrom:newerData comparedTo:orderHistory];
+
+            NSLog(@"Deleted : %u, Inserted : %u",deletedRowIndexPaths.count, insertedRowIndexPaths.count);
+            [self updateTableWithDeleted:deletedRowIndexPaths insertedPaths:insertedRowIndexPaths insertedOrders:array ];
+        }
     }
-//    else if([self updatedRecords].count > 0){
-//        [self updateTable];
-//    }
+}
+
+- (NSArray *)getDeletedIndexPathsFrom:(NSMutableArray *)newerOrders comparedTo:(NSMutableArray *)olderData {
+    NSMutableArray *deletedIndexPaths = [[NSMutableArray alloc] init];
+
+    for(Order *older in olderData){
+        BOOL flag = YES;
+        for(OrderViewModel *orderViewModel in newerOrders){
+            NSComparisonResult result = [orderViewModel.orderDate compare:older.orderDate];
+            if (result == NSOrderedSame) {
+                flag = NO;
+                break;
+            }
+        }
+        if(flag){
+            NSLog(@"Deleted - Display Order : %@, Item : %@", older.displayOrder, older.itemName);
+            [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:[older.displayOrder integerValue] inSection:0]];
+        }
+    }
+    return deletedIndexPaths;
+}
+
+-(NSArray *)getInsertedIndexPathsFrom:(NSMutableArray *)newerOrders comparedTo:(NSMutableArray *)olderData{
+    NSMutableArray *insertedIndexPaths = [[NSMutableArray alloc] init];
+
+    for(OrderViewModel *newerOrderViewModel in newerOrders){
+        BOOL flag = YES;
+        for(Order *older in olderData){
+            if([newerOrderViewModel.orderDate compare:older.orderDate] == NSOrderedSame){
+                flag = NO;
+                break;
+            }
+        }
+        if(flag){
+            newerOrderViewModel.displayOrder = [NSNumber numberWithInt:0];
+            NSLog(@"Inserted - Display Order : %@, Item : %@", newerOrderViewModel.displayOrder, newerOrderViewModel.itemName);
+            [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:[newerOrderViewModel.displayOrder integerValue] inSection:0]];
+        }
+    }
+    return insertedIndexPaths;
+}
+
+- (NSManagedObjectContext *)managedObjectContext {
+    NSManagedObjectContext *context = nil;
+    id delegate = [[UIApplication sharedApplication] delegate];
+    if ([delegate performSelector:@selector(managedObjectContext)]) {
+        context = [delegate managedObjectContext];
+    }
+    return context;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-//    CATransform3D rotation = CATransform3DMakeRotation(M_PI/2, 0, 0.5, 0);
     CATransform3D rotation = CATransform3DMakeScale(.3, .3, .3);
     cell.layer.transform = rotation;
     cell.layer.anchorPoint = CGPointMake(0.5, 0.5);
@@ -311,19 +458,62 @@
                      } completion:nil];
 }
 
-- (void)updateTable {
+-(void) insertTableData{
     NSMutableArray *array = [[NSMutableArray alloc] init];
+    orderHistory = [[self getSavedOrderHistory] mutableCopy];
     [self.tableView beginUpdates];
-
     [orderHistory enumerateObjectsUsingBlock:^(Order *order, NSUInteger index, BOOL *stop){
         NSIndexPath *path = [NSIndexPath indexPathForRow:index inSection:0];
         [array addObject:path];
     }];
-
-    [self.tableView insertRowsAtIndexPaths:array withRowAnimation:UITableViewRowAnimationMiddle];
-
+    [self.tableView insertRowsAtIndexPaths:array withRowAnimation:UITableViewRowAnimationTop];
     [self.tableView endUpdates];
+}
 
+- (void)updateTableWithDeleted:(NSArray *)deleted insertedPaths:(NSArray *)inserted insertedOrders:(NSArray *)orders {
+//    NSMutableArray *array = [[NSMutableArray alloc] init];
+//    orderHistory = [[self getSavedOrderHistory] mutableCopy];
+//    [self.tableView beginUpdates];
+//    [orderHistory enumerateObjectsUsingBlock:^(Order *order, NSUInteger index, BOOL *stop){
+//        NSIndexPath *path = [NSIndexPath indexPathForRow:index inSection:0];
+//        [array addObject:path];
+//    }];
+//    [self.tableView insertRowsAtIndexPaths:array withRowAnimation:UITableViewRowAnimationTop];
+//    [self.tableView endUpdates];
+
+    for(NSIndexPath *path in deleted){
+        NSLog(@"Deleted rows at :%i",path.row);
+        [orderHistory removeObjectAtIndex:(NSUInteger) path.row];
+    }
+
+    for(OrderViewModel *order in orders){
+        //TODO : add these viewModel in OrderHistory
+        NSLog(@"Adding rows at : %@",order.itemName);
+        NSManagedObjectContext *context = [self managedObjectContext];
+        NSManagedObject *orderObject = [NSEntityDescription
+                insertNewObjectForEntityForName:@"Order"
+                         inManagedObjectContext:context];
+        [orderObject setValue:order.quantity forKey:@"quantity"];
+        [orderObject setValue:order.itemName forKey:@"itemName"];
+        [orderObject setValue:order.price forKey:@"price"];
+        [orderObject setValue:order.orderDate forKey:@"orderDate"];
+//        [orderObject setValue:displayOrder forKey:@"displayOrder"];
+        NSError *error;
+//        [context save:&error];
+        if(error){
+            NSLog(@"Error occured : %@",error.localizedDescription);
+        }else{
+//            displayOrder =  [NSNumber numberWithInt:[displayOrder intValue] + 1];
+//            NSLog(@"Order saved : %@",[dailyMenu objectForKey:@"ItemName"]);
+        }
+        [orderHistory insertObject:orderObject atIndex:0];
+    }
+
+
+    [self.tableView beginUpdates];
+    [self.tableView deleteRowsAtIndexPaths:deleted withRowAnimation:UITableViewRowAnimationRight];
+    [self.tableView insertRowsAtIndexPaths:inserted withRowAnimation:UITableViewRowAnimationLeft];
+    [self.tableView endUpdates];
 }
 
 - (void)showError:(NSString *)response {
@@ -373,6 +563,10 @@
     NSError *error = nil;
     NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:totalData options:NSJSONReadingMutableContainers error:&error];
     BOOL userExists = ![((NSNumber *)[jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:1]];
+
+    if(error != nil){
+        NSLog(@"Error parsing JSON Data : %@", [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding]);
+    }
     if(userExists){
         if([self isThereAnyOrderHistory:jsonArray]){
             [self setOrderHistory:jsonArray];

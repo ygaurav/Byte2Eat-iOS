@@ -12,6 +12,7 @@
 #import "OrderHistoryViewController.h"
 #import "TransitionManager.h"
 #import "ThanksViewController.h"
+#import "Utilities.h"
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
@@ -263,12 +264,12 @@
     [self.backgroundImageView setImage:image];
 
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
-    interpolationHorizontal.minimumRelativeValue = @40.0;
-    interpolationHorizontal.maximumRelativeValue = @-40.0;
+    interpolationHorizontal.minimumRelativeValue = @30.0;
+    interpolationHorizontal.maximumRelativeValue = @-30.0;
 
     UIInterpolatingMotionEffect *interpolationVertical = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
-    interpolationVertical.minimumRelativeValue = @40.0;
-    interpolationVertical.maximumRelativeValue = @-40.0;
+    interpolationVertical.minimumRelativeValue = @30.0;
+    interpolationVertical.maximumRelativeValue = @-30.0;
 
     [self.backgroundImageView addMotionEffect:interpolationHorizontal];
     [self.backgroundImageView addMotionEffect:interpolationVertical];
@@ -430,6 +431,7 @@
     }];
 }
 - (IBAction)onLogout:(UIButton *)sender {
+    [Utilities logUserOut];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -543,7 +545,7 @@
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
-    self.transitionManager.scaleFactor = 1;
+    self.transitionManager.scaleFactor = 0.9;
     return self.transitionManager;
 }
 
