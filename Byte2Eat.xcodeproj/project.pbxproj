@@ -36,6 +36,11 @@
 		F474480318A545DF009CF205 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F474480118A545DF009CF205 /* InfoPlist.strings */; };
 		F474480518A545DF009CF205 /* Byte2EatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F474480418A545DF009CF205 /* Byte2EatTests.m */; };
 		F474481018A58021009CF205 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = F474480F18A58021009CF205 /* UIImage+ImageEffects.m */; };
+		F4963CD318B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD218B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m */; };
+		F4963CD618B3F36C004A7CA1 /* MyCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD518B3F36C004A7CA1 /* MyCollectionViewCell.m */; };
+		F4963CD918B3F545004A7CA1 /* MyFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD818B3F545004A7CA1 /* MyFlowLayout.m */; };
+		F4963CDC18B4038D004A7CA1 /* MyWideCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CDB18B4038D004A7CA1 /* MyWideCollectionViewCell.m */; };
+		F4963CDE18B403C7004A7CA1 /* WideCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4963CDD18B403C7004A7CA1 /* WideCollectionViewCell.xib */; };
 		F4ACC65D18A658C300F8560D /* fireflies.sks in Resources */ = {isa = PBXBuildFile; fileRef = F4ACC65B18A658C300F8560D /* fireflies.sks */; };
 		F4ACC65E18A658C300F8560D /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = F4ACC65C18A658C300F8560D /* spark.png */; };
 		F4ACC66818A65B6900F8560D /* snow.sks in Resources */ = {isa = PBXBuildFile; fileRef = F4ACC66718A65B6900F8560D /* snow.sks */; };
@@ -97,6 +102,15 @@
 		F474480418A545DF009CF205 /* Byte2EatTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Byte2EatTests.m; sourceTree = "<group>"; };
 		F474480E18A58021009CF205 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		F474480F18A58021009CF205 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
+		F4963CD118B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderHistoryCollectionViewController.h; sourceTree = "<group>"; };
+		F4963CD218B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderHistoryCollectionViewController.m; sourceTree = "<group>"; };
+		F4963CD418B3F36C004A7CA1 /* MyCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCollectionViewCell.h; sourceTree = "<group>"; };
+		F4963CD518B3F36C004A7CA1 /* MyCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCollectionViewCell.m; sourceTree = "<group>"; };
+		F4963CD718B3F545004A7CA1 /* MyFlowLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyFlowLayout.h; sourceTree = "<group>"; };
+		F4963CD818B3F545004A7CA1 /* MyFlowLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyFlowLayout.m; sourceTree = "<group>"; };
+		F4963CDA18B4038D004A7CA1 /* MyWideCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyWideCollectionViewCell.h; sourceTree = "<group>"; };
+		F4963CDB18B4038D004A7CA1 /* MyWideCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyWideCollectionViewCell.m; sourceTree = "<group>"; };
+		F4963CDD18B403C7004A7CA1 /* WideCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WideCollectionViewCell.xib; sourceTree = "<group>"; };
 		F4ACC65B18A658C300F8560D /* fireflies.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = fireflies.sks; sourceTree = "<group>"; };
 		F4ACC65C18A658C300F8560D /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		F4ACC66718A65B6900F8560D /* snow.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = snow.sks; sourceTree = "<group>"; };
@@ -196,6 +210,15 @@
 				F4147BF118B133DD00ECEDA2 /* Order.m */,
 				7EB5EBD9443B83794E04601D /* OrderViewModel.m */,
 				7EB5EA5621B4CFAF4396457A /* OrderViewModel.h */,
+				F4963CD118B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.h */,
+				F4963CD218B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m */,
+				F4963CD418B3F36C004A7CA1 /* MyCollectionViewCell.h */,
+				F4963CD518B3F36C004A7CA1 /* MyCollectionViewCell.m */,
+				F4963CD718B3F545004A7CA1 /* MyFlowLayout.h */,
+				F4963CD818B3F545004A7CA1 /* MyFlowLayout.m */,
+				F4963CDA18B4038D004A7CA1 /* MyWideCollectionViewCell.h */,
+				F4963CDB18B4038D004A7CA1 /* MyWideCollectionViewCell.m */,
+				F4963CDD18B403C7004A7CA1 /* WideCollectionViewCell.xib */,
 			);
 			path = Byte2Eat;
 			sourceTree = "<group>";
@@ -305,6 +328,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4963CDE18B403C7004A7CA1 /* WideCollectionViewCell.xib in Resources */,
 				F4ACC65E18A658C300F8560D /* spark.png in Resources */,
 				F47447F218A545DF009CF205 /* Images.xcassets in Resources */,
 				F4ACC66818A65B6900F8560D /* snow.sks in Resources */,
@@ -339,13 +363,17 @@
 				F47447EA18A545DF009CF205 /* AppDelegate.m in Sources */,
 				F4236A4A18A5DAE9001A4164 /* TransitionManager.m in Sources */,
 				F47447E618A545DF009CF205 /* main.m in Sources */,
+				F4963CDC18B4038D004A7CA1 /* MyWideCollectionViewCell.m in Sources */,
 				7EB5EEF35BC1964D255AFB4D /* Constants.m in Sources */,
 				7EB5E84F3ED224DABBE249A1 /* OrderHistoryViewController.m in Sources */,
+				F4963CD318B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m in Sources */,
 				7EB5E937A0DE3E0A63C88A50 /* OrderHistoryCell.m in Sources */,
 				7EB5E1142653EB00B9D293E2 /* ThanksViewController.m in Sources */,
 				7EB5EDB77AD3B70AE368BA12 /* Utilities.m in Sources */,
 				7EB5EDB0D77D8983449175A4 /* FileManager.m in Sources */,
+				F4963CD918B3F545004A7CA1 /* MyFlowLayout.m in Sources */,
 				7EB5ED6C0AB3FC22AE2D0277 /* OrderViewModel.m in Sources */,
+				F4963CD618B3F36C004A7CA1 /* MyCollectionViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

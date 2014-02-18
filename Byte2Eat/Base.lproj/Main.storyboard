@@ -439,10 +439,10 @@
             </objects>
             <point key="canvasLocation" x="965" y="288"/>
         </scene>
-        <!--View Controller-->
+        <!--Order History Collection View Controller-->
         <scene sceneID="YbI-5y-siz">
             <objects>
-                <viewController id="auf-5O-Kcr" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="IDOrderHistoryCollectionScreen" id="auf-5O-Kcr" customClass="OrderHistoryCollectionViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Jh6-is-qXr"/>
                         <viewControllerLayoutGuide type="bottom" id="Rzk-Bv-YTI"/>
@@ -471,22 +471,22 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
-                            <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.20000000000000001" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Ohr-YH-txD">
+                            <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Ohr-YH-txD">
                                 <rect key="frame" x="0.0" y="64" width="320" height="460"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="F0w-dz-BLb">
-                                    <size key="itemSize" width="210" height="245"/>
+                                <color key="backgroundColor" red="0.90878109056122447" green="0.90878109056122447" blue="0.90878109056122447" alpha="1" colorSpace="calibratedRGB"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="F0w-dz-BLb" customClass="MyFlowLayout">
+                                    <size key="itemSize" width="210" height="234"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="verticalCollectionCell" id="uIM-96-xA0">
-                                        <rect key="frame" x="55" y="0.0" width="210" height="245"/>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="myCollectionCell" id="uIM-96-xA0" customClass="MyCollectionViewCell">
+                                        <rect key="frame" x="0.0" y="113" width="210" height="234"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="210" height="245"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="210" height="234"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sandwich" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bgV-JO-hf6">
@@ -564,9 +564,36 @@
                                             <constraint firstItem="hbA-9i-wmR" firstAttribute="top" secondItem="vcz-Rd-5Av" secondAttribute="bottom" constant="20" id="ubV-4H-l9d"/>
                                             <constraint firstItem="t79-1N-1KZ" firstAttribute="leading" secondItem="hbA-9i-wmR" secondAttribute="leading" id="uvu-a0-f99"/>
                                         </constraints>
+                                        <connections>
+                                            <outlet property="labelItemCost" destination="8HS-aV-3aw" id="Ik7-fy-oSN"/>
+                                            <outlet property="labelItemName" destination="bgV-JO-hf6" id="tGW-aN-9KJ"/>
+                                            <outlet property="labelItemPrice" destination="77R-17-YJZ" id="hgL-kx-ZvD"/>
+                                            <outlet property="labelOrderDate" destination="ev5-nz-GTd" id="il7-Op-1zd"/>
+                                            <outlet property="labelQuantity" destination="PD4-N0-59l" id="QbT-uO-VKC"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="auf-5O-Kcr" id="ez9-kH-vtr"/>
+                                    <outlet property="delegate" destination="auf-5O-Kcr" id="cXh-Ii-VK2"/>
+                                </connections>
                             </collectionView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="fetching data..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tgA-5Y-W1D">
+                                <rect key="frame" x="125" y="45" width="71" height="12"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zpJ-v6-tkZ">
+                                <rect key="frame" x="283" y="20" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="   !   ">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="changeCollectionLayout:" destination="auf-5O-Kcr" eventType="touchUpInside" id="JZg-Ru-Efz"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -576,13 +603,22 @@
                             <constraint firstItem="Ulc-GT-dog" firstAttribute="leading" secondItem="57H-Xw-S7y" secondAttribute="leading" id="MjV-BD-Bg9"/>
                             <constraint firstItem="Vto-Y5-HVX" firstAttribute="top" secondItem="Jh6-is-qXr" secondAttribute="bottom" id="Ql9-vm-AmR"/>
                             <constraint firstAttribute="trailing" secondItem="Ulc-GT-dog" secondAttribute="trailing" id="RNR-ph-F9i"/>
+                            <constraint firstItem="zpJ-v6-tkZ" firstAttribute="centerY" secondItem="Vto-Y5-HVX" secondAttribute="centerY" constant="3" id="UQs-uj-yjo"/>
                             <constraint firstItem="Vto-Y5-HVX" firstAttribute="leading" secondItem="57H-Xw-S7y" secondAttribute="leading" id="Vad-gP-zkA"/>
                             <constraint firstAttribute="trailing" secondItem="Vto-Y5-HVX" secondAttribute="trailing" id="Voc-1e-bcL"/>
                             <constraint firstAttribute="trailing" secondItem="Ohr-YH-txD" secondAttribute="trailing" id="XAq-LE-DDJ"/>
+                            <constraint firstAttribute="centerX" secondItem="tgA-5Y-W1D" secondAttribute="centerX" id="auf-Qh-ObC"/>
                             <constraint firstItem="Ulc-GT-dog" firstAttribute="top" secondItem="Ohr-YH-txD" secondAttribute="bottom" id="jWC-8B-VSC"/>
+                            <constraint firstAttribute="trailing" secondItem="zpJ-v6-tkZ" secondAttribute="trailing" constant="7" id="rri-x9-tog"/>
+                            <constraint firstItem="tgA-5Y-W1D" firstAttribute="top" secondItem="Jh6-is-qXr" secondAttribute="bottom" constant="45" id="v6H-B1-HpB"/>
                         </constraints>
                     </view>
                     <nil key="simulatedStatusBarMetrics"/>
+                    <connections>
+                        <outlet property="doneButton" destination="Ulc-GT-dog" id="Tlw-Dq-LhU"/>
+                        <outlet property="errorLabel" destination="tgA-5Y-W1D" id="ubn-7s-WUh"/>
+                        <outlet property="myCollectionView" destination="Ohr-YH-txD" id="RCa-tc-RVL"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="X1v-rq-bap" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

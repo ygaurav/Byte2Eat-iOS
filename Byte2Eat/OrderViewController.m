@@ -13,6 +13,7 @@
 #import "TransitionManager.h"
 #import "ThanksViewController.h"
 #import "Utilities.h"
+#import "OrderHistoryCollectionViewController.h"
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
@@ -429,9 +430,10 @@
     self.transitionManager.scaleFactor = 0.9;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
+//    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
-    [modal setUser:_userName];
+//    [modal setUser:_userName];
     [self presentViewController:modal animated:YES completion:^{
     }];
 }
@@ -552,6 +554,7 @@
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
+//    self.transitionManager.cornerRadius = 0;
     self.transitionManager.scaleFactor = 0.9;
     return self.transitionManager;
 }
