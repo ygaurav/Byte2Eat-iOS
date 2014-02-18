@@ -508,45 +508,6 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
 }
 
 - (void)updateTableWithDeletedOrders:(NSArray *)deleted insertedOrders:(NSArray *)inserted reloadedOrders:(NSArray *)reloaded {
-//    NSMutableArray *array = [[NSMutableArray alloc] init];
-//    orderHistory = [[self getSavedOrderHistory] mutableCopy];
-//    [self.tableView beginUpdates];
-//    [orderHistory enumerateObjectsUsingBlock:^(Order *order, NSUInteger index, BOOL *stop){
-//        NSIndexPath *path = [NSIndexPath indexPathForRow:index inSection:0];
-//        [array addObject:path];
-//    }];
-//    [self.tableView insertRowsAtIndexPaths:array withRowAnimation:UITableViewRowAnimationTop];
-//    [self.tableView endUpdates];
-
-//    for (NSIndexPath *path in deleted) {
-//        NSLog(@"Deleted rows at :%i", path.row);
-//        [orderHistory removeObjectAtIndex:(NSUInteger) path.row];
-//    }
-
-//    for(OrderViewModel *order in orders){
-//        //TODO : add these viewModel in OrderHistory
-//        NSLog(@"Adding rows at : %@",order.itemName);
-//        NSManagedObjectContext *context = [self managedObjectContext];
-//        NSManagedObject *orderObject = [NSEntityDescription
-//                insertNewObjectForEntityForName:@"Order"
-//                         inManagedObjectContext:context];
-//        [orderObject setValue:order.quantity forKey:@"quantity"];
-//        [orderObject setValue:order.itemName forKey:@"itemName"];
-//        [orderObject setValue:order.price forKey:@"price"];
-//        [orderObject setValue:order.orderDate forKey:@"orderDate"];
-////        [orderObject setValue:displayOrder forKey:@"displayOrder"];
-//        NSError *error;
-////        [context save:&error];
-//        if(error){
-//            NSLog(@"Error occured : %@",error.localizedDescription);
-//        }else{
-////            displayOrder =  [NSNumber numberWithInt:[displayOrder intValue] + 1];
-////            NSLog(@"Order saved : %@",[dailyMenu objectForKey:@"ItemName"]);
-//        }
-//        [orderHistory insertObject:orderObject atIndex:0];
-//    }
-
-
     [self.tableView beginUpdates];
     [self.tableView deleteRowsAtIndexPaths:deleted withRowAnimation:UITableViewRowAnimationRight];
     [self.tableView insertRowsAtIndexPaths:inserted withRowAnimation:UITableViewRowAnimationLeft];

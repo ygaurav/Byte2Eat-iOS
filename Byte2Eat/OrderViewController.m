@@ -208,6 +208,26 @@
     [userKaNaam addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, userKaNaam.length)];
     [_LabelUserName setAttributedText:userKaNaam];
 
+
+}
+
+- (void)setUserData {
+
+    self.transitionManager = [[TransitionManager alloc] init];
+    [self setUserInformation];
+}
+
+- (void)setUserInformation {
+    _errorLabel.text = @"";
+//    _pricePerUnit = (NSNumber *)[_userInfo objectForKey:keyItemPrice];
+    _itemName = @"";
+    NSString *name = [_userInfo objectForKey:keyUserName];
+    _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
+    _remainingBalance = [_userInfo objectForKey:keyBalance];
+    _currentOrderNumber = [NSNumber numberWithInt:1];
+    _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
+    _userId = [_userInfo objectForKey:keyUserId];
+
     [_LabelTotalOrder setText:[NSString stringWithFormat:@"%@",_todayTotalOrder]];
 
     NSMutableAttributedString *remainingBalanceString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",_remainingBalance]];
@@ -218,20 +238,6 @@
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1] range:NSMakeRange(0, remainingBalanceString.length)];
     }
     [_LabelRemainingBalance setAttributedText:remainingBalanceString];
-}
-
-- (void)setUserData {
-
-    self.transitionManager = [[TransitionManager alloc] init];
-    _errorLabel.text = @"";
-    _pricePerUnit = (NSNumber *)[_userInfo objectForKey:keyItemPrice];
-    _itemName = @"";
-    NSString *name = [_userInfo objectForKey:keyUserName];
-    _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
-    _remainingBalance = [_userInfo objectForKey:keyBalance];
-    _currentOrderNumber = [NSNumber numberWithInt:1];
-    _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
-    _userId = [_userInfo objectForKey:keyUserId];
 }
 
 - (void)setRandomBackgroundImage {
@@ -472,6 +478,7 @@
             NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
             NSLog(@" %@ , %@ , %@ , %@, %@", userName, userId,balance,todayNumberOfOrders,response);
             [self setUserInfo:jsonArray];
+            [self setUserInformation];
         }else{
             NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
             NSLog(@"%@",response);
