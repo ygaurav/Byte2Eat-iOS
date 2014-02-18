@@ -399,10 +399,11 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
 
             NSArray *deletedRowIndexPaths = [self getDeletedIndexPathsFrom:newerData comparedTo:orderHistory];
             NSArray *insertedRowIndexPaths = [self getInsertedIndexPathsFrom:newerData comparedTo:orderHistory];
+            NSArray *obsoleteRowIndexPaths = [self getObsoleteIndexPathsFrom:newerData comparedTo:orderHistory];
 
             orderHistory = [self mapFromManagedObject:newerData];
             NSLog(@"Deleted : %u, Inserted : %u", deletedRowIndexPaths.count, insertedRowIndexPaths.count);
-            [self updateTableWithDeleted:deletedRowIndexPaths insertedPaths:insertedRowIndexPaths insertedOrders:nil ];
+            [self updateTableWithDeletedOrders:deletedRowIndexPaths insertedOrders:insertedRowIndexPaths reloadedOrders:obsoleteRowIndexPaths ];
         }
     }
 }
@@ -448,6 +449,28 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
     return insertedIndexPaths;
 }
 
+-(NSArray *)getObsoleteIndexPathsFrom:(NSMutableArray *)newerOrders comparedTo:(NSMutableArray *)olderData{
+    NSMutableArray *obsoleteIndexPaths = [[NSMutableArray alloc] init];
+
+    for (Order *order in newerOrders) {
+        BOOL flag = NO;
+        for (OrderViewModel *older in olderData) {
+            if ([order.orderDate compare:older.orderDate] == NSOrderedSame) {
+                if(![order.itemName isEqualToString:older.itemName] || [order.quantity compare:older.quantity] != NSOrderedSame){
+                    NSLog(@"Is obsolete data, reload row , %@ - %@ ", order.itemName, order.orderDate);
+                    flag = YES;
+                    break;
+                }
+            }
+        }
+        if (flag) {
+            NSLog(@"Reload row - Display Order : %@, Item : %@", order.displayOrder, order.itemName);
+            [obsoleteIndexPaths addObject:[NSIndexPath indexPathForRow:[order.displayOrder integerValue] inSection:0]];
+        }
+    }
+    return obsoleteIndexPaths;
+}
+
 - (NSManagedObjectContext *)managedObjectContext {
     NSManagedObjectContext *context = nil;
     id delegate = [[UIApplication sharedApplication] delegate];
@@ -484,7 +507,7 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
     [self.tableView endUpdates];
 }
 
-- (void)updateTableWithDeleted:(NSArray *)deleted insertedPaths:(NSArray *)inserted insertedOrders:(NSArray *)orders {
+- (void)updateTableWithDeletedOrders:(NSArray *)deleted insertedOrders:(NSArray *)inserted reloadedOrders:(NSArray *)reloaded {
 //    NSMutableArray *array = [[NSMutableArray alloc] init];
 //    orderHistory = [[self getSavedOrderHistory] mutableCopy];
 //    [self.tableView beginUpdates];
@@ -527,6 +550,7 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
     [self.tableView beginUpdates];
     [self.tableView deleteRowsAtIndexPaths:deleted withRowAnimation:UITableViewRowAnimationRight];
     [self.tableView insertRowsAtIndexPaths:inserted withRowAnimation:UITableViewRowAnimationLeft];
+    [self.tableView reloadRowsAtIndexPaths:reloaded withRowAnimation:UITableViewRowAnimationAutomatic];
     [self.tableView endUpdates];
 }
 
