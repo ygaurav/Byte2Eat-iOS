@@ -12,6 +12,7 @@
 #import "OrderHistoryCell.h"
 #import "AppDelegate.h"
 #import "OrderViewModel.h"
+#import "Utilities.h"
 
 
 typedef NS_ENUM(NSUInteger, BERowStatus) {
@@ -37,8 +38,7 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
     [self setData];
     [self setUpAnimations];
 
-    AppDelegate *appDelegate = (AppDelegate *) [UIApplication sharedApplication].delegate;
-    self.managedObjectContext = appDelegate.managedObjectContext;
+    self.managedObjectContext = [Utilities getManagedObjectContext];
 
     orderHistory = [self mapFromManagedObject:[[self getSavedOrderHistory] mutableCopy]];
     NSLog(@"Saved Order count : %u", orderHistory.count);
@@ -403,6 +403,7 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
 
             orderHistory = [self mapFromManagedObject:newerData];
             NSLog(@"Deleted : %u, Inserted : %u", deletedRowIndexPaths.count, insertedRowIndexPaths.count);
+
             [self updateTableWithDeletedOrders:deletedRowIndexPaths insertedOrders:insertedRowIndexPaths reloadedOrders:obsoleteRowIndexPaths ];
         }
     }

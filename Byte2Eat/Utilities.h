@@ -5,6 +5,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class NSManagedObjectContext;
+
 
 @interface Utilities : NSObject
 
@@ -15,5 +17,7 @@
 + (void) logUserOut;
 
 + (NSDictionary *)getUserDetailsFromPlist;
+
++(NSManagedObjectContext *)getManagedObjectContext;
 
 @end

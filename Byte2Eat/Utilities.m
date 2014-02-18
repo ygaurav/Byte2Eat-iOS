@@ -3,8 +3,11 @@
 // Copyright (c) 2014 spiderlogic. All rights reserved.
 //
 
+#import <CoreData/CoreData.h>
 #import "Utilities.h"
 #import "Constants.h"
+#import "AppDelegate.h"
+#import "Order.h"
 
 
 @implementation Utilities
@@ -84,6 +87,12 @@
     return temp;
 }
 
++ (NSManagedObjectContext *)getManagedObjectContext {
+    AppDelegate *appDelegate = (AppDelegate *) [UIApplication sharedApplication].delegate;
+    return appDelegate.managedObjectContext;
+}
+
+
 + (void) logUserOut{
     NSString *error;
 
@@ -99,6 +108,24 @@
     if(plistData) {
         BOOL b = [plistData writeToFile:plistPath atomically:YES];
         NSLog(@"Did logout save file : %d", b);
+        NSManagedObjectContext *managedObjectContext = [Utilities getManagedObjectContext];
+        [managedObjectContext deletedObjects];
+
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        NSEntityDescription *entity = [NSEntityDescription entityForName:@"Order" inManagedObjectContext:managedObjectContext];
+        [fetchRequest setEntity:entity];
+        NSError *error;
+        NSArray *fetchedRecords = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+
+        if(error){
+            NSLog(@"Error fetching order data on log out");
+        }
+        if (fetchedRecords.count > 0) {
+            for (Order *order in fetchedRecords) {
+                [managedObjectContext deleteObject:order];
+            }
+        }
+
     }
     else {
         NSLog(@"Something happened while logging out saving username in plist");

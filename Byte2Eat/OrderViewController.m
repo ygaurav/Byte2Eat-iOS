@@ -22,12 +22,36 @@
     [super viewDidLoad];
 
     isFetchingMenu = NO;
-    [self setUserData];
+    self.transitionManager = [[TransitionManager alloc] init];
+    [self initShadows];
+    [self setUserInformation];
     [self styleStaticData];
     [self setRandomBackgroundImage];
     [self setUpAnimations];
     [self fetchTodayMenu];
 
+}
+
+- (void)initShadows {
+    self.shadow = [[NSShadow alloc] init];
+    self.shadow.shadowBlurRadius = 3.0;
+    self.shadow.shadowColor = [UIColor blackColor];
+    self.shadow.shadowOffset = CGSizeMake(0, 0);
+
+    self.blueShadow = [[NSShadow alloc] init];
+    self.blueShadow.shadowBlurRadius = 3.0;
+    self.blueShadow.shadowColor = [UIColor colorWithRed:60 green:71 blue:210 alpha:1];
+    self.blueShadow.shadowOffset = CGSizeMake(0, 0);
+
+    self.redShadow = [[NSShadow alloc] init];
+    self.redShadow.shadowBlurRadius = 3.0;
+    self.redShadow.shadowColor = [UIColor redColor];
+    self.redShadow.shadowOffset = CGSizeMake(0, 0);
+
+    self.greenShadow = [[NSShadow alloc] init];
+    self.greenShadow.shadowBlurRadius = 3.0;
+    self.greenShadow.shadowColor = [UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1];
+    self.greenShadow.shadowOffset = CGSizeMake(0, 0);
 }
 
 - (BOOL)canBecomeFirstResponder {
@@ -176,25 +200,6 @@
     self.orderHistoryButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.orderHistoryButton.layer.cornerRadius = 3;
     self.logoutButton.layer.cornerRadius = 3;
-    self.shadow = [[NSShadow alloc] init];
-    self.shadow.shadowBlurRadius = 3.0;
-    self.shadow.shadowColor = [UIColor blackColor];
-    self.shadow.shadowOffset = CGSizeMake(0, 0);
-
-    self.blueShadow = [[NSShadow alloc] init];
-    self.blueShadow.shadowBlurRadius = 3.0;
-    self.blueShadow.shadowColor = [UIColor colorWithRed:60 green:71 blue:210 alpha:1];
-    self.blueShadow.shadowOffset = CGSizeMake(0, 0);
-
-    self.redShadow = [[NSShadow alloc] init];
-    self.redShadow.shadowBlurRadius = 3.0;
-    self.redShadow.shadowColor = [UIColor redColor];
-    self.redShadow.shadowOffset = CGSizeMake(0, 0);
-
-    self.greenShadow = [[NSShadow alloc] init];
-    self.greenShadow.shadowBlurRadius = 3.0;
-    self.greenShadow.shadowColor = [UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1];
-    self.greenShadow.shadowOffset = CGSizeMake(0, 0);
 
     UIFont *font = [UIFont systemFontOfSize:40];
 
@@ -211,31 +216,25 @@
 
 }
 
-- (void)setUserData {
-
-    self.transitionManager = [[TransitionManager alloc] init];
-    [self setUserInformation];
-}
-
 - (void)setUserInformation {
     _errorLabel.text = @"";
-//    _pricePerUnit = (NSNumber *)[_userInfo objectForKey:keyItemPrice];
     _itemName = @"";
     NSString *name = [_userInfo objectForKey:keyUserName];
-    _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
     _remainingBalance = [_userInfo objectForKey:keyBalance];
     _currentOrderNumber = [NSNumber numberWithInt:1];
-    _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
-    _userId = [_userInfo objectForKey:keyUserId];
 
-    [_LabelTotalOrder setText:[NSString stringWithFormat:@"%@",_todayTotalOrder]];
+    _userId = [_userInfo objectForKey:keyUserId];
+    _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
+    [_LabelTotalOrder setText:[_todayTotalOrder stringValue]];
+    _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
 
     NSMutableAttributedString *remainingBalanceString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",_remainingBalance]];
+    NSRange range = NSMakeRange(0, remainingBalanceString.length);
     if([_remainingBalance compare:[NSNumber numberWithInt:0]] == NSOrderedAscending ){
-        [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, remainingBalanceString.length)];
+        [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:range];
     }else{
-        [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:NSMakeRange(0, remainingBalanceString.length)];
-        [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1] range:NSMakeRange(0, remainingBalanceString.length)];
+        [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:range];
+        [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50 / 256.0 green:193 / 256.0 blue:92 / 256.0 alpha:1] range:range];
     }
     [_LabelRemainingBalance setAttributedText:remainingBalanceString];
 }
@@ -438,6 +437,7 @@
 }
 - (IBAction)onLogout:(UIButton *)sender {
     [Utilities logUserOut];
+
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
