@@ -8,10 +8,10 @@
 
 @interface OrderViewModel : NSObject
 
-@property (nonatomic, weak) NSNumber *quantity;
-@property (nonatomic, weak) NSDate *orderDate;
-@property (nonatomic, weak) NSString *itemName;
-@property (nonatomic, weak) NSNumber *price;
-@property (nonatomic, weak) NSNumber *displayOrder;
+@property (nonatomic, strong) NSNumber *quantity;
+@property (nonatomic, strong) NSDate *orderDate;
+@property (nonatomic, strong) NSString *itemName;
+@property (nonatomic, strong) NSNumber *price;
+@property (nonatomic, strong) NSNumber *displayOrder;
 
 @end

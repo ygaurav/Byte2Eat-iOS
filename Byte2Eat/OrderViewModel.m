@@ -6,7 +6,5 @@
 #import "OrderViewModel.h"
 
 
-@implementation OrderViewModel {
-
-}
+@implementation OrderViewModel
 @end
