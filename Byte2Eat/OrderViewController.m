@@ -1,10 +1,3 @@
-//
-//  OrderViewController.m
-//  Byte2Eat
-//
-//  Created by Gaurav Yadav on 07/02/14.
-//  Copyright (c) 2014 spiderlogic. All rights reserved.
-//
 
 #import "OrderViewController.h"
 #import "UIImage+ImageEffects.h"
@@ -433,7 +426,7 @@
 //    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
-//    [modal setUser:_userName];
+    [modal setUser:_userName];
     [self presentViewController:modal animated:YES completion:^{
     }];
 }
@@ -549,12 +542,14 @@
     NSLog(@"Seriously what happend : %@", error.domain);
 }
 
+#pragma NSURLConnection Delegate Methods end
+
+
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                    presentingController:(UIViewController *)presenting
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
-//    self.transitionManager.cornerRadius = 0;
     self.transitionManager.scaleFactor = 0.9;
     return self.transitionManager;
 }

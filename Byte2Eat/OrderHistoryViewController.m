@@ -1,10 +1,3 @@
-//
-//  OrderHistoryViewController.m
-//  Byte2Eat
-//
-//  Created by Gaurav Yadav on 09/02/14.
-//  Copyright (c) 2014 spiderlogic. All rights reserved.
-//
 
 #import "OrderHistoryViewController.h"
 #import "Constants.h"
@@ -13,11 +6,6 @@
 #import "AppDelegate.h"
 #import "OrderViewModel.h"
 #import "Utilities.h"
-
-
-typedef NS_ENUM(NSUInteger, BERowStatus) {
-    BEUpdated, BEDeleted, BERowAdded
-};
 
 @implementation OrderHistoryViewController {
     NSString *userName;
@@ -410,6 +398,7 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
 }
 
 - (NSArray *)getDeletedIndexPathsFrom:(NSMutableArray *)newerOrders comparedTo:(NSMutableArray *)olderData {
+    NSDate *methodStart = [NSDate date];
     NSMutableArray *deletedIndexPaths = [[NSMutableArray alloc] init];
     NSLog(@"Checking for deletion Newer : %u, Older count : %u", newerOrders.count, olderData.count);
     for (OrderViewModel *older in olderData) {
@@ -427,10 +416,14 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
             [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:[older.displayOrder integerValue] inSection:0]];
         }
     }
+    NSDate *methodFinish = [NSDate date];
+    NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+    NSLog(@"Delete executionTime = %f", executionTime);
     return deletedIndexPaths;
 }
 
 - (NSArray *)getInsertedIndexPathsFrom:(NSMutableArray *)newerOrders comparedTo:(NSMutableArray *)olderData {
+    NSDate *methodStart = [NSDate date];
     NSMutableArray *insertedIndexPaths = [[NSMutableArray alloc] init];
 
     for (Order *order in newerOrders) {
@@ -447,10 +440,15 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
             [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:[order.displayOrder integerValue] inSection:0]];
         }
     }
+
+    NSDate *methodFinish = [NSDate date];
+    NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+    NSLog(@"Inserted executionTime = %f", executionTime);
     return insertedIndexPaths;
 }
 
 -(NSArray *)getObsoleteIndexPathsFrom:(NSMutableArray *)newerOrders comparedTo:(NSMutableArray *)olderData{
+    NSDate *methodStart = [NSDate date];
     NSMutableArray *obsoleteIndexPaths = [[NSMutableArray alloc] init];
 
     for (Order *order in newerOrders) {
@@ -469,6 +467,9 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
             [obsoleteIndexPaths addObject:[NSIndexPath indexPathForRow:[order.displayOrder integerValue] inSection:0]];
         }
     }
+    NSDate *methodFinish = [NSDate date];
+    NSTimeInterval executionTime = [methodFinish timeIntervalSinceDate:methodStart];
+    NSLog(@"Obsolete executionTime = %f", executionTime);
     return obsoleteIndexPaths;
 }
 
@@ -603,6 +604,12 @@ typedef NS_ENUM(NSUInteger, BERowStatus) {
     [self showError:error.localizedDescription];
     NSLog(@"Seriously what happend : %@", error.domain);
 }
+
+
+#pragma FetchedResultsController methods
+
+
+#pragma FetchedResultController methods end
 
 
 - (IBAction)onDoneTap:(UIButton *)sender {

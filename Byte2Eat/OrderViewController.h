@@ -1,11 +1,5 @@
-//
-//  OrderViewController.h
-//  Byte2Eat
-//
-//  Created by Gaurav Yadav on 07/02/14.
-//  Copyright (c) 2014 spiderlogic. All rights reserved.
-//
 
+#import <CoreData/CoreData.h>
 
 @class TransitionManager;
 
@@ -47,6 +41,7 @@
 
 @property (nonatomic, weak) NSDictionary *userInfo;
 @property (nonatomic,strong) TransitionManager *transitionManager;
+
 
 - (IBAction)onLogout:(UIButton *)sender;
 - (IBAction)onOrder:(UIButton *)sender;

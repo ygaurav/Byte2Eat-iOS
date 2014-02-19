@@ -1,11 +1,4 @@
-//
-//  OrderHistoryViewController.h
-//  Byte2Eat
-//
-//  Created by Gaurav Yadav on 09/02/14.
-//  Copyright (c) 2014 spiderlogic. All rights reserved.
-//
-
+#import <CoreData/CoreData.h>
 
 
 @interface OrderHistoryViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, NSURLConnectionDelegate>
@@ -16,6 +9,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet UILabel *operationLabel;
 @property (nonatomic,retain) NSManagedObjectContext* managedObjectContext;
+
 - (IBAction)onDoneTap:(UIButton *)sender;
 
 - (void)setUser:(NSString *)name;

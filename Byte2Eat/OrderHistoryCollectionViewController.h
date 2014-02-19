@@ -5,5 +5,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 - (IBAction)changeCollectionLayout:(UIButton *)sender;
+- (IBAction)onDoneButtonTap:(UIButton *)sender;
 
 @end
