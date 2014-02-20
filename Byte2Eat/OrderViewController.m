@@ -539,7 +539,7 @@
     } else {
         [self showError:error.localizedDescription];
     }
-    NSLog(@"Seriously what happend : %@", error.domain);
+    NSLog(@"Seriously what happend : %@", error.localizedDescription);
 }
 
 #pragma NSURLConnection Delegate Methods end
