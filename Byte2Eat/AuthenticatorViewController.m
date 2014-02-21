@@ -196,6 +196,7 @@
 
 - (void)showError:(NSString *)message {
     [self changeEmitterBirthrateTo:0];
+    [self.timer invalidate];
 
     NSShadow *shadow = [[NSShadow alloc] init];
     shadow.shadowColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.7];
@@ -221,7 +222,7 @@
                              [_errorLabel setCenter:point];
                              [_errorLabel setAlpha:1];
                          } completion:^(BOOL finished){
-        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
     }];
 
 }

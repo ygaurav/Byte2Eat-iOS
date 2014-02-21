@@ -7,6 +7,7 @@
 #import "Utilities.h"
 #import "MySimpleLayout.h"
 #import "MySpringyLayout.h"
+#import "MyCoverFlowLayout.h"
 
 BOOL isFetchingHistory;
 BOOL isSimple = NO;
@@ -23,7 +24,8 @@ int layoutId = 1;
 - (void)viewDidLoad {
     [super viewDidLoad];
 //    MySimpleLayout *flowLayout = [[MySimpleLayout alloc] init];
-    MyFlowLayout *flowLayout = [[MyFlowLayout alloc] init];
+//    MyFlowLayout *flowLayout = [[MyFlowLayout alloc] init];
+    MyCoverFlowLayout *flowLayout = [[MyCoverFlowLayout alloc] init];
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     [self.myCollectionView setCollectionViewLayout:flowLayout animated:YES];
     [self.myCollectionView registerNib:[UINib nibWithNibName:@"WideCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:@"wideCollectionViewCell"];
@@ -147,6 +149,9 @@ int layoutId = 1;
     collectionViewCell.labelItemCost.attributedText = cost;
     collectionViewCell.labelQuantity.attributedText = quantity;
     collectionViewCell.labelOrderDate.attributedText = date;
+
+    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
+    [collectionViewCell addGestureRecognizer:pinchGestureRecognizer];
 
     return collectionViewCell;
 }
@@ -368,4 +373,5 @@ int layoutId = 1;
             break;
     }
 }
+
 @end

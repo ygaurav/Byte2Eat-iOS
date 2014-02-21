@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7EB5E00B3F03E12CF6EF9974 /* MyCoverFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E9B2BB8C4FDE42B4AEAC /* MyCoverFlowLayout.m */; };
 		7EB5E1142653EB00B9D293E2 /* ThanksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E2E083595EDC4380EF4E /* ThanksViewController.m */; };
 		7EB5E3F33D8F2F5F12521FB2 /* MySimpleLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E79A2BADF11356C00D4F /* MySimpleLayout.m */; };
 		7EB5E84F3ED224DABBE249A1 /* OrderHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5EC21DFDB71B4F2D46947 /* OrderHistoryViewController.m */; };
@@ -65,10 +66,12 @@
 		7EB5E2F4CC04E13626C721E1 /* FileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileManager.h; sourceTree = "<group>"; };
 		7EB5E71A7C92169B4E9D61A3 /* OrderHistoryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderHistoryCell.h; sourceTree = "<group>"; };
 		7EB5E71D35117F8D9B9F10E4 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		7EB5E752AF2E1CEA1C320B21 /* MyCoverFlowLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCoverFlowLayout.h; sourceTree = "<group>"; };
 		7EB5E79A2BADF11356C00D4F /* MySimpleLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySimpleLayout.m; sourceTree = "<group>"; };
 		7EB5E7AFBE7C2F387977EC07 /* MySpringyLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySpringyLayout.m; sourceTree = "<group>"; };
 		7EB5E8ED0C4C9235FBEC6C3E /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		7EB5E8F684B11091829D6114 /* OrderHistoryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderHistoryCell.m; sourceTree = "<group>"; };
+		7EB5E9B2BB8C4FDE42B4AEAC /* MyCoverFlowLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCoverFlowLayout.m; sourceTree = "<group>"; };
 		7EB5EA5621B4CFAF4396457A /* OrderViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderViewModel.h; sourceTree = "<group>"; };
 		7EB5EA695EE0BBA693B16B83 /* MySpringyLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySpringyLayout.h; sourceTree = "<group>"; };
 		7EB5EBD9443B83794E04601D /* OrderViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderViewModel.m; sourceTree = "<group>"; };
@@ -229,6 +232,8 @@
 				7EB5EFD7B4267CF0AD77D33B /* MySimpleLayout.h */,
 				7EB5E7AFBE7C2F387977EC07 /* MySpringyLayout.m */,
 				7EB5EA695EE0BBA693B16B83 /* MySpringyLayout.h */,
+				7EB5E9B2BB8C4FDE42B4AEAC /* MyCoverFlowLayout.m */,
+				7EB5E752AF2E1CEA1C320B21 /* MyCoverFlowLayout.h */,
 			);
 			path = Byte2Eat;
 			sourceTree = "<group>";
@@ -386,6 +391,7 @@
 				F4963CD618B3F36C004A7CA1 /* MyCollectionViewCell.m in Sources */,
 				7EB5E3F33D8F2F5F12521FB2 /* MySimpleLayout.m in Sources */,
 				7EB5EF279657794C61D4F72F /* MySpringyLayout.m in Sources */,
+				7EB5E00B3F03E12CF6EF9974 /* MyCoverFlowLayout.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

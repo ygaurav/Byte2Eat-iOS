@@ -27,6 +27,8 @@
 @property (nonatomic) CAEmitterLayer *leftEmitterLayer;
 @property (nonatomic) CAEmitterLayer *rightEmitterLayer;
 
+@property(nonatomic, strong) NSTimer *timer;
+
 - (IBAction)onLoginButtonTap:(UIButton *)sender;
 
 @end

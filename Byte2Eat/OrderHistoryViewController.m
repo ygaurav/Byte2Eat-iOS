@@ -314,7 +314,7 @@
     NSArray *orderHistoryDictionary = [dictionary objectForKey:keyOrderHistory];
     if ([_fetchedResultsController fetchedObjects].count == 0) {
         NSLog(@"Saving order History for first time.");
-        NSNumber *displayOrder = [NSNumber numberWithInt:1];
+        NSNumber *displayOrder = [[NSNumber alloc] initWithInt:1];
         for (NSDictionary *order in orderHistoryDictionary) {
             NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
 
@@ -332,7 +332,7 @@
             if (error) {
                 NSLog(@"Error occured : %@", error.localizedDescription);
             } else {
-                [displayOrder initWithInt:[displayOrder integerValue] + 1];
+                displayOrder = [NSNumber numberWithInt:[displayOrder integerValue] + 1];
                 NSLog(@"Order saved : %@", [dailyMenu objectForKey:@"ItemName"]);
             }
         }

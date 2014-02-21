@@ -1,11 +1,16 @@
-#import "MyFlowLayout.h"
+//
+// Created by Gaurav Yadav on 21/02/14.
+// Copyright (c) 2014 spiderlogic. All rights reserved.
+//
 
-CGFloat ACTIVE_DISTANCE = 275;
-CGFloat RADIUS = 300;
+#import "MyCoverFlowLayout.h"
 
-@implementation MyFlowLayout
 
-#pragma  Paper like Circular layout
+@implementation MyCoverFlowLayout
+CGFloat ACTIVE_DISTANCE_COVER_FLOW = 275;
+CGFloat RADIUS_COVER_FLOW = 300;
+
+#pragma  Cover Flow Layout
 
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect {
     NSArray *array = [super layoutAttributesForElementsInRect:rect];
@@ -16,19 +21,17 @@ CGFloat RADIUS = 300;
         CGFloat distanceInX = CGRectGetMidX(visibleRect) - attr.center.x;
         CGFloat angle = 0;
         if (CGRectIntersectsRect(attr.frame, rect)) {
-            if (ABS(distanceInX) < ACTIVE_DISTANCE) {
-                angle = (CGFloat) asin(-distanceInX/ RADIUS);
-                attr.transform3D = CATransform3DMakeRotation(angle, 0, 0, 1);
+            if (ABS(distanceInX) < ACTIVE_DISTANCE_COVER_FLOW) {
+                CATransform3D transform = CATransform3DIdentity;
+                angle = (CGFloat) asin(distanceInX/ RADIUS_COVER_FLOW);
+                transform.m34 = 1.0/-600;
+                attr.transform3D = CATransform3DRotate(transform, angle, 0, 1, 0);
             }
-            CGFloat d = MAX(0 , 1 - ABS(distanceInX/200));
-            attr.alpha = d;
-//            attr.transform3D = CATransform3DScale(attr.transform3D, d, d, d);
-            CGFloat y = (CGFloat) (attr.center.y + RADIUS *(1 - cos(angle)));
-            attr.center = CGPointMake(attr.center.x, y);
         }
     }
     return array;
 }
+
 
 -(CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset withScrollingVelocity:(CGPoint)velocity {
     CGFloat offsetAdjustment = MAXFLOAT;
@@ -48,5 +51,6 @@ CGFloat RADIUS = 300;
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
     return YES;
 }
+
 
 @end

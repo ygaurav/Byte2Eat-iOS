@@ -43,6 +43,8 @@
 @property (nonatomic,strong) TransitionManager *transitionManager;
 
 
+@property(nonatomic, strong) NSTimer *timer;
+
 - (IBAction)onLogout:(UIButton *)sender;
 - (IBAction)onOrder:(UIButton *)sender;
 - (IBAction)onOrderHistory:(UIButton *)sender;
