@@ -420,10 +420,10 @@
     [self disableUserInput];
 }
 - (IBAction)onOrderHistory:(UIButton *)sender {
-    self.transitionManager.scaleFactor = 0.9;
+    self.transitionManager.scaleFactor = 1;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
-//    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
+//    OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
+    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
@@ -519,7 +519,7 @@
     [self enableUserInput];
     [self changeEmitterBirthrateTo:0];
     if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
-        [self showError:@"Some error occurred. Try again."];
+        [self showError:[NSString stringWithFormat:@"%@",error.localizedDescription]];
         NSMutableAttributedString *itemKaNaam=nil;
         if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
             itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
@@ -550,7 +550,7 @@
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
-    self.transitionManager.scaleFactor = 0.9;
+    self.transitionManager.scaleFactor = 1;
     return self.transitionManager;
 }
 
