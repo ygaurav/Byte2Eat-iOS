@@ -7,10 +7,10 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="wideCollectionViewCell" id="Hir-8L-5BE" customClass="MyWideCollectionViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="327" height="104"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                <rect key="frame" x="0.0" y="0.0" width="327" height="104"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sandwich" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K2n-5N-8qR">
@@ -47,7 +47,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22nd Jan 2014 12:30 pm" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QE0-Pa-tnH">
-                        <rect key="frame" x="146" y="26" width="161" height="17"/>
+                        <rect key="frame" x="139" y="26" width="161" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <color key="textColor" red="0.91342474490000003" green="0.030472052409999999" blue="0.1224566035" alpha="1" colorSpace="calibratedRGB"/>
@@ -69,6 +69,7 @@
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </view>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="aPr-Qv-Gs2" firstAttribute="leading" secondItem="M3w-uj-cmg" secondAttribute="trailing" constant="30" id="5Lw-JU-t0p"/>
                 <constraint firstItem="M3w-uj-cmg" firstAttribute="baseline" secondItem="Pxp-vW-apv" secondAttribute="baseline" id="5ly-jq-zGh"/>
@@ -87,7 +88,7 @@
                 <constraint firstItem="K2n-5N-8qR" firstAttribute="top" secondItem="Hir-8L-5BE" secondAttribute="top" constant="20" id="rIZ-GP-XCA"/>
                 <constraint firstItem="K2n-5N-8qR" firstAttribute="leading" secondItem="M3w-uj-cmg" secondAttribute="leading" id="x2H-vB-4QL"/>
             </constraints>
-            <size key="customSize" width="327" height="104"/>
+            <size key="customSize" width="321" height="104"/>
             <connections>
                 <outlet property="labelItemCost" destination="EDn-yE-GKD" id="kvd-aH-9Ke"/>
                 <outlet property="labelItemName" destination="K2n-5N-8qR" id="VfQ-HY-BSw"/>

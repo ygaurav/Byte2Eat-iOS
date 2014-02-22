@@ -8,6 +8,8 @@
 #import "MySimpleLayout.h"
 #import "MySpringyLayout.h"
 #import "MyCoverFlowLayout.h"
+#import "MyWideCollectionViewCell.h"
+#import "MyCircleLayout.h"
 
 BOOL isFetchingHistory;
 BOOL isSimple = NO;
@@ -23,9 +25,11 @@ int layoutId = 1;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    MyFlowLayout *flowLayout = [[MyFlowLayout alloc] init];
 //    MySimpleLayout *flowLayout = [[MySimpleLayout alloc] init];
-//    MyFlowLayout *flowLayout = [[MyFlowLayout alloc] init];
-    MyCoverFlowLayout *flowLayout = [[MyCoverFlowLayout alloc] init];
+//    MyCoverFlowLayout *flowLayout = [[MyCoverFlowLayout alloc] init];
+//    MySpringyLayout *flowLayout = [[MySpringyLayout alloc] init];
+//    MyCircleLayout *flowLayout  = [[MyCircleLayout alloc] init];
     flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     [self.myCollectionView setCollectionViewLayout:flowLayout animated:YES];
     [self.myCollectionView registerNib:[UINib nibWithNibName:@"WideCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:@"wideCollectionViewCell"];
@@ -98,7 +102,11 @@ int layoutId = 1;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+//  For Other Layout
     MyCollectionViewCell *collectionViewCell = (MyCollectionViewCell *) [self.myCollectionView dequeueReusableCellWithReuseIdentifier:@"myCollectionCell" forIndexPath:indexPath];
+
+//  For Springy Layout
+//    MyWideCollectionViewCell *collectionViewCell = (MyWideCollectionViewCell *)[self.myCollectionView dequeueReusableCellWithReuseIdentifier:@"wideCollectionViewCell" forIndexPath:indexPath];
     Order *order = [orderHistory objectAtIndex:(NSUInteger) indexPath.item];
 
     NSShadow *blueShadow = [[NSShadow alloc] init];
@@ -150,34 +158,21 @@ int layoutId = 1;
     collectionViewCell.labelQuantity.attributedText = quantity;
     collectionViewCell.labelOrderDate.attributedText = date;
 
-    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
-    [collectionViewCell addGestureRecognizer:pinchGestureRecognizer];
-
     return collectionViewCell;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(210, 234);
+    return CGSizeMake(210, 234);                      //For Every other Layout
+//    return CGSizeMake(320, 100);                        //For Springy Layout
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(50, 55, 50, 55);
+    return UIEdgeInsetsMake(50, 55, 50, 55);          //For Every other layout
+//    return UIEdgeInsetsMake(0, 0, 0, 0);                //For Springy Layout
 }
 
-
 - (IBAction)changeCollectionLayout:(UIButton *)sender {
-////    MyFlowLayout *flowLayout = [[MyFlowLayout alloc] init];
-//    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-//    flowLayout.scrollDirection = isVertical ? UICollectionViewScrollDirectionHorizontal : UICollectionViewScrollDirectionVertical;
-//    isVertical = !isVertical;
-//    [self.myCollectionView setCollectionViewLayout:flowLayout animated:YES];
-////    [self.myCollectionView reloadItemsAtIndexPaths:[self.myCollectionView visibleCells]];
-
-//    self.cellCount = self.cellCount + 1;
-//    [self.myCollectionView performBatchUpdates:^{
-//        [self.myCollectionView insertItemsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForItem:0 inSection:0]]];
-//    }                               completion:nil];
-    [self changeLayout];
+    //TODO Do Something
 }
 
 - (IBAction)onDoneButtonTap:(UIButton *)sender {
@@ -185,13 +180,6 @@ int layoutId = 1;
 }
 
 - (IBAction)onDeleteTap:(UIButton *)sender {
-//    if (self.cellCount != 0) {
-//        self.cellCount = self.cellCount - 1;
-//        [self.myCollectionView performBatchUpdates:^{
-//            [self.myCollectionView deleteItemsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath indexPathForItem:0 inSection:0]]];
-//
-//        }                               completion:nil];
-//    }
 }
 
 
@@ -297,7 +285,7 @@ int layoutId = 1;
         if (error) {
             NSLog(@"Error occured : %@", error.localizedDescription);
         } else {
-            [displayOrder initWithInt:[displayOrder integerValue] + 1];
+            displayOrder = [NSNumber numberWithInt:[displayOrder integerValue] + 1];
             NSLog(@"Order saved : %@", [dailyMenu objectForKey:@"ItemName"]);
         }
     }
@@ -320,6 +308,12 @@ int layoutId = 1;
     date = [dateFormatter dateFromString:stringDate];
     return date;
 }
+/*! Takes NSDate and returns short string containing date only
+ 
+ @param NSDate *
+ @returns NSString *
+ 
+*/
 
 - (NSString *)shortDateTimeString:(NSDate *)date {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -340,38 +334,5 @@ int layoutId = 1;
     userName = name;
 }
 
--(void) changeLayout{
-//    if(isSimple){
-//        MyFlowLayout *flowLayout = [[MyFlowLayout alloc] init];
-//        [self.myCollectionView setCollectionViewLayout:flowLayout animated:YES];
-//    }else{
-////        MySimpleLayout *mySimpleLayout = [[MySimpleLayout alloc] init];
-//        MySpringyLayout *mySimpleLayout = [[MySpringyLayout alloc] init];
-//        [self.myCollectionView setCollectionViewLayout:mySimpleLayout animated:YES];
-//    }
-//    isSimple = !isSimple;
-    //TODO: ON DID SELECT CELL WE CAN ZOOM UP CELL IN SPRINGY WAY ;-)
-
-    UICollectionViewFlowLayout *layout ;
-    switch(layoutId){
-        case 1:
-            layoutId = 2;
-            layout = [[MySpringyLayout alloc] init];
-            [self.myCollectionView setCollectionViewLayout:layout animated:YES];
-            break;
-        case 2:
-            layoutId = 3;
-            layout = [[MyFlowLayout alloc] init];
-            [self.myCollectionView setCollectionViewLayout:layout animated:YES];
-            break;
-        case 3:
-            layoutId = 1;
-            layout = [[MySimpleLayout alloc] init];
-            [self.myCollectionView setCollectionViewLayout:layout animated:YES];
-            break;
-        default:
-            break;
-    }
-}
 
 @end

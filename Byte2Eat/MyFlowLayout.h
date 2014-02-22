@@ -10,8 +10,4 @@
 
 @interface MyFlowLayout : UICollectionViewFlowLayout
 
-@property (nonatomic, strong) NSMutableArray *deleteIndexPaths;
-@property (nonatomic, strong) NSMutableArray *insertIndexPaths;
-@property (nonatomic, assign) NSInteger cellCount;
-@property (nonatomic, strong) UIDynamicAnimator *dynamicAnimator;
 @end

@@ -318,7 +318,7 @@
 - (void)setTodayMenu:(NSDictionary *)dictionary {
     _dailyMenuId = [dictionary objectForKey:keyMenuId];
     _itemName = [dictionary objectForKey:keyItemName];
-    NSLog(@"---- %@",_dailyMenuId);
+    NSLog(@"Daily Menu Id---- %@",_dailyMenuId);
     NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
@@ -423,8 +423,8 @@
 - (IBAction)onOrderHistory:(UIButton *)sender {
     self.transitionManager.scaleFactor = 1;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
-    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
+    OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
+//    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
@@ -551,7 +551,7 @@
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
-    self.transitionManager.scaleFactor = 1;
+    self.transitionManager.scaleFactor = 0.9;
     return self.transitionManager;
 }
 

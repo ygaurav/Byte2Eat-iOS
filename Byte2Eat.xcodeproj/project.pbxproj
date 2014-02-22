@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7EB5E00B3F03E12CF6EF9974 /* MyCoverFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E9B2BB8C4FDE42B4AEAC /* MyCoverFlowLayout.m */; };
 		7EB5E1142653EB00B9D293E2 /* ThanksViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E2E083595EDC4380EF4E /* ThanksViewController.m */; };
+		7EB5E252AEACFC52202E0DCD /* MyCircleLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5EE03ADDC7E4F31F12070 /* MyCircleLayout.m */; };
 		7EB5E3F33D8F2F5F12521FB2 /* MySimpleLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E79A2BADF11356C00D4F /* MySimpleLayout.m */; };
 		7EB5E84F3ED224DABBE249A1 /* OrderHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5EC21DFDB71B4F2D46947 /* OrderHistoryViewController.m */; };
 		7EB5E937A0DE3E0A63C88A50 /* OrderHistoryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EB5E8F684B11091829D6114 /* OrderHistoryCell.m */; };
@@ -60,6 +61,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7EB5E1EF99A0ED876F5D9C68 /* MyCircleLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCircleLayout.h; sourceTree = "<group>"; };
 		7EB5E2314D7D8EC13B9A16DC /* ThanksViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThanksViewController.h; sourceTree = "<group>"; };
 		7EB5E2E083595EDC4380EF4E /* ThanksViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThanksViewController.m; sourceTree = "<group>"; };
 		7EB5E2E5E7D693B51AAC80D0 /* Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utilities.m; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 		7EB5EC21DFDB71B4F2D46947 /* OrderHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderHistoryViewController.m; sourceTree = "<group>"; };
 		7EB5ECACD6908E770FAC719D /* FileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileManager.m; sourceTree = "<group>"; };
 		7EB5ECD3226539B20458B89B /* OrderHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderHistoryViewController.h; sourceTree = "<group>"; };
+		7EB5EE03ADDC7E4F31F12070 /* MyCircleLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCircleLayout.m; sourceTree = "<group>"; };
 		7EB5EE9F05904CB2CFAAC717 /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		7EB5EFD7B4267CF0AD77D33B /* MySimpleLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySimpleLayout.h; sourceTree = "<group>"; };
 		F4147BE918B0DEC500ECEDA2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -234,6 +237,8 @@
 				7EB5EA695EE0BBA693B16B83 /* MySpringyLayout.h */,
 				7EB5E9B2BB8C4FDE42B4AEAC /* MyCoverFlowLayout.m */,
 				7EB5E752AF2E1CEA1C320B21 /* MyCoverFlowLayout.h */,
+				7EB5EE03ADDC7E4F31F12070 /* MyCircleLayout.m */,
+				7EB5E1EF99A0ED876F5D9C68 /* MyCircleLayout.h */,
 			);
 			path = Byte2Eat;
 			sourceTree = "<group>";
@@ -392,6 +397,7 @@
 				7EB5E3F33D8F2F5F12521FB2 /* MySimpleLayout.m in Sources */,
 				7EB5EF279657794C61D4F72F /* MySpringyLayout.m in Sources */,
 				7EB5E00B3F03E12CF6EF9974 /* MyCoverFlowLayout.m in Sources */,
+				7EB5E252AEACFC52202E0DCD /* MyCircleLayout.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
