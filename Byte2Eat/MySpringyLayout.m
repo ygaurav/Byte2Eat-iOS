@@ -1,8 +1,3 @@
-//
-// Created by Gaurav Yadav on 21/02/14.
-// Copyright (c) 2014 spiderlogic. All rights reserved.
-//
-
 #import "MySpringyLayout.h"
 
 @interface MySpringyLayout ()
@@ -15,11 +10,6 @@
 @implementation MySpringyLayout
 -(id)init {
     if (!(self = [super init])) return nil;
-
-//    self.minimumInteritemSpacing = 10;
-//    self.minimumLineSpacing = 10;
-//    self.itemSize = CGSizeMake(44, 44);
-//    self.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10);
 
     self.dynamicAnimator = [[UIDynamicAnimator alloc] initWithCollectionViewLayout:self];
     self.visibleIndexPathsSet = [NSMutableSet set];

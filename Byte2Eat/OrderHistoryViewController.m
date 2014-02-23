@@ -63,6 +63,10 @@
     return YES;
 }
 
+-(void) setBackgroundImage:(UIImage *)backgroundImage{
+    [self.tableView setBackgroundView:backgroundImage];
+}
+
 - (NSArray *)getSavedOrderHistory {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 

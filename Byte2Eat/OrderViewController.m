@@ -246,16 +246,16 @@
             uiImage = [UIImage imageNamed:@"myoranges"];
             break;
         case 2:
-            uiImage = [UIImage imageNamed:@"fruits.png"];
+            uiImage = [UIImage imageNamed:@"IceCream"];
             break;
         case 3:
-            uiImage = [UIImage imageNamed:@"foodcake"];
+            uiImage = [UIImage imageNamed:@"Foodcopy"];
             break;
         case 4:
-            uiImage = [UIImage imageNamed:@"slicedfruitcopy"];
+            uiImage = [UIImage imageNamed:@"fetasaladfood"];
             break;
         default:
-            uiImage = [UIImage imageNamed:@"slicedfruitcopy"];
+            uiImage = [UIImage imageNamed:@"everything"];
     }
 
     UIImage *image = [uiImage applyLightEffect];
@@ -295,10 +295,12 @@
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    _currentOrderNumber = [NSNumber numberWithInteger:row + 1];
+    if (_pricePerUnit && _pricePerUnit != [NSNumber numberWithInt:0]) {
+        _currentOrderNumber = [NSNumber numberWithInteger:row + 1];
 
-    [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
-    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
+        [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
+        [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
+    }
 }
 
 - (void)updateTotalCost:(NSTimer *)timer {
@@ -319,7 +321,12 @@
     _dailyMenuId = [dictionary objectForKey:keyMenuId];
     _itemName = [dictionary objectForKey:keyItemName];
     NSLog(@"Daily Menu Id---- %@",_dailyMenuId);
-    NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
+    NSMutableAttributedString *itemKaNaam = nil;
+    if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
+        itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"nothing today :("];
+    } else {
+        itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
+    }
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
@@ -332,11 +339,21 @@
 
     _pricePerUnit = (NSNumber *)[dictionary objectForKey:keyItemPrice];
 
-    NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]]];
+    NSString *itemPriceText=nil;
+    NSString *totalCostText=nil;
+
+    if (_pricePerUnit && _pricePerUnit != [NSNumber numberWithInt:0]) {
+        itemPriceText = [NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]];
+        totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
+    } else {
+        itemPriceText = @"N/A";
+        totalCostText = @"N/A";
+    }
+    NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:itemPriceText];
     [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
     [_LabelPricePerUnit setAttributedText:pricePerUnitString];
 
-    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalCostText];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     [_LabelTotalCost setAttributedText:totalCostString];
 }
@@ -351,7 +368,8 @@
 
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:response];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
-    [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
+//    [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
+    [error addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, error.length)];
     [_errorLabel setAttributedText:error];
 
     CGPoint point = _errorLabel.center;
@@ -367,7 +385,7 @@
                          [_errorLabel setCenter:point];
                          [_errorLabel setAlpha:1];
                      } completion:^(BOOL finished){
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
     }];
 }
 
@@ -408,26 +426,40 @@
 }
 
 - (IBAction)onOrder:(UIButton *)sender {
-    NSString *message = [NSString stringWithFormat:@"Toda's Order Summary \n\n Earlier Order Qty : %@ \nCurrent Order Qty : %@\n-------------------------------\nTotal order Qty: %u", _todayTotalOrder, _currentOrderNumber, [_todayTotalOrder unsignedIntValue] + [_currentOrderNumber unsignedIntValue]];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
-                                                    message:message
-                                                   delegate:self
-                                          cancelButtonTitle:@"Cancel"
-                                          otherButtonTitles:@"OK", nil];
-    [alert setTag:keyAlertOrderConfirm];
-    [alert show];
+    if (_dailyMenuId && ![_dailyMenuId isEqualToNumber:[NSNumber numberWithInt:0]]) {
+        NSString *message = [NSString stringWithFormat:@"Toda's Order Summary \n\n Earlier Order Qty : %@ \nCurrent Order Qty : %@\n-------------------------------\nTotal order Qty: %u", _todayTotalOrder, _currentOrderNumber, [_todayTotalOrder unsignedIntValue] + [_currentOrderNumber unsignedIntValue]];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
+                                                        message:message
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                              otherButtonTitles:@"OK", nil];
+        [alert setTag:keyAlertOrderConfirm];
+        [alert show];
 
-    [self changeEmitterBirthrateTo:100];
-    [self disableUserInput];
+        [self changeEmitterBirthrateTo:100];
+        [self disableUserInput];
+    }else{
+        [self showError:@"Nothing in menu today. Try refreshing."];
+    }
 }
 - (IBAction)onOrderHistory:(UIButton *)sender {
     self.transitionManager.scaleFactor = 1;
+
+    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, NO, 0);
+    
+    [self.view drawViewHierarchyInRect:self.view.bounds afterScreenUpdates:YES];
+    
+    UIImage *copied = UIGraphicsGetImageFromCurrentImageContext();
+    UIImage *background = [copied applyExtraLightEffect];
+    UIGraphicsEndImageContext();
+    
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
 //    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
+    [modal setBackgroundImage:background];
     [self presentViewController:modal animated:YES completion:^{
     }];
 }
@@ -551,7 +583,6 @@
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
-    self.transitionManager.scaleFactor = 0.9;
     return self.transitionManager;
 }
 

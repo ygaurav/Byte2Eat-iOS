@@ -10,6 +10,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *operationLabel;
 @property (nonatomic,retain) NSManagedObjectContext* managedObjectContext;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+-(void) setBackgroundImage:(UIImage *)backgroundImage;
 
 - (IBAction)onDoneTap:(UIButton *)sender;
 - (IBAction)onTopButtonTap:(UIButton *)sender;
