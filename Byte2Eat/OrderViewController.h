@@ -1,5 +1,6 @@
 
 #import <CoreData/CoreData.h>
+#import <CoreMotion/CoreMotion.h>
 
 @class TransitionManager;
 
@@ -31,7 +32,7 @@
 @property (nonatomic) NSNumber *dailyMenuId;
 
 @property (nonatomic, strong) NSShadow *shadow;
-@property (nonatomic, strong) NSShadow *blueShadow;
+@property (nonatomic, strong) NSShadow *whiteShadow;
 @property (nonatomic, strong) NSShadow *greenShadow;
 @property (nonatomic, strong) NSShadow *redShadow;
 @property (nonatomic) CAEmitterLayer *sparkleEmitterLayer;

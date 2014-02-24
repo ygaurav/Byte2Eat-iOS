@@ -11,6 +11,8 @@
     CAEmitterLayer *_leftEmitterLayer;
     CAEmitterLayer *_rightEmitterLayer;
     NSMutableData *totalData;
+    NSDateFormatter *shortDateFormatter;
+    NSDateFormatter *dateFromJSONFormatter;
 }
 
 @synthesize managedObjectContext;
@@ -18,17 +20,30 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
+        [self setUpDateFormatter];
     [self setData];
     [self setUpAnimations];
-
+    
     self.managedObjectContext = [Utilities getManagedObjectContext];
+    
 
 
     NSError *error;
     if (![[self fetchedResultsController:NO ] performFetch:&error]) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     }
+}
+
+-(void) setUpDateFormatter{
+    shortDateFormatter = [[NSDateFormatter alloc] init];
+    [shortDateFormatter setDateStyle:NSDateFormatterMediumStyle];
+    dateFromJSONFormatter = [[NSDateFormatter alloc] init];
+    
+    [NSDateFormatter setDefaultFormatterBehavior:NSDateFormatterBehavior10_4];
+    [dateFromJSONFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+    [dateFromJSONFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    [dateFromJSONFormatter setCalendar:[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar]];
 }
 
 - (NSFetchedResultsController *)fetchedResultsController:(BOOL)ascending {
@@ -64,7 +79,10 @@
 }
 
 -(void) setBackgroundImage:(UIImage *)backgroundImage{
-    [self.tableView setBackgroundView:backgroundImage];
+    [self.tableView setBackgroundColor:[UIColor clearColor]];
+    UIImageView *imageView = [[UIImageView alloc]initWithImage:backgroundImage];
+    imageView.layer.zPosition = -1;
+    [self.view addSubview:imageView];
 }
 
 - (NSArray *)getSavedOrderHistory {
@@ -81,24 +99,22 @@
 }
 
 - (void)setData {
-
+    self.operationLabel.text = @"";
+    
     self.shadow = [[NSShadow alloc] init];
     self.shadow.shadowBlurRadius = 3.0;
     self.shadow.shadowColor = [UIColor blackColor];
     self.shadow.shadowOffset = CGSizeMake(0, 0);
-    self.operationLabel.text = @"";
-
 
     NSShadow *blueShadow = [[NSShadow alloc] init];
     blueShadow.shadowColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:0.5];
     blueShadow.shadowOffset = CGSizeMake(0, 0);
     blueShadow.shadowBlurRadius = 3.0;
 
-    self.doneButton.backgroundColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:.6];
     NSMutableAttributedString *doneButton = [[NSMutableAttributedString alloc] initWithString:@"Done"];
-    [doneButton addAttribute:NSShadowAttributeName value:blueShadow range:NSMakeRange(0, doneButton.length)];
-    [doneButton addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:1] range:NSMakeRange(0, doneButton.length)];
-    [doneButton addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:20] range:NSMakeRange(0, doneButton.length)];
+    [doneButton addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, doneButton.length)];
+    [doneButton addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, doneButton.length)];
+    [doneButton addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:22] range:NSMakeRange(0, doneButton.length)];
     [self.doneButton setAttributedTitle:doneButton forState:UIControlStateNormal];
 
     NSMutableAttributedString *history = [[NSMutableAttributedString alloc] initWithString:@"Order History"];
@@ -271,7 +287,7 @@
     [cost addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, cost.length)];
 
-    NSMutableAttributedString *date = [[NSMutableAttributedString alloc] initWithString:[self shortDateTimeString:order.orderDate]];
+    NSMutableAttributedString *date = [[NSMutableAttributedString alloc] initWithString:[shortDateFormatter stringFromDate:order.orderDate]];
     [date addAttribute:NSShadowAttributeName value:redShadow range:NSMakeRange(0, date.length)];
     [date addAttribute:NSForegroundColorAttributeName value:redColor range:NSMakeRange(0, date.length)];
     [date addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, date.length)];
@@ -286,32 +302,16 @@
 
 }
 
-- (NSString *)shortDateTimeString:(NSDate *)date {
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
-    return [dateFormatter stringFromDate:date];
-}
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     NSLog(@"Response - %@", response);
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    NSLog(@"Received %d bytes of data", [data length]);
+    NSLog(@"Received %lu bytes of data", (unsigned long)[data length]);
     if (data != nil) {
         [totalData appendData:data];
     }
-}
-
-- (NSDate *)dateWithJSONString:(NSString *)stringDate {
-    [NSDateFormatter setDefaultFormatterBehavior:NSDateFormatterBehavior10_4];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-    [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-    [dateFormatter setCalendar:[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar]];
-    NSDate *date;
-    date = [dateFormatter dateFromString:stringDate];
-    return date;
 }
 
 - (void)setOrderHistory:(NSDictionary *)dictionary {
@@ -328,7 +328,7 @@
             orderObject.quantity = [order objectForKey:@"Quantity"];
             orderObject.itemName = [dailyMenu objectForKey:keyItemName];
             orderObject.price = [dailyMenu objectForKey:keyItemPrice];
-            orderObject.orderDate = [self dateWithJSONString:(NSString *) [order objectForKey:@"OrderDate"]];
+            orderObject.orderDate = [dateFromJSONFormatter dateFromString:(NSString *) [order objectForKey:@"OrderDate"]];
             orderObject.displayOrder = displayOrder;
 
             NSError *error;
@@ -336,8 +336,7 @@
             if (error) {
                 NSLog(@"Error occured : %@", error.localizedDescription);
             } else {
-                displayOrder = [NSNumber numberWithInt:[displayOrder integerValue] + 1];
-                NSLog(@"Order saved : %@", [dailyMenu objectForKey:@"ItemName"]);
+                displayOrder = [NSNumber numberWithLong:[displayOrder integerValue] + 1];
             }
         }
     } else {
@@ -345,9 +344,8 @@
         for(Order *order in _fetchedResultsController.fetchedObjects){
             BOOL isDeleted = YES;
             for(NSDictionary *orderDict in orderHistoryDictionary){
-                if([[self dateWithJSONString:(NSString *) [orderDict objectForKey:@"OrderDate"]] compare:order.orderDate] == NSOrderedSame){
+                if([[dateFromJSONFormatter dateFromString:(NSString *) [orderDict objectForKey:@"OrderDate"]] compare:order.orderDate] == NSOrderedSame){
                     if(order.quantity != [orderDict objectForKey:@"Quantity"]){
-                        NSLog(@"Updated %@, from %@ to %@", order.itemName, order.quantity,[orderDict objectForKey:@"Quantity"] );
                         order.quantity = [orderDict objectForKey:@"Quantity"];
                     }
                     isDeleted = NO;
@@ -355,7 +353,6 @@
                 }
             }
             if(isDeleted){
-                NSLog(@"Deleted : %@", order.itemName);
                 [self.managedObjectContext deleteObject:order];
             }
         }
@@ -364,7 +361,7 @@
         for (NSDictionary *order in orderHistoryDictionary) {
             BOOL isNew = YES;
             for(Order *orderManagedObject in [_fetchedResultsController fetchedObjects]){
-                if([[self dateWithJSONString:(NSString *) [order objectForKey:@"OrderDate"]] compare:orderManagedObject.orderDate] == NSOrderedSame){
+                if([[dateFromJSONFormatter dateFromString:(NSString *) [order objectForKey:@"OrderDate"]] compare:orderManagedObject.orderDate] == NSOrderedSame){
                     isNew = NO;
                     break;
                 }
@@ -379,8 +376,7 @@
                 orderObject.quantity = [order objectForKey:@"Quantity"];
                 orderObject.itemName = [dailyMenu objectForKey:keyItemName];
                 orderObject.price = [dailyMenu objectForKey:keyItemPrice];
-                orderObject.orderDate = [self dateWithJSONString:(NSString *) [order objectForKey:@"OrderDate"]];
-                NSLog(@"Saving Order %@, %@", orderObject.itemName, orderObject.orderDate);
+                orderObject.orderDate = [dateFromJSONFormatter dateFromString:(NSString *) [order objectForKey:@"OrderDate"]];
             }
         }
     }
@@ -390,7 +386,7 @@
         NSLog(@"Error occured : %@", error.localizedDescription);
     }
     [_fetchedResultsController performFetch:&error];
-    NSLog(@"Count after save = %u", [_fetchedResultsController fetchedObjects].count);
+    NSLog(@"Count after save = %lu", (unsigned long)[_fetchedResultsController fetchedObjects].count);
     [self.managedObjectContext processPendingChanges];
 }
 
@@ -474,7 +470,7 @@
     } else {
         NSString *response = (NSString *) [jsonArray objectForKey:keyResponseMessage];
         [self showError:response];
-        NSLog(@"%@", response);
+        NSLog(@"Response : %@", response);
     }
 }
 
@@ -501,7 +497,7 @@
     [self changeEmitterBirthrateTo:0];
     [self setTitleBack];
     [self showError:error.localizedDescription];
-    NSLog(@"Seriously what happend : %@", error.localizedDescription);
+    NSLog(@"Error : %@", error.localizedDescription);
 }
 
 
@@ -514,14 +510,12 @@
  */
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
-    NSLog(@"controllerWillChangeContent");
     [self.tableView beginUpdates];
 }
 
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
            atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
-    NSLog(@"didChangeSection at index %u", sectionIndex);
 
     switch (type) {
         case NSFetchedResultsChangeInsert:
@@ -540,7 +534,6 @@
 - (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject
        atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath {
-    NSLog(@"didChangeObject at indexpath %@, new Indexpath %@", indexPath, newIndexPath);
 
     UITableView *tableView = self.tableView;
 
@@ -572,7 +565,6 @@
 
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
-    NSLog(@"controllerDidChangeContent");
     [self.tableView endUpdates];
 }
 
@@ -585,14 +577,11 @@
 }
 
 - (IBAction)onTopButtonTap:(UIButton *)sender {
-    NSError *error;
     NSMutableArray *array = [[_fetchedResultsController fetchedObjects] mutableCopy];
 
     for(int j = 0; j <array.count; j++){
         Order *order = (Order *) [array objectAtIndex:(NSUInteger) j];
-        NSLog(@"Before %@ - %@",order.orderDate, order.displayOrder);
         (order).displayOrder = [NSNumber numberWithUnsignedInteger:array.count - j];
-        NSLog(@"After %@ - %@",order.orderDate, order.displayOrder);
     }
 
     [self.managedObjectContext save:nil];

@@ -1,11 +1,3 @@
-//
-//  AuthenticatorViewController.m
-//  Byte2Eat
-//
-//  Created by Gaurav Yadav on 08/02/14.
-//  Copyright (c) 2014 spiderlogic. All rights reserved.
-//
-
 #import "AuthenticatorViewController.h"
 #import "UIImage+ImageEffects.h"
 #import "TransitionManager.h"
@@ -49,9 +41,24 @@
 }
 
 - (void)setBackgroundImage {
-    UIImage *uiImage = [UIImage imageNamed:@"slicedfruitcopy"];
-    UIImage *image = [uiImage applyLightEffect];
-    [self.backgroundView setImage:image];
+    dispatch_queue_t queue = dispatch_queue_create("com.spiderlogic.Byte2Eat", NULL);
+    dispatch_async(queue, ^{
+        __block UIImage *image = [[UIImage imageNamed:@"slicedfruitcopy"] applyLightEffect];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [UIView transitionWithView:_backgroundView
+                              duration:0.5f
+                               options:UIViewAnimationOptionTransitionCrossDissolve
+                            animations:^{
+                                [_backgroundView setImage:image];
+                            } completion:^(BOOL finished){
+                image = nil;
+            }];
+        });
+    });
+//    UIImage *uiImage = [UIImage imageNamed:@"slicedfruitcopy"];
+//    UIImage *image = [uiImage applyLightEffect];
+//    uiImage = nil;
+//    [self.backgroundView setImage:image];
 }
 
 - (void)setTitleStyles {
@@ -77,7 +84,7 @@
 - (void)setTitleAnimation {
     CATransform3D transform3D = CATransform3DIdentity;
     transform3D = CATransform3DScale(transform3D, 5, 5, 5);
-//    transform3D.m34 = 1./-1200;
+    transform3D.m34 = 1./-1200;
     self.byte2eatHeader.layer.transform = transform3D;
     self.loginSubheading.layer.transform = transform3D;
     [UIView animateWithDuration:1
@@ -199,7 +206,7 @@
     [self.timer invalidate];
 
     NSShadow *shadow = [[NSShadow alloc] init];
-    shadow.shadowColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.7];
+    shadow.shadowColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:1];
     shadow.shadowBlurRadius = 2.0;
     shadow.shadowOffset = CGSizeMake(0, 0);
 
@@ -207,6 +214,7 @@
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:message];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
     [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
+    [error addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:14] range:NSMakeRange(0, error.length)];
     [_errorLabel setAttributedText:error];
 
     CGPoint point = _errorLabel.center;
@@ -222,7 +230,7 @@
                              [_errorLabel setCenter:point];
                              [_errorLabel setAlpha:1];
                          } completion:^(BOOL finished){
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:keyErrorMessageTime target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
     }];
 
 }
@@ -352,6 +360,7 @@
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     [self enableUserInput];
     [self changeEmitterBirthrateTo:0];
+    
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

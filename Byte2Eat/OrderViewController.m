@@ -10,6 +10,8 @@
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
+    CMMotionManager *cmManager;
+    
 }
 
 - (void)viewDidLoad{
@@ -17,6 +19,14 @@
 
     isFetchingMenu = NO;
     self.transitionManager = [[TransitionManager alloc] init];
+    
+    cmManager.accelerometerUpdateInterval = 0.1;
+    
+    [cmManager startGyroUpdatesToQueue:[NSOperationQueue currentQueue]
+                                    withHandler:^(CMGyroData *gyroData, NSError *error) {
+                                        [self outputRotationData:gyroData.rotationRate];
+                                    }];
+
     [self initShadows];
     [self setUserInformation];
     [self styleStaticData];
@@ -26,16 +36,20 @@
 
 }
 
+- (void)outputRotationData:(CMRotationRate)rotation {
+    
+}
+
 - (void)initShadows {
     self.shadow = [[NSShadow alloc] init];
     self.shadow.shadowBlurRadius = 3.0;
     self.shadow.shadowColor = [UIColor blackColor];
     self.shadow.shadowOffset = CGSizeMake(0, 0);
 
-    self.blueShadow = [[NSShadow alloc] init];
-    self.blueShadow.shadowBlurRadius = 3.0;
-    self.blueShadow.shadowColor = [UIColor colorWithRed:60 green:71 blue:210 alpha:1];
-    self.blueShadow.shadowOffset = CGSizeMake(0, 0);
+    self.whiteShadow = [[NSShadow alloc] init];
+    self.whiteShadow.shadowBlurRadius = 3.0;
+    self.whiteShadow.shadowColor = [UIColor colorWithRed:60 green:71 blue:210 alpha:1];
+    self.whiteShadow.shadowOffset = CGSizeMake(0, 0);
 
     self.redShadow = [[NSShadow alloc] init];
     self.redShadow.shadowBlurRadius = 3.0;
@@ -84,7 +98,7 @@
 
     NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"fetching today's menu"];
     [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
     CATransition *animation = [CATransition animation];
@@ -151,7 +165,8 @@
     [_scrollView.layer addSublayer:self.rightEmitterLayer];
 
     self.sparkleEmitterLayer = [CAEmitterLayer layer];
-    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x + 2, _LabelTotalCost.layer.position.y + 63);
+//    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x + 2, _LabelTotalCost.layer.position.y + 63);
+    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.frame.origin.x + 30, _LabelTotalCost.frame.origin.y + 70);
     self.sparkleEmitterLayer.emitterZPosition = 10.0;
     self.sparkleEmitterLayer.emitterSize = CGSizeMake(5, 5);
     self.sparkleEmitterLayer.emitterShape = kCAEmitterLayerPoint;
@@ -230,6 +245,7 @@
         [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:range];
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50 / 256.0 green:193 / 256.0 blue:92 / 256.0 alpha:1] range:range];
     }
+    [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, remainingBalanceString.length)];
     [_LabelRemainingBalance setAttributedText:remainingBalanceString];
 }
 
@@ -237,8 +253,8 @@
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit) fromDate:[NSDate date]];
 
-    int seconds = [components second];
-    int d = seconds%5;
+    long seconds = [components second];
+    int d = seconds%9;
 
     UIImage *uiImage;
     switch(d){
@@ -254,13 +270,38 @@
         case 4:
             uiImage = [UIImage imageNamed:@"fetasaladfood"];
             break;
+        case 5:
+            uiImage = [UIImage imageNamed:@"fruits"];
+            break;
+        case 6:
+            uiImage = [UIImage imageNamed:@"spinich"];
+            break;
+        case 7:
+            uiImage = [UIImage imageNamed:@"FruitVegetables"];
+            break;
         default:
             uiImage = [UIImage imageNamed:@"everything"];
     }
 
-    UIImage *image = [uiImage applyLightEffect];
+    dispatch_queue_t queue = dispatch_queue_create("com.spiderlogic.Byte2Eat", NULL);
+    dispatch_async(queue, ^{
+        __block UIImage *image = [uiImage applyLightEffect];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [UIView transitionWithView:_backgroundImageView
+                              duration:0.5f
+                               options:UIViewAnimationOptionTransitionCrossDissolve
+                            animations:^{
+                                [_backgroundImageView setImage:image];
+                            } completion:^(BOOL finished){
+                                
+                                image = nil;
+                            }];
+        });
+    });
+    
+//    UIImage *image = [uiImage applyLightEffect];
 
-    [self.backgroundImageView setImage:image];
+//    [self.backgroundImageView setImage:image];
 
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
     interpolationHorizontal.minimumRelativeValue = @30.0;
@@ -320,14 +361,13 @@
 - (void)setTodayMenu:(NSDictionary *)dictionary {
     _dailyMenuId = [dictionary objectForKey:keyMenuId];
     _itemName = [dictionary objectForKey:keyItemName];
-    NSLog(@"Daily Menu Id---- %@",_dailyMenuId);
     NSMutableAttributedString *itemKaNaam = nil;
     if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"nothing today :("];
     } else {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
     }
-    [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
     CATransition *animation = [CATransition animation];
@@ -361,14 +401,14 @@
 - (void)showError:(NSString *)response {
     [self.timer invalidate];
     NSShadow *shadow = [[NSShadow alloc] init];
-    shadow.shadowColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.7];
+    shadow.shadowColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
     shadow.shadowBlurRadius = 2.0;
     shadow.shadowOffset = CGSizeMake(0, 0);
 
 
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:response];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
-//    [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
+    [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
     [error addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, error.length)];
     [_errorLabel setAttributedText:error];
 
@@ -385,7 +425,7 @@
                          [_errorLabel setCenter:point];
                          [_errorLabel setAlpha:1];
                      } completion:^(BOOL finished){
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:keyErrorMessageTime target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
     }];
 }
 
@@ -396,8 +436,6 @@
                      animations:^{
                          _errorLabel.alpha = 0;
                      } completion:nil];
-
-
     [timer invalidate];
 }
 
@@ -443,15 +481,13 @@
     }
 }
 - (IBAction)onOrderHistory:(UIButton *)sender {
-    self.transitionManager.scaleFactor = 1;
+    self.transitionManager.scaleFactor = 0.9;
 
-    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, NO, 0);
-    
-    [self.view drawViewHierarchyInRect:self.view.bounds afterScreenUpdates:YES];
-    
-    UIImage *copied = UIGraphicsGetImageFromCurrentImageContext();
-    UIImage *background = [copied applyExtraLightEffect];
-    UIGraphicsEndImageContext();
+//    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, NO, 0);
+//    [self.view drawViewHierarchyInRect:self.view.bounds afterScreenUpdates:YES];
+//    UIImage *copied = UIGraphicsGetImageFromCurrentImageContext();
+//    UIImage *background = [copied applyLightEffect];
+//    UIGraphicsEndImageContext();
     
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
@@ -459,7 +495,7 @@
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
-    [modal setBackgroundImage:background];
+//    [modal setBackgroundImage:background];
     [self presentViewController:modal animated:YES completion:^{
     }];
 }
@@ -480,7 +516,6 @@
     NSError *error = nil;
     NSURL *url = connection.currentRequest.URL;
     NSLog(@"URL : %@", url);
-    //TODO : if contains menu, user, order etc
     if([[url absoluteString] rangeOfString:@"menu"].location != NSNotFound){
         //Menu
 
@@ -497,19 +532,12 @@
         NSError *error = nil;
         NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         BOOL userExists = ![((NSNumber *)[jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:0]];
-        NSNumber *userId = (NSNumber *)[jsonArray objectForKey:keyUserId];
-        NSLog(@"--- %d -- %@", userExists, userId);
         if(userExists){
-            NSString *userName = (NSString *)[jsonArray objectForKey:keyUserName];
-            NSNumber *balance = (NSNumber *)[jsonArray objectForKey:keyBalance];
-            NSNumber *todayNumberOfOrders = (NSNumber *)[jsonArray objectForKey:keyTodaysOrderQty];
-            NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
-            NSLog(@" %@ , %@ , %@ , %@, %@", userName, userId,balance,todayNumberOfOrders,response);
             [self setUserInfo:jsonArray];
             [self setUserInformation];
         }else{
             NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
-            NSLog(@"%@",response);
+            NSLog(@"Response : %@",response);
         }
     }else{
         //Order
@@ -560,7 +588,7 @@
             itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
         }
         [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
-        [itemKaNaam addAttribute:NSShadowAttributeName value:self.blueShadow range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
         CATransition *animation = [CATransition animation];

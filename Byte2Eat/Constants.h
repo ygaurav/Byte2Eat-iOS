@@ -20,6 +20,7 @@ extern NSString *const keyURLDailyMenu;
 extern NSString *const keyURLOrderHistory;
 
 extern int const keyAlertOrderConfirm;
+extern int const keyErrorMessageTime;
 
 extern NSString *const keyMenuId;
 extern NSString *const keyItemName;
