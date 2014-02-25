@@ -12,7 +12,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *LabelPricePerUnit;
 @property (weak, nonatomic) IBOutlet UILabel *LabelTotalCost;
 @property (weak, nonatomic) IBOutlet UILabel *LabelTotalOrder;
-@property (weak, nonatomic) IBOutlet UIPickerView *OrderNumberPicker;
+@property (strong, nonatomic) IBOutlet UIPickerView *OrderNumberPicker;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIImageView *backgroundImageView;
 @property (weak, nonatomic) IBOutlet UIButton *orderButton;
@@ -20,6 +20,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *aajKhaneMeinKyaHai;
 @property (weak, nonatomic) IBOutlet UIButton *orderHistoryButton;
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
+@property (weak, nonatomic) IBOutlet UIButton *orderQuantityButton;
 
 @property (nonatomic) NSNumber *remainingBalance;
 @property (nonatomic) NSString *userName;
@@ -39,6 +40,8 @@
 
 @property (nonatomic) CAEmitterLayer *leftEmitterLayer;
 @property (nonatomic) CAEmitterLayer *rightEmitterLayer;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *totalCostConstraint;
+@property (weak, nonatomic) IBOutlet UILabel *howManyLabel;
 
 @property (nonatomic, weak) NSDictionary *userInfo;
 @property (nonatomic,strong) TransitionManager *transitionManager;
@@ -50,5 +53,6 @@
 - (IBAction)onLogout:(UIButton *)sender;
 - (IBAction)onOrder:(UIButton *)sender;
 - (IBAction)onOrderHistory:(UIButton *)sender;
+- (IBAction)onQuantityChangeButton:(UIButton *)sender;
 
 @end

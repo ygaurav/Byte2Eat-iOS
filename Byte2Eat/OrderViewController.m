@@ -11,6 +11,8 @@
 @implementation OrderViewController{
     BOOL isFetchingMenu;
     BOOL isCoreMotionTimerValid;
+    BOOL isPickerVisible;
+    NSLayoutConstraint *beforeConstraint;
 }
 
 - (void)viewDidLoad{
@@ -19,15 +21,49 @@
     isFetchingMenu = NO;
     isCoreMotionTimerValid = false;
     self.transitionManager = [[TransitionManager alloc] init];
+    beforeConstraint = self.totalCostConstraint;
 
+    [self.orderQuantityButton setTitle:@"1" forState:UIControlStateNormal];
 
     [self initShadows];
     [self setUserInformation];
     [self styleStaticData];
     [self setRandomBackgroundImage];
+    [self hidePickerView];
     [self setUpAnimations];
     [self fetchTodayMenu];
+}
 
+-(void)hidePickerView{
+    self.totalCostConstraint.constant = 12;
+    self.OrderNumberPicker.alpha = 0;
+    isPickerVisible = NO;
+}
+
+-(void)togglePicker:(UIGestureRecognizer *)gestureRecognizer{
+    if(isPickerVisible){
+        self.totalCostConstraint.constant = 12;
+    }else{
+        self.totalCostConstraint.constant = 162;
+    }
+    [self.scrollView setNeedsUpdateConstraints];
+
+    [UIView animateWithDuration:0.5
+                          delay:0
+         usingSpringWithDamping:0.5
+          initialSpringVelocity:2
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         if(isPickerVisible){
+                             [self.scrollView layoutIfNeeded];
+                             self.OrderNumberPicker.alpha = 0;
+                         }else{
+                             [self.scrollView layoutIfNeeded];
+                             [self.OrderNumberPicker setAlpha:1];
+                         }
+                     } completion:^(BOOL finished){
+                         isPickerVisible = !isPickerVisible;
+                     }];
 }
 
 -(void)startAccelerometerUpdates{
@@ -191,7 +227,7 @@
 
     self.sparkleEmitterLayer = [CAEmitterLayer layer];
 //    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x + 2, _LabelTotalCost.layer.position.y + 63);
-    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.frame.origin.x + 30, _LabelTotalCost.frame.origin.y + 70);
+    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.frame.origin.x + 28, _LabelTotalCost.frame.origin.y + 15);
     self.sparkleEmitterLayer.emitterZPosition = 10.0;
     self.sparkleEmitterLayer.emitterSize = CGSizeMake(5, 5);
     self.sparkleEmitterLayer.emitterShape = kCAEmitterLayerPoint;
@@ -236,7 +272,10 @@
 }
 
 - (void)styleStaticData {
+    
     self.orderButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.orderQuantityButton.layer.cornerRadius = 3;
+    self.orderQuantityButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.logoutButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.orderHistoryButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.orderHistoryButton.layer.cornerRadius = 3;
@@ -366,7 +405,7 @@
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     if (_pricePerUnit && _pricePerUnit != [NSNumber numberWithInt:0]) {
         _currentOrderNumber = [NSNumber numberWithInteger:row + 1];
-
+        [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
         [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
     }
@@ -526,6 +565,34 @@
 //    [modal setBackgroundImage:background];
     [self presentViewController:modal animated:YES completion:^{
     }];
+}
+
+- (IBAction)onQuantityChangeButton:(UIButton *)sender {
+    self.orderQuantityButton.userInteractionEnabled = NO;
+    if(isPickerVisible){
+        self.totalCostConstraint.constant = 20;
+    }else{
+        self.totalCostConstraint.constant = 162;
+    }
+    [self.scrollView setNeedsUpdateConstraints];
+    
+    [UIView animateWithDuration:0.5
+                          delay:0
+         usingSpringWithDamping:0.5
+          initialSpringVelocity:2
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         if(isPickerVisible){
+                             [self.scrollView layoutIfNeeded];
+                             self.OrderNumberPicker.alpha = 0;
+                         }else{
+                             [self.scrollView layoutIfNeeded];
+                             [self.OrderNumberPicker setAlpha:1];
+                         }
+                     } completion:^(BOOL finished){
+                         isPickerVisible = !isPickerVisible;
+                         self.orderQuantityButton.userInteractionEnabled = YES;
+                     }];
 }
 - (IBAction)onLogout:(UIButton *)sender {
     [Utilities logUserOut];
