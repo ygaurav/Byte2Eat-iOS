@@ -46,6 +46,10 @@
     [dateFromJSONFormatter setCalendar:[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar]];
 }
 
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
 - (NSFetchedResultsController *)fetchedResultsController:(BOOL)ascending {
 
     if (_fetchedResultsController != nil) {

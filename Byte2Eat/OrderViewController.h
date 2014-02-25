@@ -43,6 +43,7 @@
 @property (nonatomic, weak) NSDictionary *userInfo;
 @property (nonatomic,strong) TransitionManager *transitionManager;
 
+@property (nonatomic, strong)     CMMotionManager *coreMotionManager;
 
 @property(nonatomic, strong) NSTimer *timer;
 

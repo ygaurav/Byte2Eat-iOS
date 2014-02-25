@@ -10,22 +10,16 @@
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
-    CMMotionManager *cmManager;
-    
+    BOOL isCoreMotionTimerValid;
 }
 
 - (void)viewDidLoad{
     [super viewDidLoad];
 
     isFetchingMenu = NO;
+    isCoreMotionTimerValid = false;
     self.transitionManager = [[TransitionManager alloc] init];
-    
-    cmManager.accelerometerUpdateInterval = 0.1;
-    
-    [cmManager startGyroUpdatesToQueue:[NSOperationQueue currentQueue]
-                                    withHandler:^(CMGyroData *gyroData, NSError *error) {
-                                        [self outputRotationData:gyroData.rotationRate];
-                                    }];
+
 
     [self initShadows];
     [self setUserInformation];
@@ -36,8 +30,39 @@
 
 }
 
-- (void)outputRotationData:(CMRotationRate)rotation {
+-(void)startAccelerometerUpdates{
+    self.coreMotionManager = [[CMMotionManager alloc]init];
+    NSLog(@"Starting accelerometer updates..");
+    self.coreMotionManager.accelerometerUpdateInterval = 1/30;
+    isCoreMotionTimerValid = YES;
+    [self.coreMotionManager startAccelerometerUpdates];
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(getData:) userInfo:nil repeats:YES];
+}
+
+-(void)stopAccelerometerUpdates{
+    isCoreMotionTimerValid = NO;
+    NSLog(@"Stopping acceleromteter updates...");
+    [self.coreMotionManager stopAccelerometerUpdates];
+    self.coreMotionManager = nil;
+}
+
+-(void)getData:(NSTimer *)thisTimer{
+    if (isCoreMotionTimerValid) {
+        CMAccelerometerData *newestData = self.coreMotionManager.accelerometerData;
+        if (newestData != nil) {
+            [self outputRotationData:newestData.acceleration];
+        }
+    }else{
+        [thisTimer invalidate];
+    }
+}
+
+- (void)outputRotationData:(CMAcceleration)rotation {
+    [_leftEmitterLayer setValue:[NSNumber numberWithInt:(int) (rotation.x * 100)] forKeyPath:@"emitterCells.left.xAcceleration"];
+    [_leftEmitterLayer setValue:[NSNumber numberWithInt:(int) -(rotation.y * 100)] forKeyPath:@"emitterCells.left.yAcceleration"];
     
+    [_rightEmitterLayer setValue:[NSNumber numberWithInt:(int) (rotation.x * 100)] forKeyPath:@"emitterCells.right.xAcceleration"];
+    [_rightEmitterLayer setValue:[NSNumber numberWithInt:(int) -(rotation.y * 100)] forKeyPath:@"emitterCells.right.yAcceleration"];
 }
 
 - (void)initShadows {
@@ -195,8 +220,15 @@
 }
 
 - (void)changeEmitterBirthrateTo:(int)birthRate {
-    [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
-    [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+    if (birthRate == 0) {
+        [self stopAccelerometerUpdates];
+        [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
+        [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+    }else{
+        [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
+        [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+        [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(startAccelerometerUpdates) userInfo:nil repeats:NO];
+    }
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
@@ -299,10 +331,6 @@
         });
     });
     
-//    UIImage *image = [uiImage applyLightEffect];
-
-//    [self.backgroundImageView setImage:image];
-
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
     interpolationHorizontal.minimumRelativeValue = @30.0;
     interpolationHorizontal.maximumRelativeValue = @-30.0;
@@ -511,7 +539,6 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self changeEmitterBirthrateTo:0];
     [self enableUserInput];
     NSError *error = nil;
     NSURL *url = connection.currentRequest.URL;
@@ -572,13 +599,14 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     isFetchingMenu = NO;
+
     [self changeEmitterBirthrateTo:0];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    [self changeEmitterBirthrateTo:0];
     isFetchingMenu = NO;
     [self enableUserInput];
-    [self changeEmitterBirthrateTo:0];
     if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
         [self showError:[NSString stringWithFormat:@"%@",error.localizedDescription]];
         NSMutableAttributedString *itemKaNaam=nil;
