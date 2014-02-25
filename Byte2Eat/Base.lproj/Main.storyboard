@@ -51,7 +51,7 @@
                                             <constraint firstAttribute="width" constant="320" id="Mga-p5-8mu"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no" returnKeyType="done"/>
                                         <connections>
                                             <action selector="onTextFieldTouch:" destination="fww-Kk-YZf" eventType="touchUpInside" id="Uuf-Dx-DR0"/>
                                             <outlet property="delegate" destination="fww-Kk-YZf" id="jVg-Vc-Gdh"/>
@@ -224,8 +224,8 @@
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="How many units would you like to order?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d3U-mP-76T">
-                                        <rect key="frame" x="7" y="234" width="263" height="17"/>
+                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="How many would you like to order?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d3U-mP-76T">
+                                        <rect key="frame" x="7" y="234" width="228" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <nil key="highlightedColor"/>
@@ -282,6 +282,7 @@
                                         <rect key="frame" x="0.0" y="142" width="320" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <color key="textColor" red="0.91342474490000003" green="0.030472052409999999" blue="0.1224566035" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Y58-Q7-Ljd">
@@ -369,7 +370,6 @@
                         <outlet property="aajKhaneMeinKyaHai" destination="hrn-cB-tui" id="ulR-mo-7hd"/>
                         <outlet property="backgroundImageView" destination="hlR-WW-Jx2" id="NZQ-Jf-0bL"/>
                         <outlet property="errorLabel" destination="LgK-Sa-IYU" id="NL0-WG-M6p"/>
-                        <outlet property="howManyLabel" destination="d3U-mP-76T" id="iMh-Ar-TdK"/>
                         <outlet property="logoutButton" destination="x4t-mJ-CZD" id="ydf-a9-Mcj"/>
                         <outlet property="orderButton" destination="CIc-Em-8oK" id="cve-2W-AYY"/>
                         <outlet property="orderHistoryButton" destination="J32-Cs-i4Y" id="I1h-dP-w7z"/>

@@ -66,7 +66,7 @@
                      }];
 }
 
--(void)startAccelerometerUpdates{
+-(void)startAccUpdates{
     self.coreMotionManager = [[CMMotionManager alloc]init];
     NSLog(@"Starting accelerometer updates..");
     self.coreMotionManager.accelerometerUpdateInterval = 1/30;
@@ -246,7 +246,7 @@
     sparkleCell.xAcceleration = 0;
     sparkleCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     sparkleCell.scale = 0.03;
-    sparkleCell.alphaSpeed = -0.40;
+    sparkleCell.alphaSpeed = -0.80;
     sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
     [sparkleCell setName:@"sparkle"];
 
@@ -259,11 +259,15 @@
     if (birthRate == 0) {
         [self stopAccelerometerUpdates];
         [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
+        [_leftEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.left.yAcceleration"];
         [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+        [_rightEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.right.yAcceleration"];
+        [self enableMotionEffect];
     }else{
+        [self disableMotionEffect];
         [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
         [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
-        [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(startAccelerometerUpdates) userInfo:nil repeats:NO];
+        [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(startAccUpdates) userInfo:nil repeats:NO];
     }
 }
 
@@ -370,16 +374,26 @@
         });
     });
     
+    
+}
+
+-(void)enableMotionEffect{
     UIInterpolatingMotionEffect *interpolationHorizontal = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.x" type:UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis];
-    interpolationHorizontal.minimumRelativeValue = @30.0;
-    interpolationHorizontal.maximumRelativeValue = @-30.0;
-
+    interpolationHorizontal.minimumRelativeValue = @20.0;
+    interpolationHorizontal.maximumRelativeValue = @-20.0;
+    
     UIInterpolatingMotionEffect *interpolationVertical = [[UIInterpolatingMotionEffect alloc]initWithKeyPath:@"center.y" type:UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis];
-    interpolationVertical.minimumRelativeValue = @30.0;
-    interpolationVertical.maximumRelativeValue = @-30.0;
-
+    interpolationVertical.minimumRelativeValue = @20.0;
+    interpolationVertical.maximumRelativeValue = @-20.0;
+    
     [self.backgroundImageView addMotionEffect:interpolationHorizontal];
     [self.backgroundImageView addMotionEffect:interpolationVertical];
+}
+
+-(void)disableMotionEffect{
+    for(UIMotionEffect *motionEffect in self.backgroundImageView.motionEffects){
+        [self.backgroundImageView removeMotionEffect:motionEffect];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -406,6 +420,7 @@
     if (_pricePerUnit && _pricePerUnit != [NSNumber numberWithInt:0]) {
         _currentOrderNumber = [NSNumber numberWithInteger:row + 1];
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
+        [_sparkleEmitterLayer setEmitterPosition:_LabelTotalCost.center];
         [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
         [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
     }
@@ -428,11 +443,16 @@
 - (void)setTodayMenu:(NSDictionary *)dictionary {
     _dailyMenuId = [dictionary objectForKey:keyMenuId];
     _itemName = [dictionary objectForKey:keyItemName];
+    _pricePerUnit = (NSNumber *)[dictionary objectForKey:keyItemPrice];
+    
+    
     NSMutableAttributedString *itemKaNaam = nil;
     if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"nothing today :("];
+        [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
     } else {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
+        self.orderQuantityButton.userInteractionEnabled = YES;
     }
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
@@ -444,17 +464,18 @@
     [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
 
-    _pricePerUnit = (NSNumber *)[dictionary objectForKey:keyItemPrice];
-
     NSString *itemPriceText=nil;
     NSString *totalCostText=nil;
 
     if (_pricePerUnit && _pricePerUnit != [NSNumber numberWithInt:0]) {
         itemPriceText = [NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]];
         totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
+        [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
+        self.orderQuantityButton.userInteractionEnabled = YES;
     } else {
         itemPriceText = @"N/A";
         totalCostText = @"N/A";
+        [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
     }
     NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:itemPriceText];
     [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
@@ -463,6 +484,8 @@
     NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalCostText];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     [_LabelTotalCost setAttributedText:totalCostString];
+    
+    [self setRandomBackgroundImage];
 }
 
 - (void)showError:(NSString *)response {
@@ -666,7 +689,6 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     isFetchingMenu = NO;
-
     [self changeEmitterBirthrateTo:0];
 }
 
@@ -676,22 +698,37 @@
     [self enableUserInput];
     if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
         [self showError:[NSString stringWithFormat:@"%@",error.localizedDescription]];
-        NSMutableAttributedString *itemKaNaam=nil;
-        if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
-            itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
-        } else {
-            itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
-        }
-        [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
+        
+        _dailyMenuId = 0;
+        _itemName = @"";
+        _pricePerUnit = 0;
+        
+        NSMutableAttributedString *itemKaNaam = nil;
+
+        itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
         [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
         CATransition *animation = [CATransition animation];
-        animation.duration = .5;
+        animation.duration = 1.0;
         animation.type = kCATransitionFade;
-        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
         [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+        
+        NSString *itemPriceText = @"N/A";
+        NSString *totalCostText = @"N/A";
+        NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:itemPriceText];
+        [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
+        [_LabelPricePerUnit setAttributedText:pricePerUnitString];
+        
+        NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalCostText];
+        [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
+        [_LabelTotalCost setAttributedText:totalCostString];
+        
+        [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
+        self.orderQuantityButton.userInteractionEnabled = NO;
+        
     } else {
         [self showError:error.localizedDescription];
     }

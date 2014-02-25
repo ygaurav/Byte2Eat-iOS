@@ -41,12 +41,10 @@
 @property (nonatomic) CAEmitterLayer *leftEmitterLayer;
 @property (nonatomic) CAEmitterLayer *rightEmitterLayer;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *totalCostConstraint;
-@property (weak, nonatomic) IBOutlet UILabel *howManyLabel;
 
-@property (nonatomic, weak) NSDictionary *userInfo;
+@property (nonatomic,weak) NSDictionary *userInfo;
 @property (nonatomic,strong) TransitionManager *transitionManager;
-
-@property (nonatomic, strong)     CMMotionManager *coreMotionManager;
+@property (nonatomic,strong) CMMotionManager *coreMotionManager;
 
 @property(nonatomic, strong) NSTimer *timer;
 
