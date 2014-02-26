@@ -1,6 +1,7 @@
 
 #import <CoreData/CoreData.h>
 #import <CoreMotion/CoreMotion.h>
+#import "InteractiveTransitionManager.h"
 
 @class TransitionManager;
 
@@ -44,6 +45,7 @@
 
 @property (nonatomic,weak) NSDictionary *userInfo;
 @property (nonatomic,strong) TransitionManager *transitionManager;
+//@property(nonatomic,strong) InteractiveTransitionManager *transitionManager;
 @property (nonatomic,strong) CMMotionManager *coreMotionManager;
 
 @property(nonatomic, strong) NSTimer *timer;

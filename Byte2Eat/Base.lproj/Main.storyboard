@@ -682,7 +682,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order History" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DLd-EJ-Vta">
+                            <label opaque="NO" clipsSubviews="YES" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order History" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DLd-EJ-Vta">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="57"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -841,6 +841,7 @@
                     <connections>
                         <outlet property="doneButton" destination="vAe-SN-FYB" id="C7g-pd-YCl"/>
                         <outlet property="historyTitleLabel" destination="DLd-EJ-Vta" id="dGY-jd-7U2"/>
+                        <outlet property="onSortingButton" destination="Z3b-Eq-BrI" id="hnK-WN-s4t"/>
                         <outlet property="operationLabel" destination="dEl-xQ-hZs" id="018-gK-qQG"/>
                         <outlet property="tableView" destination="pV3-PY-VOG" id="XHg-WY-Rr3"/>
                     </connections>

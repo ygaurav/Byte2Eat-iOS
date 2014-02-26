@@ -40,6 +40,7 @@
 		F474480318A545DF009CF205 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F474480118A545DF009CF205 /* InfoPlist.strings */; };
 		F474480518A545DF009CF205 /* Byte2EatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F474480418A545DF009CF205 /* Byte2EatTests.m */; };
 		F474481018A58021009CF205 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = F474480F18A58021009CF205 /* UIImage+ImageEffects.m */; };
+		F48CD33618BE5524001ECAED /* InteractiveTransitionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F48CD33518BE5524001ECAED /* InteractiveTransitionManager.m */; };
 		F4963CD318B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD218B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m */; };
 		F4963CD618B3F36C004A7CA1 /* MyCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD518B3F36C004A7CA1 /* MyCollectionViewCell.m */; };
 		F4963CD918B3F545004A7CA1 /* MyFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD818B3F545004A7CA1 /* MyFlowLayout.m */; };
@@ -114,6 +115,8 @@
 		F474480418A545DF009CF205 /* Byte2EatTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Byte2EatTests.m; sourceTree = "<group>"; };
 		F474480E18A58021009CF205 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		F474480F18A58021009CF205 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
+		F48CD33418BE5524001ECAED /* InteractiveTransitionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InteractiveTransitionManager.h; sourceTree = "<group>"; };
+		F48CD33518BE5524001ECAED /* InteractiveTransitionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InteractiveTransitionManager.m; sourceTree = "<group>"; };
 		F4963CD118B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderHistoryCollectionViewController.h; sourceTree = "<group>"; };
 		F4963CD218B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderHistoryCollectionViewController.m; sourceTree = "<group>"; };
 		F4963CD418B3F36C004A7CA1 /* MyCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCollectionViewCell.h; sourceTree = "<group>"; };
@@ -239,6 +242,8 @@
 				7EB5E752AF2E1CEA1C320B21 /* MyCoverFlowLayout.h */,
 				7EB5EE03ADDC7E4F31F12070 /* MyCircleLayout.m */,
 				7EB5E1EF99A0ED876F5D9C68 /* MyCircleLayout.h */,
+				F48CD33418BE5524001ECAED /* InteractiveTransitionManager.h */,
+				F48CD33518BE5524001ECAED /* InteractiveTransitionManager.m */,
 			);
 			path = Byte2Eat;
 			sourceTree = "<group>";
@@ -396,6 +401,7 @@
 				F4963CD618B3F36C004A7CA1 /* MyCollectionViewCell.m in Sources */,
 				7EB5E3F33D8F2F5F12521FB2 /* MySimpleLayout.m in Sources */,
 				7EB5EF279657794C61D4F72F /* MySpringyLayout.m in Sources */,
+				F48CD33618BE5524001ECAED /* InteractiveTransitionManager.m in Sources */,
 				7EB5E00B3F03E12CF6EF9974 /* MyCoverFlowLayout.m in Sources */,
 				7EB5E252AEACFC52202E0DCD /* MyCircleLayout.m in Sources */,
 			);

@@ -20,7 +20,8 @@
 
     isFetchingMenu = NO;
     isCoreMotionTimerValid = false;
-    self.transitionManager = [[TransitionManager alloc] init];
+//    self.transitionManager = [[TransitionManager alloc] init];
+    self.transitionManager = [[InteractiveTransitionManager alloc] init];
     beforeConstraint = self.totalCostConstraint;
 
     [self.orderQuantityButton setTitle:@"1" forState:UIControlStateNormal];
@@ -576,7 +577,7 @@
     }
 }
 - (IBAction)onOrderHistory:(UIButton *)sender {
-    self.transitionManager.scaleFactor = 0.9;
+    self.transitionManager.scaleFactor = 1;
 
 //    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, NO, 0);
 //    [self.view drawViewHierarchyInRect:self.view.bounds afterScreenUpdates:YES];

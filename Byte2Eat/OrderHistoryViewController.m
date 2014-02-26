@@ -13,6 +13,12 @@
     NSMutableData *totalData;
     NSDateFormatter *shortDateFormatter;
     NSDateFormatter *dateFromJSONFormatter;
+    CGPoint touchCenter;
+    CGRect initialFrame;
+    UIView *topHalfSnapshot;
+    UIView *bottomHalfSnapshot;
+    UIView *fullSnapShot ;
+    CATransform3D transform;
 }
 
 @synthesize managedObjectContext;
@@ -21,14 +27,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-        [self setUpDateFormatter];
+    [self setUpDateFormatter];
     [self setData];
     [self setUpAnimations];
+    self.historyTitleLabel.layer.zPosition = 2000;
+    [self setupGestureRecognizer];
+    touchCenter = self.historyTitleLabel.center;
+    initialFrame = self.view.frame;
+    transform = CATransform3DIdentity;
+    
     
     self.managedObjectContext = [Utilities getManagedObjectContext];
     
-
-
     NSError *error;
     if (![[self fetchedResultsController:NO ] performFetch:&error]) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -134,7 +144,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    [self fetchOrderHistory:YES ];
+//    [self fetchOrderHistory:YES ];
 }
 
 - (void)setUpAnimations {
@@ -507,12 +517,6 @@
 
 #pragma FetchedResultsController methods
 
-/*
- Assume self has a property 'tableView' -- as is the case for an instance of a UITableViewController
- subclass -- and a method configureCell:atIndexPath: which updates the contents of a given cell
- with information from a managed object at the given index path in the fetched results controller.
- */
-
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
     [self.tableView beginUpdates];
 }
@@ -595,4 +599,89 @@
 - (void)setUser:(NSString *)name {
     userName = name;
 }
+
+#pragma Folding animation code
+
+-(void)setupGestureRecognizer{
+    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPanGesture:)];
+    [pan setMaximumNumberOfTouches:1];
+    [pan setMinimumNumberOfTouches:1];
+    [self.historyTitleLabel addGestureRecognizer:pan];
+}
+
+-(void)onPanGesture:(UIPanGestureRecognizer *)panRecognizer{
+    CGPoint touch = [panRecognizer translationInView:self.view];
+    if (panRecognizer.state == UIGestureRecognizerStateBegan) {
+        NSLog(@"Began Gesture : %f , %f", touch.x, touch.y);
+        fullSnapShot = [self.view snapshotViewAfterScreenUpdates:NO];
+        
+        CGRect topHalfRect = CGRectMake(CGRectGetMinX(initialFrame),
+                                        CGRectGetMinY(initialFrame),
+                                        CGRectGetWidth(initialFrame),
+                                        CGRectGetHeight(initialFrame) / 2.0);
+        
+        topHalfSnapshot = [fullSnapShot resizableSnapshotViewFromRect:topHalfRect
+                                                           afterScreenUpdates:NO
+                                                                withCapInsets:UIEdgeInsetsZero];
+        
+        CGRect bottomHalfRect = CGRectMake(CGRectGetMinX(initialFrame),
+                                           CGRectGetMidY(initialFrame),
+                                           CGRectGetWidth(initialFrame),
+                                           CGRectGetHeight(initialFrame) / 2.0);
+        
+        bottomHalfSnapshot = [fullSnapShot resizableSnapshotViewFromRect:bottomHalfRect
+                                                              afterScreenUpdates:NO
+                                                                   withCapInsets:UIEdgeInsetsZero];
+        [self.tableView setAlpha:0];
+        [self.onSortingButton setAlpha:0];
+        [self.historyTitleLabel setAlpha:0];
+
+        [self.view addSubview:topHalfSnapshot];
+        bottomHalfSnapshot.center = CGPointMake(bottomHalfSnapshot.center.x, bottomHalfSnapshot.center.y + bottomHalfSnapshot.bounds.size.height);
+        [self.view addSubview:bottomHalfSnapshot];
+//        [self.view insertSubview:bottomHalfSnapshot belowSubview:topHalfSnapshot];
+
+        topHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 1);
+        topHalfSnapshot.layer.position = [self getLayerPosition:topHalfSnapshot.layer];
+        transform.m34 = 1.0/-1000;
+    }
+    
+    if (panRecognizer.state == UIGestureRecognizerStateChanged) {
+        CGFloat y = MIN(0, -touch.y);
+        CGFloat angle = M_PI_2*(y/160);
+        topHalfSnapshot.layer.transform = CATransform3DRotate(transform, angle, 1, 0, 0);
+    }
+    
+    if (panRecognizer.state == UIGestureRecognizerStateEnded) {
+        NSLog(@"Ended Gesture : %f , %f", touch.x, touch.y);
+        
+        [UIView animateWithDuration:0.5
+                         animations:^{
+                            topHalfSnapshot.layer.transform = CATransform3DIdentity;
+                         } completion:^(BOOL finished){
+                             [topHalfSnapshot removeFromSuperview];
+                             [bottomHalfSnapshot removeFromSuperview];
+                             [self.tableView setAlpha:1];
+                             [self.historyTitleLabel setAlpha:1];
+                             [self.onSortingButton setAlpha:1];
+                         }];
+//        [bottomHalfSnapshot removeFromSuperview];
+    }
+}
+
+-(CGPoint)getLayerPosition:(CALayer *)layer{
+    CGFloat ax = layer.anchorPoint.x;
+    CGFloat ay = layer.anchorPoint.y;
+    CGPoint p = layer.position;
+    CGFloat x,y;
+    CGFloat width = layer.bounds.size.width;
+    CGFloat height = layer.bounds.size.height;
+    
+    x = p.x - width*(.5 - ax);
+    y = p.y + height*(ay - .5);
+    
+    return CGPointMake(x, y);
+}
+
+
 @end
