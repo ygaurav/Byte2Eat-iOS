@@ -278,12 +278,16 @@
 - (void)styleStaticData {
     
     self.orderButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    
     self.orderQuantityButton.layer.cornerRadius = 3;
     self.orderQuantityButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    
     self.logoutButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.logoutButton.layer.cornerRadius = 3;
+    
     self.orderHistoryButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.orderHistoryButton.layer.cornerRadius = 3;
-    self.logoutButton.layer.cornerRadius = 3;
+    
 
     UIFont *font = [UIFont systemFontOfSize:40];
 
@@ -373,8 +377,6 @@
                             }];
         });
     });
-    
-    
 }
 
 -(void)enableMotionEffect{
@@ -450,10 +452,12 @@
     if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"nothing today :("];
         [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
+        self.orderQuantityButton.userInteractionEnabled = NO;
     } else {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
         self.orderQuantityButton.userInteractionEnabled = YES;
     }
+    
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
@@ -476,6 +480,7 @@
         itemPriceText = @"N/A";
         totalCostText = @"N/A";
         [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
+        self.orderQuantityButton.userInteractionEnabled = NO;
     }
     NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:itemPriceText];
     [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];

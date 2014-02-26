@@ -25,7 +25,8 @@
     UIView *fromView = fromVC.view;
     UIView *toView = toVC.view;
     UIView *containerView = [transitionContext containerView];
-    NSLog(@"Container view Fram : %f,%f -- %f,%f",containerView.frame.origin.x, containerView.frame.origin.y, containerView.frame.size.height, containerView.frame.size.width);
+    NSLog(@"Container view Frame : %f,%f -- %f,%f",containerView.frame.origin.x, containerView.frame.origin.y, containerView.frame.size.height, containerView.frame.size.width);
+    NSLog(@"Container view bounds : %f,%f -- %f,%f",containerView.bounds.origin.x, containerView.bounds.origin.y, containerView.bounds.size.height, containerView.bounds.size.width);
     CGFloat duration = [self transitionDuration:transitionContext];
 
     if (self.appearing) {
@@ -36,8 +37,8 @@
         // Set initial scale to zero
         toView.transform = CGAffineTransformMakeScale(0.0, 0.0);
         [containerView addSubview:toView];
-//        [toView setFrame:CGRectMake(160, 240, 0, 0)];
         NSLog(@"Toview Frame : %f,%f -- %f,%f",toView.frame.origin.x, toView.frame.origin.y, toView.frame.size.height, toView.frame.size.width);
+        NSLog(@"Toview Bounds : %f,%f -- %f,%f",toView.bounds.origin.x, toView.bounds.origin.y, toView.bounds.size.height, toView.bounds.size.width);
 
         [UIView animateWithDuration:duration
                               delay:0
@@ -49,6 +50,7 @@
                          } completion:^(BOOL finished){
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]] ;
             NSLog(@"Toview after completion Frame : %f,%f -- %f,%f",toView.frame.origin.x, toView.frame.origin.y, toView.frame.size.height, toView.frame.size.width);
+            NSLog(@"Toview after completion Bounds : %f,%f -- %f,%f",toView.bounds.origin.x, toView.bounds.origin.y, toView.bounds.size.height, toView.bounds.size.width);
         }];
     }
     else {

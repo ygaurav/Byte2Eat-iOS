@@ -63,6 +63,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"NSConstraintBasedLayoutVisualizeMutuallyExclusiveConstraints"];
     [[UIApplication sharedApplication] cancelAllLocalNotifications];
 
     UILocalNotification *notification = [[UILocalNotification alloc] init];
