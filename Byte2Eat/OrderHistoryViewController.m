@@ -31,7 +31,7 @@
     [self setData];
     [self setUpAnimations];
     self.historyTitleLabel.layer.zPosition = 2000;
-//    [self setupGestureRecognizer];
+    [self setupGestureRecognizer];
     touchCenter = self.historyTitleLabel.center;
     initialFrame = self.view.frame;
     transform = CATransform3DIdentity;
@@ -144,7 +144,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-//    [self fetchOrderHistory:YES ];
+    [self fetchOrderHistory:YES ];
 }
 
 - (void)setUpAnimations {

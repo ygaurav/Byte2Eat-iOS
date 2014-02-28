@@ -18,6 +18,7 @@
 -(void)prepareTransitionController:(UIViewController *)viewController{
     NSLog(@"Gesture recognizer added");
     toViewController = viewController;
+    _shouldCompleteTransition = NO;
     panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
     [toViewController.view addGestureRecognizer:panGesture];
 }
@@ -35,6 +36,7 @@
             CGFloat y = MIN(0, -translation.y);
             NSLog(@"Gesture changed Y : %f",y);
             if (self.interactionInProgress) {
+                NSLog(@"Y : %f",-y);
                 if (-y > 240) {
                     _shouldCompleteTransition = YES;
                 }

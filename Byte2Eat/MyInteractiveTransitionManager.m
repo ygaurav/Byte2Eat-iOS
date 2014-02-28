@@ -14,7 +14,7 @@
 }
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 5;
+    return 6;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
@@ -40,7 +40,7 @@
     CGRect topHalfRect = CGRectMake(CGRectGetMinX(initialFrame),
                                     CGRectGetMinY(initialFrame),
                                     CGRectGetWidth(initialFrame),
-                                    CGRectGetHeight(initialFrame) / 2.0);
+                                    CGRectGetHeight(initialFrame) / 2.0 + 1);
     
     CGRect bottomHalfRect = CGRectMake(CGRectGetMinX(initialFrame),
                                        CGRectGetMidY(initialFrame),
@@ -76,7 +76,7 @@
     toViewTopHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 1);
     toViewTopHalfSnapshot.layer.position = [self getLayerPosition:toViewTopHalfSnapshot.layer];
 
-    toViewTopHalfSnapshot.layer.transform = CATransform3DMakeRotation(-M_PI*(.999), 1, 0, 0);
+    toViewTopHalfSnapshot.layer.transform = CATransform3DMakeRotation(-M_PI*(.99999999999999999999), 1, 0, 0);
     [containerView addSubview:toViewTopHalfSnapshot];
     NSLog(@"to top%f,%f",toViewTopHalfSnapshot.center.x,toViewTopHalfSnapshot.center.y);
     
@@ -85,7 +85,7 @@
     t.m34 = 1.0/-1000;
     fromViewBottomHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 0);
     fromViewBottomHalfSnapshot.layer.position = CGPointMake(fromViewBottomHalfSnapshot.layer.position.x, fromViewBottomHalfSnapshot.layer.position.y + fromViewBottomHalfSnapshot.layer.bounds.size.height/2);
-    fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(t, M_PI*(.02), 1, 0, 0);
+    fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(t, M_PI*(.0001), 1, 0, 0);
     [containerView addSubview:fromViewBottomHalfSnapshot];
 
      NSLog(@"from bottom%f,%f",fromViewBottomHalfSnapshot.center.x,fromViewBottomHalfSnapshot.center.y);
@@ -98,22 +98,31 @@
     
     NSTimeInterval duration = [self transitionDuration:transitionContext];
     
-    [UIView animateWithDuration:duration
-                     animations:^{
-                         toViewTopHalfSnapshot.layer.transform = CATransform3DRotate(transform, 0, 1, 0, 0);
-                         fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(fromTransform, M_PI*(.99), 1, 0, 0);
-                     }
-                     completion:^(BOOL finished){
-                         [fromViewTopHalfSnapshot removeFromSuperview];
-                         [fromViewBottomHalfSnapshot removeFromSuperview];
-                         [toViewTopHalfSnapshot removeFromSuperview];
-                         [toViewBottomHalfSnapshot removeFromSuperview];
-                         
-                         toView.frame = containerView.bounds;
-                         fromView.frame = containerView.bounds;
-                         NSLog(@"Transition : %d",[transitionContext transitionWasCancelled]);
-                         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                     }];
+    //    [UIView animateKeyframesWithDuration:duration
+//                                   delay:0.0
+//                                 options:0
+//                              animations:^{
+//                                  [UIView addKeyframeWithRelativeStartTime:0.0
+//                                                          relativeDuration:0.5
+//                                                                animations:^{
+//                                                                    fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(fromTransform, M_PI*(.99999999999999999999), 1, 0, 0);
+//                                                                }];
+//                                  [UIView addKeyframeWithRelativeStartTime:0.001
+//                                                          relativeDuration:0.5
+//                                                                animations:^{
+//                                                                    toViewTopHalfSnapshot.layer.transform = CATransform3DRotate(transform, 0, 1, 0, 0);
+//                                                                }];
+//                              } completion:^(BOOL finished) {
+//                                  [fromViewBottomHalfSnapshot removeFromSuperview];
+//                                  [fromViewTopHalfSnapshot removeFromSuperview];
+//                                  [toViewBottomHalfSnapshot removeFromSuperview];
+//                                  [toViewTopHalfSnapshot removeFromSuperview];
+//                                  
+//                                  toView.frame = containerView.bounds;
+//                                  fromView.frame = containerView.bounds;
+//                                  NSLog(@"Transition : %d",[transitionContext transitionWasCancelled]);
+//                                  [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+//                              }];
 }
 
 -(CGPoint)getLayerPosition:(CALayer *)layer{

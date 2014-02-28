@@ -3,6 +3,7 @@
 #import "Constants.h"
 #import "AppDelegate.h"
 #import "ThanksViewController.h"
+#import "TransitionManager.h"
 #import "InteractiveTransitionController.h"
 #import "Utilities.h"
 
@@ -19,8 +20,8 @@
 
     isFetchingMenu = NO;
     isCoreMotionTimerValid = false;
-//    self.transitionManager = [[TransitionManager alloc] init];
-    self.transitionManager = [[MyInteractiveTransitionManager alloc] init];
+    self.transitionManager = [[TransitionManager alloc] init];
+//    self.transitionManager = [[MyInteractiveTransitionManager alloc] init];
     beforeConstraint = self.totalCostConstraint;
 
     [self.orderQuantityButton setTitle:@"1" forState:UIControlStateNormal];
@@ -578,7 +579,7 @@
 - (IBAction)onOrderHistory:(UIButton *)sender {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
-    AppDelegateAccessor.settingsInteractionController = [[InteractiveTransitionController alloc] init];
+//    AppDelegateAccessor.settingsInteractionController = [[InteractiveTransitionController alloc] init];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
@@ -732,39 +733,39 @@
 
 #pragma NSURLConnection Delegate Methods end
 
-//
-//- (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
-//                                                                   presentingController:(UIViewController *)presenting
-//                                                                       sourceController:(UIViewController *)source{
-//    self.transitionManager.appearing = YES;
-//    self.transitionManager.cornerRadius = 5;
-//    return self.transitionManager;
-//}
-//
-//- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
-//{
-//    self.transitionManager.appearing = NO;
-//    return self.transitionManager;
-//}
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-    
-    if(AppDelegateAccessor.settingsInteractionController){
-        [AppDelegateAccessor.settingsInteractionController prepareTransitionController:presented];
-    }
-    
-    self.transitionManager.reverse = NO;
+- (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+                                                                   presentingController:(UIViewController *)presenting
+                                                                       sourceController:(UIViewController *)source{
+    self.transitionManager.appearing = YES;
+    self.transitionManager.cornerRadius = 5;
     return self.transitionManager;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
-    self.transitionManager.reverse = YES;
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+{
+    self.transitionManager.appearing = NO;
     return self.transitionManager;
 }
 
-- (id<UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id<UIViewControllerAnimatedTransitioning>)animator {
-    return AppDelegateAccessor.settingsInteractionController && AppDelegateAccessor.settingsInteractionController.interactionInProgress ? AppDelegateAccessor.settingsInteractionController : nil;
-}
+//- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
+//    
+//    if(AppDelegateAccessor.settingsInteractionController){
+//        [AppDelegateAccessor.settingsInteractionController prepareTransitionController:presented];
+//    }
+//    
+//    self.transitionManager.reverse = NO;
+//    return self.transitionManager;
+//}
+//
+//- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+//    self.transitionManager.reverse = YES;
+//    return self.transitionManager;
+//}
+//
+//- (id<UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id<UIViewControllerAnimatedTransitioning>)animator {
+//    return AppDelegateAccessor.settingsInteractionController && AppDelegateAccessor.settingsInteractionController.interactionInProgress ? AppDelegateAccessor.settingsInteractionController : nil;
+//}
 
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
