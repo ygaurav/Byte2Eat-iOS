@@ -14,7 +14,7 @@
 }
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 4;
+    return 5;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
@@ -63,49 +63,36 @@
                                                               afterScreenUpdates:YES
                                                                    withCapInsets:UIEdgeInsetsZero];
     
-
-    
-//    [containerView addSubview:toViewBottomHalfSnapshot];
-//    toViewBottomHalfSnapshot.center = CGPointMake(toViewBottomHalfSnapshot.center.x, toViewBottomHalfSnapshot.center.y + toViewBottomHalfSnapshot.bounds.size.height);
-//    [containerView addSubview:toViewTopHalfSnapshot];
-//    
-//    [containerView addSubview:fromViewTopHalfSnapshot];
-//    fromViewBottomHalfSnapshot.center = CGPointMake(fromViewBottomHalfSnapshot.center.x, fromViewBottomHalfSnapshot.center.y + fromViewBottomHalfSnapshot.bounds.size.height);
-//    [containerView addSubview:fromViewBottomHalfSnapshot];
-//    
-//    toViewTopHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 1);
-//    toViewTopHalfSnapshot.layer.position = [self getLayerPosition:toViewTopHalfSnapshot.layer];
-//    
-//    fromViewBottomHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 0);
-//    fromViewBottomHalfSnapshot.layer.position = CGPointMake(fromViewBottomHalfSnapshot.layer.position.x, fromViewBottomHalfSnapshot.layer.position.y + fromViewBottomHalfSnapshot.layer.bounds.size.height/2);
-    
     // FROM TOP HALF
     [containerView addSubview:fromViewTopHalfSnapshot];
     NSLog(@"from top %f,%f",fromViewTopHalfSnapshot.center.x,fromViewTopHalfSnapshot.center.y);
     
     //TO BOTTOM HALF
     toViewBottomHalfSnapshot.center = CGPointMake(toViewBottomHalfSnapshot.center.x, toViewBottomHalfSnapshot.center.y + toViewBottomHalfSnapshot.bounds.size.height);
-//    [containerView addSubview:toViewBottomHalfSnapshot];
+    [containerView addSubview:toViewBottomHalfSnapshot];
     NSLog(@"to bottom %f,%f",toViewBottomHalfSnapshot.center.x,toViewBottomHalfSnapshot.center.y);
     
     // TO TOP HALF
     toViewTopHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 1);
     toViewTopHalfSnapshot.layer.position = [self getLayerPosition:toViewTopHalfSnapshot.layer];
+
+    toViewTopHalfSnapshot.layer.transform = CATransform3DMakeRotation(-M_PI*(.999), 1, 0, 0);
     [containerView addSubview:toViewTopHalfSnapshot];
-    toViewTopHalfSnapshot.layer.transform = CATransform3DMakeRotation(M_PI, 1, 0, 0);
     NSLog(@"to top%f,%f",toViewTopHalfSnapshot.center.x,toViewTopHalfSnapshot.center.y);
     
     //FROM BOTTOM HALF
+    CATransform3D t = CATransform3DIdentity;
+    t.m34 = 1.0/-1000;
     fromViewBottomHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 0);
     fromViewBottomHalfSnapshot.layer.position = CGPointMake(fromViewBottomHalfSnapshot.layer.position.x, fromViewBottomHalfSnapshot.layer.position.y + fromViewBottomHalfSnapshot.layer.bounds.size.height/2);
-//    [containerView addSubview:fromViewBottomHalfSnapshot];
-    [containerView insertSubview:fromViewBottomHalfSnapshot aboveSubview:toViewTopHalfSnapshot];
+    fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(t, M_PI*(.02), 1, 0, 0);
+    [containerView addSubview:fromViewBottomHalfSnapshot];
 
      NSLog(@"from bottom%f,%f",fromViewBottomHalfSnapshot.center.x,fromViewBottomHalfSnapshot.center.y);
     
     transform = CATransform3DIdentity;
     transform.m34 = 1.0/-1000;
-    
+
     fromTransform = CATransform3DIdentity;
     fromTransform.m34 = 1.0/-1000;
     
@@ -113,9 +100,8 @@
     
     [UIView animateWithDuration:duration
                      animations:^{
-                         toViewTopHalfSnapshot.layer.transform = CATransform3DRotate(transform, -M_PI*(160/180), 1, 0, 0);  
-                         fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(fromTransform, M_PI_2*(1.95), 1, 0, 0);
-//                         fromViewTopHalfSnapshot.layer.transform = CATransform3DRotate(fromTransform, M_PI*(160/180), 1, 0, 0);
+                         toViewTopHalfSnapshot.layer.transform = CATransform3DRotate(transform, 0, 1, 0, 0);
+                         fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(fromTransform, M_PI*(.99), 1, 0, 0);
                      }
                      completion:^(BOOL finished){
                          [fromViewTopHalfSnapshot removeFromSuperview];
