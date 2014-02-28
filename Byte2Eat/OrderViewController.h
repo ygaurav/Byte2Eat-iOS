@@ -1,9 +1,8 @@
 
 #import <CoreData/CoreData.h>
 #import <CoreMotion/CoreMotion.h>
-#import "InteractiveTransitionManager.h"
-
-@class TransitionManager;
+#import "MyInteractiveTransitionManager.h"
+@class MyInteractiveTransitionManager;
 
 @interface OrderViewController : UIViewController  <UITextViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, NSURLConnectionDelegate, UIViewControllerTransitioningDelegate>
 
@@ -44,8 +43,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *totalCostConstraint;
 
 @property (nonatomic,weak) NSDictionary *userInfo;
-@property (nonatomic,strong) TransitionManager *transitionManager;
-//@property(nonatomic,strong) InteractiveTransitionManager *transitionManager;
+//@property (nonatomic,strong) TransitionManager *transitionManager;
+@property(nonatomic,strong) MyInteractiveTransitionManager *transitionManager;
 @property (nonatomic,strong) CMMotionManager *coreMotionManager;
 
 @property(nonatomic, strong) NSTimer *timer;

@@ -4,7 +4,6 @@
 #import "OrderViewController.h"
 #import "Constants.h"
 #import "Utilities.h"
-#import "FileManager.h"
 
 @implementation AuthenticatorViewController
 

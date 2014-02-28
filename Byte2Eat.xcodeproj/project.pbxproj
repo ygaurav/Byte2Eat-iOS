@@ -40,7 +40,7 @@
 		F474480318A545DF009CF205 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F474480118A545DF009CF205 /* InfoPlist.strings */; };
 		F474480518A545DF009CF205 /* Byte2EatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F474480418A545DF009CF205 /* Byte2EatTests.m */; };
 		F474481018A58021009CF205 /* UIImage+ImageEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = F474480F18A58021009CF205 /* UIImage+ImageEffects.m */; };
-		F48CD33618BE5524001ECAED /* InteractiveTransitionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F48CD33518BE5524001ECAED /* InteractiveTransitionManager.m */; };
+		F48CD33618BE5524001ECAED /* MyInteractiveTransitionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F48CD33518BE5524001ECAED /* MyInteractiveTransitionManager.m */; };
 		F4963CD318B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD218B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m */; };
 		F4963CD618B3F36C004A7CA1 /* MyCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD518B3F36C004A7CA1 /* MyCollectionViewCell.m */; };
 		F4963CD918B3F545004A7CA1 /* MyFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = F4963CD818B3F545004A7CA1 /* MyFlowLayout.m */; };
@@ -49,6 +49,7 @@
 		F4ACC65D18A658C300F8560D /* fireflies.sks in Resources */ = {isa = PBXBuildFile; fileRef = F4ACC65B18A658C300F8560D /* fireflies.sks */; };
 		F4ACC65E18A658C300F8560D /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = F4ACC65C18A658C300F8560D /* spark.png */; };
 		F4ACC66818A65B6900F8560D /* snow.sks in Resources */ = {isa = PBXBuildFile; fileRef = F4ACC66718A65B6900F8560D /* snow.sks */; };
+		F4FE195318BF49580021A3EC /* InteractiveTransitionController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4FE195218BF49580021A3EC /* InteractiveTransitionController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,8 +116,8 @@
 		F474480418A545DF009CF205 /* Byte2EatTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Byte2EatTests.m; sourceTree = "<group>"; };
 		F474480E18A58021009CF205 /* UIImage+ImageEffects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageEffects.h"; sourceTree = "<group>"; };
 		F474480F18A58021009CF205 /* UIImage+ImageEffects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageEffects.m"; sourceTree = "<group>"; };
-		F48CD33418BE5524001ECAED /* InteractiveTransitionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InteractiveTransitionManager.h; sourceTree = "<group>"; };
-		F48CD33518BE5524001ECAED /* InteractiveTransitionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InteractiveTransitionManager.m; sourceTree = "<group>"; };
+		F48CD33418BE5524001ECAED /* MyInteractiveTransitionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyInteractiveTransitionManager.h; sourceTree = "<group>"; };
+		F48CD33518BE5524001ECAED /* MyInteractiveTransitionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyInteractiveTransitionManager.m; sourceTree = "<group>"; };
 		F4963CD118B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderHistoryCollectionViewController.h; sourceTree = "<group>"; };
 		F4963CD218B3F1CC004A7CA1 /* OrderHistoryCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderHistoryCollectionViewController.m; sourceTree = "<group>"; };
 		F4963CD418B3F36C004A7CA1 /* MyCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCollectionViewCell.h; sourceTree = "<group>"; };
@@ -129,6 +130,8 @@
 		F4ACC65B18A658C300F8560D /* fireflies.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = fireflies.sks; sourceTree = "<group>"; };
 		F4ACC65C18A658C300F8560D /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		F4ACC66718A65B6900F8560D /* snow.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = snow.sks; sourceTree = "<group>"; };
+		F4FE195118BF49580021A3EC /* InteractiveTransitionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InteractiveTransitionController.h; sourceTree = "<group>"; };
+		F4FE195218BF49580021A3EC /* InteractiveTransitionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InteractiveTransitionController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,8 +245,10 @@
 				7EB5E752AF2E1CEA1C320B21 /* MyCoverFlowLayout.h */,
 				7EB5EE03ADDC7E4F31F12070 /* MyCircleLayout.m */,
 				7EB5E1EF99A0ED876F5D9C68 /* MyCircleLayout.h */,
-				F48CD33418BE5524001ECAED /* InteractiveTransitionManager.h */,
-				F48CD33518BE5524001ECAED /* InteractiveTransitionManager.m */,
+				F48CD33418BE5524001ECAED /* MyInteractiveTransitionManager.h */,
+				F48CD33518BE5524001ECAED /* MyInteractiveTransitionManager.m */,
+				F4FE195118BF49580021A3EC /* InteractiveTransitionController.h */,
+				F4FE195218BF49580021A3EC /* InteractiveTransitionController.m */,
 			);
 			path = Byte2Eat;
 			sourceTree = "<group>";
@@ -386,6 +391,7 @@
 				F47447F018A545DF009CF205 /* OrderViewController.m in Sources */,
 				F4147BF218B133DD00ECEDA2 /* Order.m in Sources */,
 				F47447EA18A545DF009CF205 /* AppDelegate.m in Sources */,
+				F4FE195318BF49580021A3EC /* InteractiveTransitionController.m in Sources */,
 				F4236A4A18A5DAE9001A4164 /* TransitionManager.m in Sources */,
 				F47447E618A545DF009CF205 /* main.m in Sources */,
 				F4963CDC18B4038D004A7CA1 /* MyWideCollectionViewCell.m in Sources */,
@@ -401,7 +407,7 @@
 				F4963CD618B3F36C004A7CA1 /* MyCollectionViewCell.m in Sources */,
 				7EB5E3F33D8F2F5F12521FB2 /* MySimpleLayout.m in Sources */,
 				7EB5EF279657794C61D4F72F /* MySpringyLayout.m in Sources */,
-				F48CD33618BE5524001ECAED /* InteractiveTransitionManager.m in Sources */,
+				F48CD33618BE5524001ECAED /* MyInteractiveTransitionManager.m in Sources */,
 				7EB5E00B3F03E12CF6EF9974 /* MyCoverFlowLayout.m in Sources */,
 				7EB5E252AEACFC52202E0DCD /* MyCircleLayout.m in Sources */,
 			);

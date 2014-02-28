@@ -1,18 +1,17 @@
-
 #import "OrderViewController.h"
 #import "UIImage+ImageEffects.h"
 #import "Constants.h"
-#import "OrderHistoryViewController.h"
-#import "TransitionManager.h"
+#import "AppDelegate.h"
 #import "ThanksViewController.h"
+#import "InteractiveTransitionController.h"
 #import "Utilities.h"
-#import "OrderHistoryCollectionViewController.h"
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
     BOOL isCoreMotionTimerValid;
     BOOL isPickerVisible;
     NSLayoutConstraint *beforeConstraint;
+    OrderHistoryViewController *modal;
 }
 
 - (void)viewDidLoad{
@@ -21,7 +20,7 @@
     isFetchingMenu = NO;
     isCoreMotionTimerValid = false;
 //    self.transitionManager = [[TransitionManager alloc] init];
-    self.transitionManager = [[InteractiveTransitionManager alloc] init];
+    self.transitionManager = [[MyInteractiveTransitionManager alloc] init];
     beforeConstraint = self.totalCostConstraint;
 
     [self.orderQuantityButton setTitle:@"1" forState:UIControlStateNormal];
@@ -263,9 +262,9 @@
         [_leftEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.left.yAcceleration"];
         [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
         [_rightEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.right.yAcceleration"];
-        [self enableMotionEffect];
+//        [self enableMotionEffect];
     }else{
-        [self disableMotionEffect];
+//        [self disableMotionEffect];
         [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
         [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
         [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(startAccUpdates) userInfo:nil repeats:NO];
@@ -577,23 +576,13 @@
     }
 }
 - (IBAction)onOrderHistory:(UIButton *)sender {
-    self.transitionManager.scaleFactor = 1;
-
-//    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, NO, 0);
-//    [self.view drawViewHierarchyInRect:self.view.bounds afterScreenUpdates:YES];
-//    UIImage *copied = UIGraphicsGetImageFromCurrentImageContext();
-//    UIImage *background = [copied applyLightEffect];
-//    UIGraphicsEndImageContext();
-    
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    OrderHistoryViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
-//    OrderHistoryCollectionViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
+    modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
+    AppDelegateAccessor.settingsInteractionController = [[InteractiveTransitionController alloc] init];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
-//    [modal setBackgroundImage:background];
-    [self presentViewController:modal animated:YES completion:^{
-    }];
+    [self presentViewController:modal animated:YES completion:nil];
 }
 
 - (IBAction)onQuantityChangeButton:(UIButton *)sender {
@@ -680,12 +669,12 @@
 }
 
 - (void)goToThankYouScreen {
-    self.transitionManager.scaleFactor = 1;
+//    self.transitionManager.scaleFactor = 1;
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    ThanksViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDThankYouController"];
-    modal.transitioningDelegate = self;
-    modal.modalPresentationStyle = UIModalPresentationCustom;
-    [self presentViewController:modal animated:YES completion:^{
+    ThanksViewController *thanksViewController = [storyboard instantiateViewControllerWithIdentifier:@"IDThankYouController"];
+    thanksViewController.transitioningDelegate = self;
+    thanksViewController.modalPresentationStyle = UIModalPresentationCustom;
+    [self presentViewController:thanksViewController animated:YES completion:^{
     }];
 }
 
@@ -743,20 +732,40 @@
 
 #pragma NSURLConnection Delegate Methods end
 
+//
+//- (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+//                                                                   presentingController:(UIViewController *)presenting
+//                                                                       sourceController:(UIViewController *)source{
+//    self.transitionManager.appearing = YES;
+//    self.transitionManager.cornerRadius = 5;
+//    return self.transitionManager;
+//}
+//
+//- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
+//{
+//    self.transitionManager.appearing = NO;
+//    return self.transitionManager;
+//}
 
-- (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
-                                                                   presentingController:(UIViewController *)presenting
-                                                                       sourceController:(UIViewController *)source{
-    self.transitionManager.appearing = YES;
-    self.transitionManager.cornerRadius = 5;
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
+    
+    if(AppDelegateAccessor.settingsInteractionController){
+        [AppDelegateAccessor.settingsInteractionController prepareTransitionController:presented];
+    }
+    
+    self.transitionManager.reverse = NO;
     return self.transitionManager;
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed
-{
-    self.transitionManager.appearing = NO;
+- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
+    self.transitionManager.reverse = YES;
     return self.transitionManager;
 }
+
+- (id<UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id<UIViewControllerAnimatedTransitioning>)animator {
+    return AppDelegateAccessor.settingsInteractionController && AppDelegateAccessor.settingsInteractionController.interactionInProgress ? AppDelegateAccessor.settingsInteractionController : nil;
+}
+
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
     if(alertView.tag == keyAlertOrderConfirm){
