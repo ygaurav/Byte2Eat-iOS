@@ -7,8 +7,7 @@
 
 @implementation AuthenticatorViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
 
@@ -40,8 +39,7 @@
 }
 
 - (void)setBackgroundImage {
-    dispatch_queue_t queue = dispatch_queue_create("com.spiderlogic.Byte2Eat", NULL);
-    dispatch_async(queue, ^{
+    dispatch_async(dispatch_queue_create("com.spiderlogic.Byte2Eat", NULL), ^{
         __block UIImage *image = [[UIImage imageNamed:@"slicedfruitcopy"] applyLightEffect];
         dispatch_async(dispatch_get_main_queue(), ^{
             [UIView transitionWithView:_backgroundView
@@ -54,10 +52,6 @@
             }];
         });
     });
-//    UIImage *uiImage = [UIImage imageNamed:@"slicedfruitcopy"];
-//    UIImage *image = [uiImage applyLightEffect];
-//    uiImage = nil;
-//    [self.backgroundView setImage:image];
 }
 
 - (void)setTitleStyles {
@@ -84,6 +78,7 @@
     CATransform3D transform3D = CATransform3DIdentity;
     transform3D = CATransform3DScale(transform3D, 5, 5, 5);
     transform3D.m34 = 1./-1200;
+
     self.byte2eatHeader.layer.transform = transform3D;
     self.loginSubheading.layer.transform = transform3D;
     [UIView animateWithDuration:1
@@ -216,6 +211,7 @@
     [error addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:14] range:NSMakeRange(0, error.length)];
     [_errorLabel setAttributedText:error];
 
+
     CGPoint point = _errorLabel.center;
     [_errorLabel setCenter:CGPointMake(point.x, point.y - 100)];
     [_errorLabel setAlpha:0];
@@ -235,8 +231,8 @@
 }
 
 - (void)changeEmitterBirthrateTo:(int)birthRate {
-    [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
-    [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+    [_leftEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.left.birthRate"];
+    [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
 }
 
 - (void)goToOrderScreen:(NSDictionary *)userInfo {
@@ -290,7 +286,6 @@
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                    presentingController:(UIViewController *)presenting
-
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 0;
@@ -311,8 +306,6 @@
                      animations:^{
                          _errorLabel.alpha = 0;
                      } completion:nil];
-
-
     [timer invalidate];
 }
 
@@ -326,20 +319,18 @@
     [self enableUserInput];
     NSError *error = nil;
     NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    BOOL userExists = ![((NSNumber *)[jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:0]];
-    NSNumber *userId = (NSNumber *)[jsonArray objectForKey:keyUserId];
+    BOOL userExists = ![((NSNumber *)jsonArray[keyUserId]) isEqualToNumber:@0];
+    NSNumber *userId = (NSNumber *)jsonArray[keyUserId];
     NSLog(@"--- %d -- %@", userExists, userId);
     if(userExists){
         [Utilities setUserDetailsInPlist:jsonArray];
         [self goToOrderScreen:jsonArray];
     }else{
-        NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+        NSString *response = (NSString *)jsonArray[keyResponseMessage];
         [self showError:response];
         NSLog(@"%@",response);
     }
 }
-
-
 
 - (void)enableUserInput {
     [_userNameTextField setEnabled:YES];

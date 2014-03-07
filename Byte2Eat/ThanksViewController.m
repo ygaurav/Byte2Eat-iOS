@@ -157,16 +157,16 @@
 }
 
 - (void)addExplosion:(NSTimer *)timer {
-    [explosionLayer setValue:[NSNumber numberWithInt:1000] forKeyPath:@"emitterCells.explosion1.birthRate"];
-    [explosionLayer setValue:[NSNumber numberWithInt:1000] forKeyPath:@"emitterCells.explosion2.birthRate"];
-    [explosionLayer setValue:[NSNumber numberWithInt:1000] forKeyPath:@"emitterCells.explosion3.birthRate"];
+    [explosionLayer setValue:@1000 forKeyPath:@"emitterCells.explosion1.birthRate"];
+    [explosionLayer setValue:@1000 forKeyPath:@"emitterCells.explosion2.birthRate"];
+    [explosionLayer setValue:@1000 forKeyPath:@"emitterCells.explosion3.birthRate"];
     [timer invalidate];
 }
 
 - (void)addStars:(NSTimer *)timer {
-    [emitterLayer setValue:[NSNumber numberWithInt:20] forKeyPath:@"emitterCells.emitter1.birthRate"];
-    [emitterLayer setValue:[NSNumber numberWithInt:20] forKeyPath:@"emitterCells.emitter2.birthRate"];
-    [emitterLayer setValue:[NSNumber numberWithInt:20] forKeyPath:@"emitterCells.emitter3.birthRate"];
+    [emitterLayer setValue:@20 forKeyPath:@"emitterCells.emitter1.birthRate"];
+    [emitterLayer setValue:@20 forKeyPath:@"emitterCells.emitter2.birthRate"];
+    [emitterLayer setValue:@20 forKeyPath:@"emitterCells.emitter3.birthRate"];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -174,9 +174,9 @@
 }
 
 -(void)removeExplosion:(NSTimer *)timer{
-    [explosionLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.explosion1.birthRate"];
-    [explosionLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.explosion2.birthRate"];
-    [explosionLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.explosion3.birthRate"];
+    [explosionLayer setValue:@0 forKeyPath:@"emitterCells.explosion1.birthRate"];
+    [explosionLayer setValue:@0 forKeyPath:@"emitterCells.explosion2.birthRate"];
+    [explosionLayer setValue:@0 forKeyPath:@"emitterCells.explosion3.birthRate"];
     [timer invalidate];
 }
 

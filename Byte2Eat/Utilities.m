@@ -17,7 +17,7 @@
     NSString *errorDesc = nil;
     NSPropertyListFormat format;
     NSString *plistPath;
-    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *rootPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES)[0];
     plistPath = [rootPath stringByAppendingPathComponent:@"UserDetail.plist"];
     if (![[NSFileManager defaultManager] fileExistsAtPath:plistPath]) {
         plistPath = [[NSBundle mainBundle] pathForResource:@"UserDetail" ofType:@"plist"];
@@ -29,9 +29,9 @@
                           format:&format
                 errorDescription:&errorDesc];
     if (!temp) {
-        NSLog(@"Error reading plist: %@, format: %d", errorDesc, format);
+        NSLog(@"Error reading plist: %@, format: %u", errorDesc, format);
     }
-    NSString *personName = [temp objectForKey:@"UserName"];
+    NSString *personName = temp[@"UserName"];
     NSLog(@"User : %@", personName);
 
     if([personName isEqualToString:@""] || personName == nil){
@@ -45,14 +45,13 @@
 + (void)setUserDetailsInPlist:(NSDictionary *)dictionary {
     NSString *error;
 
-    NSString *userName = [dictionary objectForKey:keyUserName];
-    NSString *balance = [dictionary objectForKey:keyBalance];
-    NSString *userId = [dictionary objectForKey:keyUserId];
-    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *userName = dictionary[keyUserName];
+    NSString *balance = dictionary[keyBalance];
+    NSString *userId = dictionary[keyUserId];
+    NSString *rootPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
     NSString *plistPath = [rootPath stringByAppendingPathComponent:@"UserDetail.plist"];
 //    NSString *plistPath = [[NSBundle mainBundle] pathForResource:@"UserDetail" ofType:@"plist"];
-    NSDictionary *plistDict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: userName,balance,userId, nil]
-                                                          forKeys:[NSArray arrayWithObjects: keyUserName,keyBalance,keyUserId, nil]];
+    NSDictionary *plistDict = @{keyUserName: userName,keyBalance: balance,keyUserId: userId};
 
     NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:plistDict
                                                                    format:NSPropertyListXMLFormat_v1_0
@@ -70,7 +69,7 @@
     NSString *errorDesc = nil;
     NSPropertyListFormat format;
     NSString *plistPath;
-    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *rootPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES)[0];
     plistPath = [rootPath stringByAppendingPathComponent:@"UserDetail.plist"];
     if (![[NSFileManager defaultManager] fileExistsAtPath:plistPath]) {
         plistPath = [[NSBundle mainBundle] pathForResource:@"UserDetail" ofType:@"plist"];
@@ -82,7 +81,7 @@
                           format:&format
                 errorDescription:&errorDesc];
     if (!temp) {
-        NSLog(@"Error reading plist: %@, format: %d", errorDesc, format);
+        NSLog(@"Error reading plist: %@, format: %u", errorDesc, format);
     }
     return temp;
 }
@@ -96,11 +95,10 @@
 + (void) logUserOut{
     NSString *error;
 
-    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *rootPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES)[0];
     NSString *plistPath = [rootPath stringByAppendingPathComponent:@"UserDetail.plist"];
 
-    NSDictionary *plistDict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: @"",@"",@"", nil]
-                                                          forKeys:[NSArray arrayWithObjects: keyUserName,keyBalance,keyUserId, nil]];
+    NSDictionary *plistDict = @{keyUserName: @"",keyBalance: @"",keyUserId: @""};
 
     NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:plistDict
                                                                    format:NSPropertyListXMLFormat_v1_0

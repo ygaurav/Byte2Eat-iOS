@@ -73,7 +73,7 @@
 
     NSSortDescriptor *sort = [[NSSortDescriptor alloc]
             initWithKey:@"displayOrder" ascending:YES];
-    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sort]];
+    [fetchRequest setSortDescriptors:@[sort]];
 
     [fetchRequest setFetchBatchSize:20];
 
@@ -247,7 +247,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if ([[_fetchedResultsController sections] count] > 0) {
-        id <NSFetchedResultsSectionInfo> sectionInfo = [[_fetchedResultsController sections] objectAtIndex:(NSUInteger) section];
+        id <NSFetchedResultsSectionInfo> sectionInfo = [_fetchedResultsController sections][(NSUInteger) section];
         return [sectionInfo numberOfObjects];
     } else
         return 0;
@@ -329,20 +329,20 @@
 }
 
 - (void)setOrderHistory:(NSDictionary *)dictionary {
-    NSArray *orderHistoryDictionary = [dictionary objectForKey:keyOrderHistory];
+    NSArray *orderHistoryDictionary = dictionary[keyOrderHistory];
     if ([_fetchedResultsController fetchedObjects].count == 0) {
         NSLog(@"Saving order History for first time.");
-        NSNumber *displayOrder = [[NSNumber alloc] initWithInt:1];
+        NSNumber *displayOrder = @1;
         for (NSDictionary *order in orderHistoryDictionary) {
-            NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
+            NSDictionary *dailyMenu = order[@"DailyMenu"];
 
             Order *orderObject = [NSEntityDescription
                     insertNewObjectForEntityForName:@"Order"
                              inManagedObjectContext:self.managedObjectContext];
-            orderObject.quantity = [order objectForKey:@"Quantity"];
-            orderObject.itemName = [dailyMenu objectForKey:keyItemName];
-            orderObject.price = [dailyMenu objectForKey:keyItemPrice];
-            orderObject.orderDate = [dateFromJSONFormatter dateFromString:(NSString *) [order objectForKey:@"OrderDate"]];
+            orderObject.quantity = order[@"Quantity"];
+            orderObject.itemName = dailyMenu[keyItemName];
+            orderObject.price = dailyMenu[keyItemPrice];
+            orderObject.orderDate = [dateFromJSONFormatter dateFromString:(NSString *) order[@"OrderDate"]];
             orderObject.displayOrder = displayOrder;
 
             NSError *error;
@@ -350,7 +350,7 @@
             if (error) {
                 NSLog(@"Error occured : %@", error.localizedDescription);
             } else {
-                displayOrder = [NSNumber numberWithLong:[displayOrder integerValue] + 1];
+                displayOrder = @([displayOrder integerValue] + 1);
             }
         }
     } else {
@@ -358,9 +358,9 @@
         for(Order *order in _fetchedResultsController.fetchedObjects){
             BOOL isDeleted = YES;
             for(NSDictionary *orderDict in orderHistoryDictionary){
-                if([[dateFromJSONFormatter dateFromString:(NSString *) [orderDict objectForKey:@"OrderDate"]] compare:order.orderDate] == NSOrderedSame){
-                    if(order.quantity != [orderDict objectForKey:@"Quantity"]){
-                        order.quantity = [orderDict objectForKey:@"Quantity"];
+                if([[dateFromJSONFormatter dateFromString:(NSString *) orderDict[@"OrderDate"]] compare:order.orderDate] == NSOrderedSame){
+                    if(order.quantity != orderDict[@"Quantity"]){
+                        order.quantity = orderDict[@"Quantity"];
                     }
                     isDeleted = NO;
                     break;
@@ -375,7 +375,7 @@
         for (NSDictionary *order in orderHistoryDictionary) {
             BOOL isNew = YES;
             for(Order *orderManagedObject in [_fetchedResultsController fetchedObjects]){
-                if([[dateFromJSONFormatter dateFromString:(NSString *) [order objectForKey:@"OrderDate"]] compare:orderManagedObject.orderDate] == NSOrderedSame){
+                if([[dateFromJSONFormatter dateFromString:(NSString *) order[@"OrderDate"]] compare:orderManagedObject.orderDate] == NSOrderedSame){
                     isNew = NO;
                     break;
                 }
@@ -386,11 +386,11 @@
                         insertNewObjectForEntityForName:@"Order"
                                  inManagedObjectContext:self.managedObjectContext];
 
-                NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
-                orderObject.quantity = [order objectForKey:@"Quantity"];
-                orderObject.itemName = [dailyMenu objectForKey:keyItemName];
-                orderObject.price = [dailyMenu objectForKey:keyItemPrice];
-                orderObject.orderDate = [dateFromJSONFormatter dateFromString:(NSString *) [order objectForKey:@"OrderDate"]];
+                NSDictionary *dailyMenu = order[@"DailyMenu"];
+                orderObject.quantity = order[@"Quantity"];
+                orderObject.itemName = dailyMenu[keyItemName];
+                orderObject.price = dailyMenu[keyItemPrice];
+                orderObject.orderDate = [dateFromJSONFormatter dateFromString:(NSString *) order[@"OrderDate"]];
             }
         }
     }
@@ -474,7 +474,7 @@
 
     NSError *error = nil;
     NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:totalData options:NSJSONReadingMutableContainers error:&error];
-    BOOL userExists = ![((NSNumber *) [jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:1]];
+    BOOL userExists = ![((NSNumber *) jsonArray[keyUserId]) isEqualToNumber:@1];
 
     if (error != nil) {
         NSLog(@"Error parsing JSON Data : %@", [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding]);
@@ -482,7 +482,7 @@
     if (userExists) {
         [self setOrderHistory:jsonArray];
     } else {
-        NSString *response = (NSString *) [jsonArray objectForKey:keyResponseMessage];
+        NSString *response = (NSString *) jsonArray[keyResponseMessage];
         [self showError:response];
         NSLog(@"Response : %@", response);
     }
@@ -502,8 +502,8 @@
 }
 
 - (void)changeEmitterBirthrateTo:(int)birthRate {
-    [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
-    [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+    [_leftEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.left.birthRate"];
+    [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
@@ -548,24 +548,24 @@
     switch (type) {
 
         case NSFetchedResultsChangeInsert:
-            [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath]
+            [tableView insertRowsAtIndexPaths:@[newIndexPath]
                              withRowAnimation:UITableViewRowAnimationLeft];
             break;
 
         case NSFetchedResultsChangeDelete:
-            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+            [tableView deleteRowsAtIndexPaths:@[indexPath]
                              withRowAnimation:UITableViewRowAnimationRight];
             break;
 
         case NSFetchedResultsChangeUpdate:
-            [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+            [tableView reloadRowsAtIndexPaths:@[indexPath]
                              withRowAnimation:UITableViewRowAnimationFade];
             break;
 
         case NSFetchedResultsChangeMove:
-            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+            [tableView deleteRowsAtIndexPaths:@[indexPath]
                              withRowAnimation:UITableViewRowAnimationTop];
-            [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath]
+            [tableView insertRowsAtIndexPaths:@[newIndexPath]
                              withRowAnimation:UITableViewRowAnimationTop];
             break;
     }
@@ -588,8 +588,8 @@
     NSMutableArray *array = [[_fetchedResultsController fetchedObjects] mutableCopy];
 
     for(int j = 0; j <array.count; j++){
-        Order *order = (Order *) [array objectAtIndex:(NSUInteger) j];
-        (order).displayOrder = [NSNumber numberWithUnsignedInteger:array.count - j];
+        Order *order = (Order *) array[(NSUInteger) j];
+        (order).displayOrder = @(array.count - j);
     }
 
     [self.managedObjectContext save:nil];

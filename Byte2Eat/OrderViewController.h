@@ -23,6 +23,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 @property (weak, nonatomic) IBOutlet UIButton *orderQuantityButton;
 
+
+
 @property (nonatomic) NSNumber *remainingBalance;
 @property (nonatomic) NSString *userName;
 @property (nonatomic) NSString *itemName;

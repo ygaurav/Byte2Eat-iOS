@@ -107,7 +107,7 @@ int layoutId = 1;
 
 //  For Springy Layout
 //    MyWideCollectionViewCell *collectionViewCell = (MyWideCollectionViewCell *)[self.myCollectionView dequeueReusableCellWithReuseIdentifier:@"wideCollectionViewCell" forIndexPath:indexPath];
-    Order *order = [orderHistory objectAtIndex:(NSUInteger) indexPath.item];
+    Order *order = orderHistory[(NSUInteger) indexPath.item];
 
     NSShadow *blueShadow = [[NSShadow alloc] init];
     UIColor *blueColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:1];
@@ -184,7 +184,7 @@ int layoutId = 1;
 
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    NSLog(@"Received %d bytes of data", [data length]);
+    NSLog(@"Received %lu bytes of data", (unsigned long)[data length]);
     if (data != nil) {
         [totalData appendData:data];
     }
@@ -202,7 +202,7 @@ int layoutId = 1;
 
     NSError *error = nil;
     NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:totalData options:NSJSONReadingMutableContainers error:&error];
-    BOOL userExists = ![((NSNumber *) [jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:1]];
+    BOOL userExists = ![((NSNumber *) jsonArray[keyUserId]) isEqualToNumber:@1];
 
     if (error != nil) {
         NSLog(@"Error parsing JSON Data : %@", [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding]);
@@ -210,7 +210,7 @@ int layoutId = 1;
     if (userExists) {
         [self setOrderHistory:jsonArray];
     } else {
-        NSString *response = (NSString *) [jsonArray objectForKey:keyResponseMessage];
+        NSString *response = (NSString *) jsonArray[keyResponseMessage];
         [self showError:response];
         NSLog(@"%@", response);
     }
@@ -265,19 +265,19 @@ int layoutId = 1;
 }
 
 - (void)setOrderHistory:(NSDictionary *)dictionary {
-    NSArray *orderHistoryDictionary = [dictionary objectForKey:keyOrderHistory];
+    NSArray *orderHistoryDictionary = dictionary[keyOrderHistory];
     NSLog(@"Saving order History for first time.");
-    NSNumber *displayOrder = [NSNumber numberWithInt:1];
+    NSNumber *displayOrder = @1;
     for (NSDictionary *order in orderHistoryDictionary) {
-        NSDictionary *dailyMenu = [order objectForKey:@"DailyMenu"];
+        NSDictionary *dailyMenu = order[@"DailyMenu"];
 
         Order *orderObject = [NSEntityDescription
                 insertNewObjectForEntityForName:@"Order"
                          inManagedObjectContext:self.managedObjectContext];
-        orderObject.quantity = [order objectForKey:@"Quantity"];
-        orderObject.itemName = [dailyMenu objectForKey:keyItemName];
-        orderObject.price = [dailyMenu objectForKey:keyItemPrice];
-        orderObject.orderDate = [self dateWithJSONString:(NSString *) [order objectForKey:@"OrderDate"]];
+        orderObject.quantity = order[@"Quantity"];
+        orderObject.itemName = dailyMenu[keyItemName];
+        orderObject.price = dailyMenu[keyItemPrice];
+        orderObject.orderDate = [self dateWithJSONString:(NSString *) order[@"OrderDate"]];
         orderObject.displayOrder = displayOrder;
 
         NSError *error;
@@ -286,7 +286,7 @@ int layoutId = 1;
             NSLog(@"Error occured : %@", error.localizedDescription);
         } else {
             displayOrder = [NSNumber numberWithInt:[displayOrder integerValue] + 1];
-            NSLog(@"Order saved : %@", [dailyMenu objectForKey:@"ItemName"]);
+            NSLog(@"Order saved : %@", dailyMenu[@"ItemName"]);
         }
     }
     

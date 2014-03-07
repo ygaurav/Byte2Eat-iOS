@@ -14,7 +14,7 @@
 }
 
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return 6;
+    return 1;
 }
 
 - (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
@@ -98,7 +98,7 @@
     
     NSTimeInterval duration = [self transitionDuration:transitionContext];
     
-    //    [UIView animateKeyframesWithDuration:duration
+//        [UIView animateKeyframesWithDuration:duration
 //                                   delay:0.0
 //                                 options:0
 //                              animations:^{
@@ -123,6 +123,26 @@
 //                                  NSLog(@"Transition : %d",[transitionContext transitionWasCancelled]);
 //                                  [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
 //                              }];
+    [UIView animateWithDuration:duration
+                     animations:^{
+                         toViewTopHalfSnapshot.layer.transform = CATransform3DRotate(transform, 0, 1, 0, 0);
+                         fromViewBottomHalfSnapshot.layer.transform = CATransform3DRotate(fromTransform, M_PI*(.99999999999999999999), 1, 0, 0);
+                         fromViewBottomHalfSnapshot.alpha = 0;
+                     }
+                     completion:^(BOOL finished){
+                         [fromViewBottomHalfSnapshot removeFromSuperview];
+                         [fromViewTopHalfSnapshot removeFromSuperview];
+
+                         [toViewTopHalfSnapshot removeFromSuperview];
+                         [toViewBottomHalfSnapshot removeFromSuperview];
+                         
+                         toView.frame = containerView.bounds;
+                         fromView.frame = containerView.bounds;
+                         NSLog(@"Transition : %d",[transitionContext transitionWasCancelled]);
+                         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                     }];
+
+
 }
 
 -(CGPoint)getLayerPosition:(CALayer *)layer{

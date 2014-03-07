@@ -4,7 +4,6 @@
 #import "AppDelegate.h"
 #import "ThanksViewController.h"
 #import "TransitionManager.h"
-#import "InteractiveTransitionController.h"
 #import "Utilities.h"
 
 @implementation OrderViewController{
@@ -95,11 +94,11 @@
 }
 
 - (void)outputRotationData:(CMAcceleration)rotation {
-    [_leftEmitterLayer setValue:[NSNumber numberWithInt:(int) (rotation.x * 100)] forKeyPath:@"emitterCells.left.xAcceleration"];
-    [_leftEmitterLayer setValue:[NSNumber numberWithInt:(int) -(rotation.y * 100)] forKeyPath:@"emitterCells.left.yAcceleration"];
+    [_leftEmitterLayer setValue:@((int) (rotation.x * 100)) forKeyPath:@"emitterCells.left.xAcceleration"];
+    [_leftEmitterLayer setValue:@((int) -(rotation.y * 100)) forKeyPath:@"emitterCells.left.yAcceleration"];
     
-    [_rightEmitterLayer setValue:[NSNumber numberWithInt:(int) (rotation.x * 100)] forKeyPath:@"emitterCells.right.xAcceleration"];
-    [_rightEmitterLayer setValue:[NSNumber numberWithInt:(int) -(rotation.y * 100)] forKeyPath:@"emitterCells.right.yAcceleration"];
+    [_rightEmitterLayer setValue:@((int) (rotation.x * 100)) forKeyPath:@"emitterCells.right.xAcceleration"];
+    [_rightEmitterLayer setValue:@((int) -(rotation.y * 100)) forKeyPath:@"emitterCells.right.yAcceleration"];
 }
 
 - (void)initShadows {
@@ -132,6 +131,7 @@
     [super viewDidAppear:animated];
     [self becomeFirstResponder];
     [self fetchUserDetails];
+
 }
 
 - (void)fetchUserDetails {
@@ -162,7 +162,7 @@
     [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
+    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
     animation.type = kCATransitionFade;
@@ -259,17 +259,18 @@
 - (void)changeEmitterBirthrateTo:(int)birthRate {
     if (birthRate == 0) {
         [self stopAccelerometerUpdates];
-        [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
-        [_leftEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.left.yAcceleration"];
-        [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
-        [_rightEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.right.yAcceleration"];
+        [_leftEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.left.birthRate"];
+        [_leftEmitterLayer setValue:@0 forKeyPath:@"emitterCells.left.yAcceleration"];
+        [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
+        [_rightEmitterLayer setValue:@0 forKeyPath:@"emitterCells.right.yAcceleration"];
 //        [self enableMotionEffect];
     }else{
 //        [self disableMotionEffect];
-        [_leftEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.left.birthRate"];
-        [_rightEmitterLayer setValue:[NSNumber numberWithInt:birthRate] forKeyPath:@"emitterCells.right.birthRate"];
+        [_leftEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.left.birthRate"];
+        [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
         [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(startAccUpdates) userInfo:nil repeats:NO];
     }
+
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
@@ -302,24 +303,23 @@
     [userKaNaam addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, userKaNaam.length)];
     [_LabelUserName setAttributedText:userKaNaam];
 
-
 }
 
 - (void)setUserInformation {
     _errorLabel.text = @"";
     _itemName = @"";
-    NSString *name = [_userInfo objectForKey:keyUserName];
-    _remainingBalance = [_userInfo objectForKey:keyBalance];
-    _currentOrderNumber = [NSNumber numberWithInt:1];
+    NSString *name = _userInfo[keyUserName];
+    _remainingBalance = _userInfo[keyBalance];
+    _currentOrderNumber = @1;
 
-    _userId = [_userInfo objectForKey:keyUserId];
-    _todayTotalOrder = [_userInfo objectForKey:keyTodaysOrderQty];
+    _userId = _userInfo[keyUserId];
+    _todayTotalOrder = _userInfo[keyTodaysOrderQty];
     [_LabelTotalOrder setText:[_todayTotalOrder stringValue]];
     _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
 
     NSMutableAttributedString *remainingBalanceString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",_remainingBalance]];
     NSRange range = NSMakeRange(0, remainingBalanceString.length);
-    if([_remainingBalance compare:[NSNumber numberWithInt:0]] == NSOrderedAscending ){
+    if([_remainingBalance compare:@0] == NSOrderedAscending ){
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:range];
     }else{
         [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:range];
@@ -327,6 +327,8 @@
     }
     [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, remainingBalanceString.length)];
     [_LabelRemainingBalance setAttributedText:remainingBalanceString];
+
+
 }
 
 - (void)setRandomBackgroundImage {
@@ -420,11 +422,11 @@
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    if (_pricePerUnit && _pricePerUnit != [NSNumber numberWithInt:0]) {
-        _currentOrderNumber = [NSNumber numberWithInteger:row + 1];
+    if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
+        _currentOrderNumber = @(row + 1);
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         [_sparkleEmitterLayer setEmitterPosition:_LabelTotalCost.center];
-        [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:300] forKeyPath:@"emitterCells.sparkle.birthRate"];
+        [_sparkleEmitterLayer setValue:@300 forKeyPath:@"emitterCells.sparkle.birthRate"];
         [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
     }
 }
@@ -439,14 +441,15 @@
     [_LabelTotalCost.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelTotalCost setAttributedText:totalCostString];
 
-    [_sparkleEmitterLayer setValue:[NSNumber numberWithInt:0] forKeyPath:@"emitterCells.sparkle.birthRate"];
+    [_sparkleEmitterLayer setValue:@0 forKeyPath:@"emitterCells.sparkle.birthRate"];
     [timer invalidate];
+
 }
 
 - (void)setTodayMenu:(NSDictionary *)dictionary {
-    _dailyMenuId = [dictionary objectForKey:keyMenuId];
-    _itemName = [dictionary objectForKey:keyItemName];
-    _pricePerUnit = (NSNumber *)[dictionary objectForKey:keyItemPrice];
+    _dailyMenuId = dictionary[keyMenuId];
+    _itemName = dictionary[keyItemName];
+    _pricePerUnit = (NSNumber *)dictionary[keyItemPrice];
     
     
     NSMutableAttributedString *itemKaNaam = nil;
@@ -458,10 +461,10 @@
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
         self.orderQuantityButton.userInteractionEnabled = YES;
     }
-    
+
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
+    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
     animation.type = kCATransitionFade;
@@ -472,8 +475,8 @@
     NSString *itemPriceText=nil;
     NSString *totalCostText=nil;
 
-    if (_pricePerUnit && _pricePerUnit != [NSNumber numberWithInt:0]) {
-        itemPriceText = [NSString stringWithFormat:@"Rs %@/-",[dictionary objectForKey:keyItemPrice]];
+    if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
+        itemPriceText = [NSString stringWithFormat:@"Rs %@/-",dictionary[keyItemPrice]];
         totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = YES;
@@ -550,17 +553,17 @@
     [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     NSError *error;
     NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
-    [order setObject:_currentOrderNumber forKey:@"Quantity"];
-    [order setObject:_userId forKey:@"UserId"];
-    [order setObject:_dailyMenuId forKey:@"DailyMenuid"];
-    [order setObject:@"iPhone" forKey:@"DeviceInfo"];
+    order[@"Quantity"] = _currentOrderNumber;
+    order[@"UserId"] = _userId;
+    order[@"DailyMenuid"] = _dailyMenuId;
+    order[@"DeviceInfo"] = @"iPhone";
     NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
     request.HTTPBody = requestBodyData;
     [[NSURLConnection alloc] initWithRequest:request delegate:self];
 }
 
 - (IBAction)onOrder:(UIButton *)sender {
-    if (_dailyMenuId && ![_dailyMenuId isEqualToNumber:[NSNumber numberWithInt:0]]) {
+    if (_dailyMenuId && ![_dailyMenuId isEqualToNumber:@0]) {
         NSString *message = [NSString stringWithFormat:@"Toda's Order Summary \n\n Earlier Order Qty : %@ \nCurrent Order Qty : %@\n-------------------------------\nTotal order Qty: %u", _todayTotalOrder, _currentOrderNumber, [_todayTotalOrder unsignedIntValue] + [_currentOrderNumber unsignedIntValue]];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"OrderSummary"
                                                         message:message
@@ -584,6 +587,7 @@
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
     [self presentViewController:modal animated:YES completion:nil];
+    
 }
 
 - (IBAction)onQuantityChangeButton:(UIButton *)sender {
@@ -633,30 +637,30 @@
         //Menu
 
         NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        BOOL itemExists = ![((NSNumber *)[jsonArray objectForKey:keyMenuId]) isEqualToNumber:[NSNumber numberWithInt:1]];
+        BOOL itemExists = ![((NSNumber *)jsonArray[keyMenuId]) isEqualToNumber:@1];
         if(itemExists){
             [self setTodayMenu:jsonArray];
         }else{
-            NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+            NSString *response = (NSString *)jsonArray[keyResponseMessage];
             [self showError:response];
         }
     }else if([[url absoluteString] rangeOfString:@"user"].location != NSNotFound){
         //User
         NSError *error = nil;
         NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        BOOL userExists = ![((NSNumber *)[jsonArray objectForKey:keyUserId]) isEqualToNumber:[NSNumber numberWithInt:0]];
+        BOOL userExists = ![((NSNumber *)jsonArray[keyUserId]) isEqualToNumber:@0];
         if(userExists){
             [self setUserInfo:jsonArray];
             [self setUserInformation];
         }else{
-            NSString *response = (NSString *)[jsonArray objectForKey:keyResponseMessage];
+            NSString *response = (NSString *)jsonArray[keyResponseMessage];
             NSLog(@"Response : %@",response);
         }
     }else{
         //Order
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        NSString *response = (NSString *) [responseDict objectForKey:keyResponseMessage];
-        NSNumber *boolValue = (NSNumber *)[responseDict objectForKey:keyBoolValue];
+        NSString *response = (NSString *) responseDict[keyResponseMessage];
+        NSNumber *boolValue = (NSNumber *)responseDict[keyBoolValue];
 
         if([boolValue boolValue]){
             [self goToThankYouScreen];
@@ -695,16 +699,16 @@
     if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
         [self showError:[NSString stringWithFormat:@"%@",error.localizedDescription]];
         
-        _dailyMenuId = 0;
+        _dailyMenuId = @0;
         _itemName = @"";
-        _pricePerUnit = 0;
+        _pricePerUnit = @0;
         
         NSMutableAttributedString *itemKaNaam = nil;
 
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
         [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
-        [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat: -3.0] range:NSMakeRange(0, [itemKaNaam length])];
+        [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
         CATransition *animation = [CATransition animation];
         animation.duration = 1.0;
         animation.type = kCATransitionFade;
@@ -729,6 +733,7 @@
         [self showError:error.localizedDescription];
     }
     NSLog(@"Seriously what happend : %@", error.localizedDescription);
+    
 }
 
 #pragma NSURLConnection Delegate Methods end
@@ -739,6 +744,7 @@
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
+    self.transitionManager.scaleFactor = 0.9;
     return self.transitionManager;
 }
 
