@@ -31,7 +31,9 @@
     [self setUserInformation];
     [self styleStaticData];
     [self setRandomBackgroundImage];
-    [self hidePickerView];
+    if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad) {
+        [self hidePickerView];
+    }
     [self setUpAnimations];
     [self fetchTodayMenu];
 }
@@ -161,7 +163,11 @@
     [self changeEmitterBirthrateTo:100];
 
     NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"fetching today's menu"];
-    [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
+    if ([Utilities isiPad]) {
+        [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:50] range:NSMakeRange(0, itemKaNaam.length)];
+    }else{
+        [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
+    }
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
@@ -293,8 +299,19 @@
     self.orderHistoryButton.layer.cornerRadius = 3;
     
 
-    UIFont *font = [UIFont systemFontOfSize:40];
-    font = [UIFont italicSystemFontOfSize:40];
+    UIFont *font;
+
+    if ([Utilities isiPad]) {
+        font = [UIFont italicSystemFontOfSize:100];
+        [self.shadow setShadowBlurRadius:7];
+        self.orderQuantityButton.hidden = YES;
+        self.orderQuantityButton.userInteractionEnabled = NO;
+        self.orderButton.layer.cornerRadius = 10;
+        self.orderHistoryButton.layer.cornerRadius = 10;
+        self.logoutButton.layer.cornerRadius = 10;
+    }else{
+        font = [UIFont italicSystemFontOfSize:40];
+    }
 
     NSMutableAttributedString *khanemein = [[NSMutableAttributedString alloc] initWithString:@"Aaj Khane Mein Kya Hai"];
     NSRange range = NSMakeRange(0, [khanemein length]);
@@ -302,8 +319,10 @@
     [khanemein addAttribute:NSFontAttributeName value:font range:range];
     [_aajKhaneMeinKyaHai setAttributedText:khanemein];
 
-    NSMutableAttributedString *userKaNaam = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Hi, %@", _userName]];
-    [userKaNaam addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, userKaNaam.length)];
+    NSMutableAttributedString *userKaNaam = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Hi %@", _userName]];
+    if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad) {
+        [userKaNaam addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, userKaNaam.length)];
+    }
     [_LabelUserName setAttributedText:userKaNaam];
 
 }
@@ -328,7 +347,13 @@
         [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:range];
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50 / 256.0 green:193 / 256.0 blue:92 / 256.0 alpha:1] range:range];
     }
-    [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, remainingBalanceString.length)];
+
+    if ([Utilities isiPad]) {
+        [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:20] range:NSMakeRange(0, remainingBalanceString.length)];
+    }else{
+        [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, remainingBalanceString.length)];        
+    }
+    
     [_LabelRemainingBalance setAttributedText:remainingBalanceString];
 
 
@@ -429,21 +454,25 @@
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return [NSString stringWithFormat:@"%i",row + 1];
+    return [NSString stringWithFormat:@"%li",row + 1];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
-        _currentOrderNumber = @(row + 1);
-        [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
-        [_sparkleEmitterLayer setEmitterPosition:_LabelTotalCost.center];
-        [_sparkleEmitterLayer setValue:@300 forKeyPath:@"emitterCells.sparkle.birthRate"];
-        [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
+        [self updateCurrentOrderTo:@(row+1)];
     }
 }
 
+-(void)updateCurrentOrderTo:(NSNumber *)total{
+    _currentOrderNumber = total;
+    [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
+    [_sparkleEmitterLayer setEmitterPosition:_LabelTotalCost.center];
+    [_sparkleEmitterLayer setValue:@300 forKeyPath:@"emitterCells.sparkle.birthRate"];
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
+}
+
 - (void)updateTotalCost:(NSTimer *)timer {
-    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %li/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 0.5;
@@ -464,7 +493,7 @@
     
     
     NSMutableAttributedString *itemKaNaam = nil;
-    if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
+    if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N / A"]) {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"nothing today :("];
         [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = NO;
@@ -488,7 +517,7 @@
 
     if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
         itemPriceText = [NSString stringWithFormat:@"Rs %@/-",dictionary[keyItemPrice]];
-        totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
+        totalCostText = [NSString stringWithFormat:@"Rs %li/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = YES;
     } else {
@@ -519,8 +548,12 @@
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:response];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
     [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
-//    [error addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, error.length)];
-    [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:25] range:NSMakeRange(0, error.length)];
+    }else{
+        [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
+    }
+
     [_errorLabel setAttributedText:error];
 
     CGPoint point = _errorLabel.center;
@@ -701,6 +734,8 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     isFetchingMenu = NO;
+    [self.OrderNumberPicker selectRow:0 inComponent:0 animated:YES];
+    [self updateCurrentOrderTo:@1];
     [self changeEmitterBirthrateTo:0];
 }
 
@@ -717,7 +752,7 @@
         
         NSMutableAttributedString *itemKaNaam = nil;
 
-        itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N/A"];
+        itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N / A"];
         [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];

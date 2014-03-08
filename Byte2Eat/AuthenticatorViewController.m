@@ -63,15 +63,29 @@
     NSMutableAttributedString *byte2eatHeader = [[NSMutableAttributedString alloc] initWithString:@"Byte2Eat"];
     NSRange range = NSMakeRange(0, [byte2eatHeader length]);
     [byte2eatHeader addAttribute:NSShadowAttributeName value:shadow range:range];
-    [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:50] range:range];
-    [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:50] range:range];
-    [self.byte2eatHeader setAttributedText:byte2eatHeader];
 
     NSMutableAttributedString *loginSubheading = [[NSMutableAttributedString alloc] initWithString:@"Login"];
     [loginSubheading addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, loginSubheading.length)];
-    [loginSubheading addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
-    [loginSubheading addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
+
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.userNameTextField.layer.cornerRadius = 10;
+        self.loginButton.layer.cornerRadius = 10;
+        [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:100] range:range];
+        [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:100] range:range];
+        
+        [loginSubheading addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:35] range:NSMakeRange(0, loginSubheading.length)];
+        [loginSubheading addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:35] range:NSMakeRange(0, loginSubheading.length)];
+    }else{
+        [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:50] range:range];
+        [byte2eatHeader addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:50] range:range];
+        
+        [loginSubheading addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
+        [loginSubheading addAttribute:NSFontAttributeName value:[UIFont italicSystemFontOfSize:25] range:NSMakeRange(0, loginSubheading.length)];
+    }
+    
+    [self.byte2eatHeader setAttributedText:byte2eatHeader];
     [self.loginSubheading setAttributedText:loginSubheading];
+
 }
 
 - (void)setTitleAnimation {
@@ -106,13 +120,13 @@
 
 - (void)setEmitterAnimation {
     _leftEmitterLayer = [CAEmitterLayer layer];
-    _leftEmitterLayer.emitterPosition = CGPointMake(self.loginLabel.center.x - 160, self.loginLabel.center.y + 55);
+    _leftEmitterLayer.emitterPosition = CGPointMake(self.errorLabel.center.x - self.view.bounds.size.width/2, self.errorLabel.center.y + 12);
     _leftEmitterLayer.emitterZPosition = 10.0;
     _leftEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
 
     _rightEmitterLayer = [CAEmitterLayer layer];
-    _rightEmitterLayer.emitterPosition = CGPointMake(self.loginLabel.center.x + 160, self.loginLabel.center.y + 55);
+    _rightEmitterLayer.emitterPosition = CGPointMake(self.errorLabel.center.x  + self.view.bounds.size.width/2, self.errorLabel.center.y + 12);
     _rightEmitterLayer.emitterZPosition = 10.0;
     _rightEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
@@ -120,7 +134,7 @@
     CAEmitterCell*leftEmitterCell = [CAEmitterCell emitterCell];
     leftEmitterCell.birthRate = 0;
     leftEmitterCell.emissionLongitude = M_PI*2;
-    leftEmitterCell.lifetime = 2;
+    leftEmitterCell.lifetime = 4;
     leftEmitterCell.velocity = 100;
     leftEmitterCell.velocityRange = 40;
     leftEmitterCell.emissionRange = M_PI*8/180;
@@ -129,14 +143,14 @@
     leftEmitterCell.xAcceleration = 100;
     leftEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     leftEmitterCell.scale = 0.03;
-    leftEmitterCell.alphaSpeed = -0.12;
+    leftEmitterCell.alphaSpeed = -0.15;
     leftEmitterCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
     [leftEmitterCell setName:@"left"];
 
     CAEmitterCell *rightEmitterCell = [CAEmitterCell emitterCell];
     rightEmitterCell.birthRate = 0;
     rightEmitterCell.emissionLongitude = -M_PI*179/180;
-    rightEmitterCell.lifetime = 2;
+    rightEmitterCell.lifetime = 4;
     rightEmitterCell.velocity = 100;
     rightEmitterCell.velocityRange = 40;
     rightEmitterCell.emissionRange = M_PI*8/180;
@@ -145,7 +159,7 @@
     rightEmitterCell.xAcceleration = -100;
     rightEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     rightEmitterCell.scale = 0.03;
-    rightEmitterCell.alphaSpeed = -0.12;
+    rightEmitterCell.alphaSpeed = -0.15;
     rightEmitterCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
     [rightEmitterCell setName:@"right"];
 
@@ -167,6 +181,7 @@
 }
 
 - (IBAction)userNameTextField:(UITextField *)sender {
+    NSLog(@"hehe");
 }
 - (IBAction)onLoginButtonTap:(UIButton *)sender {
 
@@ -208,9 +223,15 @@
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:message];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
     [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
-    [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
-    [_errorLabel setAttributedText:error];
 
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
+    }else{
+        [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:20] range:NSMakeRange(0, error.length)];
+    }
+    
+    [_errorLabel setAttributedText:error];
 
     CGPoint point = _errorLabel.center;
     [_errorLabel setCenter:CGPointMake(point.x, point.y - 100)];
@@ -237,7 +258,8 @@
 
 - (void)goToOrderScreen:(NSDictionary *)userInfo {
     [self.userNameTextField setText:@""];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    
+    UIStoryboard *storyboard = [Utilities getStoryBoard];
     OrderViewController *modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderViewController"];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;

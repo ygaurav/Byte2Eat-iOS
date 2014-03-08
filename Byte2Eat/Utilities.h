@@ -20,4 +20,8 @@
 
 +(NSManagedObjectContext *)getManagedObjectContext;
 
++(UIStoryboard *)getStoryBoard;
+
++(BOOL)isiPad;
+
 @end

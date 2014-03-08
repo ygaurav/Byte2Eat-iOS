@@ -91,7 +91,6 @@
     return appDelegate.managedObjectContext;
 }
 
-
 + (void) logUserOut{
     NSString *error;
 
@@ -128,6 +127,20 @@
     else {
         NSLog(@"Something happened while logging out saving username in plist");
     }
+}
+
++(UIStoryboard *)getStoryBoard{
+    UIStoryboard *storyboard;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        storyboard = [UIStoryboard storyboardWithName:@"Main-iPad" bundle:nil];
+    }else{
+        storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    }
+    return storyboard;
+}
+
++(BOOL)isiPad{
+    return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
 }
 
 @end
