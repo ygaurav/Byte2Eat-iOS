@@ -31,7 +31,7 @@
     [self setUserInformation];
     [self styleStaticData];
     [self setRandomBackgroundImage];
-    if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad) {
+    if (![Utilities isiPad]) {
         [self hidePickerView];
     }
     [self setUpAnimations];
@@ -160,7 +160,11 @@
 
 - (void)fetchTodayMenu {
     isFetchingMenu = YES;
-    [self changeEmitterBirthrateTo:100];
+    if ([Utilities isiPad]) {
+        [self changeEmitterBirthrateTo:300];
+    }else{
+        [self changeEmitterBirthrateTo:100];
+    }
 
     NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"fetching today's menu"];
     if ([Utilities isiPad]) {
@@ -185,13 +189,15 @@
 
 - (void)setUpAnimations {
     _leftEmitterLayer = [CAEmitterLayer layer];
-    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y+15);
+//    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y+15);
+    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - self.view.bounds.size.width/2, self.LabelDailyMenuItemName.center.y);
     _leftEmitterLayer.emitterZPosition = 10.0;
     _leftEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
 
     _rightEmitterLayer = [CAEmitterLayer layer];
-    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + 160, self.LabelDailyMenuItemName.center.y+15);
+//    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + 160, self.LabelDailyMenuItemName.center.y+15);
+    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + self.view.bounds.size.width/2, self.LabelDailyMenuItemName.center.y);
     _rightEmitterLayer.emitterZPosition = 10.0;
     _rightEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
@@ -200,7 +206,11 @@
     leftEmitterCell.birthRate = 0;
     leftEmitterCell.emissionLongitude = M_PI*2;
     leftEmitterCell.lifetime = 3;
-    leftEmitterCell.velocity = 100;
+    if ([Utilities isiPad]) {
+        leftEmitterCell.velocity = 200;
+    }else{
+        leftEmitterCell.velocity = 100;
+    }
     leftEmitterCell.velocityRange = 40;
     leftEmitterCell.emissionRange = M_PI*8/180;
     leftEmitterCell.spin = 3;
@@ -216,7 +226,11 @@
     rightEmitterCell.birthRate = 0;
     rightEmitterCell.emissionLongitude = -M_PI*179/180;
     rightEmitterCell.lifetime = 3;
-    rightEmitterCell.velocity = 100;
+    if ([Utilities isiPad]) {
+        rightEmitterCell.velocity = 200;
+    }else{
+        rightEmitterCell.velocity = 100;
+    }
     rightEmitterCell.velocityRange = 40;
     rightEmitterCell.emissionRange = M_PI*8/180;
     rightEmitterCell.spin = 3;
@@ -618,7 +632,12 @@
         [alert setTag:keyAlertOrderConfirm];
         [alert show];
 
-        [self changeEmitterBirthrateTo:100];
+
+        if ([Utilities isiPad]) {
+            [self changeEmitterBirthrateTo:300];
+        }else{
+            [self changeEmitterBirthrateTo:100];
+        }
         [self disableUserInput];
     }else{
         [self showError:@"Nothing in menu today. Try refreshing."];

@@ -225,10 +225,10 @@
     [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
 
     
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
-    }else{
+    if ([Utilities isiPad]) {
         [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:20] range:NSMakeRange(0, error.length)];
+    }else{
+        [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
     }
     
     [_errorLabel setAttributedText:error];
