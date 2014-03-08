@@ -12,12 +12,14 @@
     BOOL isPickerVisible;
     NSLayoutConstraint *beforeConstraint;
     OrderHistoryViewController *modal;
+    BOOL isSettingBackground;
 }
 
 - (void)viewDidLoad{
     [super viewDidLoad];
 
     isFetchingMenu = NO;
+    isSettingBackground = NO;
     isCoreMotionTimerValid = false;
     self.transitionManager = [[TransitionManager alloc] init];
 //    self.transitionManager = [[MyInteractiveTransitionManager alloc] init];
@@ -191,7 +193,7 @@
     CAEmitterCell*leftEmitterCell = [CAEmitterCell emitterCell];
     leftEmitterCell.birthRate = 0;
     leftEmitterCell.emissionLongitude = M_PI*2;
-    leftEmitterCell.lifetime = 2;
+    leftEmitterCell.lifetime = 3;
     leftEmitterCell.velocity = 100;
     leftEmitterCell.velocityRange = 40;
     leftEmitterCell.emissionRange = M_PI*8/180;
@@ -200,14 +202,14 @@
     leftEmitterCell.xAcceleration = 100;
     leftEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     leftEmitterCell.scale = 0.03;
-    leftEmitterCell.alphaSpeed = -0.12;
+    leftEmitterCell.alphaSpeed = -0.15;
     leftEmitterCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
     [leftEmitterCell setName:@"left"];
 
     CAEmitterCell *rightEmitterCell = [CAEmitterCell emitterCell];
     rightEmitterCell.birthRate = 0;
     rightEmitterCell.emissionLongitude = -M_PI*179/180;
-    rightEmitterCell.lifetime = 2;
+    rightEmitterCell.lifetime = 3;
     rightEmitterCell.velocity = 100;
     rightEmitterCell.velocityRange = 40;
     rightEmitterCell.emissionRange = M_PI*8/180;
@@ -216,7 +218,7 @@
     rightEmitterCell.xAcceleration = -100;
     rightEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     rightEmitterCell.scale = 0.03;
-    rightEmitterCell.alphaSpeed = -0.12;
+    rightEmitterCell.alphaSpeed = -0.15;
     rightEmitterCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
     [rightEmitterCell setName:@"right"];
 
@@ -292,6 +294,7 @@
     
 
     UIFont *font = [UIFont systemFontOfSize:40];
+    font = [UIFont italicSystemFontOfSize:40];
 
     NSMutableAttributedString *khanemein = [[NSMutableAttributedString alloc] initWithString:@"Aaj Khane Mein Kya Hai"];
     NSRange range = NSMakeRange(0, [khanemein length]);
@@ -332,6 +335,14 @@
 }
 
 - (void)setRandomBackgroundImage {
+    if (isSettingBackground) {
+        NSLog(@"Already setting the background.....");
+        return;
+    }
+    
+    NSLog(@"Setting the background");
+    isSettingBackground = YES;
+    
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit) fromDate:[NSDate date]];
 
@@ -370,12 +381,12 @@
         __block UIImage *image = [uiImage applyLightEffect];
         dispatch_async(dispatch_get_main_queue(), ^{
             [UIView transitionWithView:_backgroundImageView
-                              duration:0.5f
+                              duration:1.0f
                                options:UIViewAnimationOptionTransitionCrossDissolve
                             animations:^{
                                 [_backgroundImageView setImage:image];
                             } completion:^(BOOL finished){
-                                
+                                isSettingBackground = NO;
                                 image = nil;
                             }];
         });
@@ -508,7 +519,8 @@
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:response];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
     [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
-    [error addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, error.length)];
+//    [error addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, error.length)];
+    [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
     [_errorLabel setAttributedText:error];
 
     CGPoint point = _errorLabel.center;
