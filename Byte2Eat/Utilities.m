@@ -3,7 +3,7 @@
 // Copyright (c) 2014 spiderlogic. All rights reserved.
 //
 
-#import <CoreData/CoreData.h>
+@import CoreData;
 #import "Utilities.h"
 #import "Constants.h"
 #import "AppDelegate.h"

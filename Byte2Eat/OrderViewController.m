@@ -1,3 +1,4 @@
+
 #import "OrderViewController.h"
 #import "UIImage+ImageEffects.h"
 #import "Constants.h"
@@ -13,6 +14,9 @@
     NSLayoutConstraint *beforeConstraint;
     OrderHistoryViewController *modal;
     BOOL isSettingBackground;
+    CAEmitterLayer *buttonEmitterLayer;
+    CAEmitterLayer *buttonTopLayer;
+    CAEmitterLayer *buttonBottomLayer;
 }
 
 - (void)viewDidLoad{
@@ -36,6 +40,50 @@
     }
     [self setUpAnimations];
     [self fetchTodayMenu];
+    [self.orderButton addTarget:self action:@selector(onOrderTouchDown:) forControlEvents:UIControlEventTouchDown];
+    [self.orderButton addTarget:self action:@selector(onOrderTouchCancel:) forControlEvents:UIControlEventTouchDragExit];
+    [self.orderButton addTarget:self action:@selector(onOrderTouchCancel:) forControlEvents:UIControlEventTouchUpInside];
+    [self.orderButton addTarget:self action:@selector(onOrderTouchDown:) forControlEvents:UIControlEventTouchDragEnter];
+    
+}
+
+-(void)onOrderTouchDown:(UIButton *)button{
+    [UIView animateWithDuration:0.3
+                          delay:0
+         usingSpringWithDamping:0.6
+          initialSpringVelocity:5
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                        self.orderButton.layer.transform = CATransform3DMakeScale(1.3, 1.3, 1.3);
+                     }
+                     completion:nil];
+    buttonTopLayer.emitterPosition = CGPointMake(self.orderButton.center.x, self.orderButton.frame.origin.y);
+    buttonBottomLayer.emitterPosition = CGPointMake(self.orderButton.center.x, self.orderButton.frame.origin.y + self.orderButton.bounds.size.height*1.3);
+    
+    [self changeButtonEmitterBirthrateTo:200];
+}
+
+-(void)onOrderTouchCancel:(UIButton *)button{
+    self.orderButton.layer.shadowColor = [UIColor clearColor].CGColor;
+    self.orderButton.layer.shadowOpacity = 0.5f;
+    self.orderButton.layer.shadowOffset = CGSizeMake(0, 0);
+    self.orderButton.layer.shadowRadius = 5;
+
+    [self changeButtonEmitterBirthrateTo:0];
+    [UIView animateWithDuration:0.3
+                          delay:0
+         usingSpringWithDamping:0.6
+          initialSpringVelocity:5
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.orderButton.layer.transform = CATransform3DIdentity;
+                     }
+                     completion:nil];
+}
+
+- (void)changeButtonEmitterBirthrateTo:(int)birthRate {
+        [buttonBottomLayer setValue:@(birthRate) forKeyPath:@"emitterCells.bottom.birthRate"];
+        [buttonTopLayer setValue:@(birthRate) forKeyPath:@"emitterCells.top.birthRate"];
 }
 
 -(void)hidePickerView{
@@ -276,13 +324,70 @@
     self.sparkleEmitterLayer.emitterCells = @[sparkleCell];
     [self.scrollView.layer addSublayer:self.sparkleEmitterLayer];
 
+    
+    buttonTopLayer = [CAEmitterLayer layer];
+    buttonTopLayer.emitterPosition = CGPointMake(self.orderButton.center.x, self.orderButton.frame.origin.y);
+    buttonTopLayer.emitterZPosition = -10.0;
+    buttonTopLayer.emitterSize = CGSizeMake(self.orderButton.bounds.size.width, 1);
+    buttonTopLayer.emitterShape = kCAEmitterLayerLine;
+    
+    CAEmitterCell*topCell = [CAEmitterCell emitterCell];
+    topCell.birthRate = 0;
+    topCell.lifetime = 1;
+    topCell.emissionLongitude = -M_PI*(1/2);
+    topCell.velocity = 60;
+    topCell.velocityRange = 40;
+    topCell.emissionRange = M_PI*(10/180);
+    topCell.spin = 3;
+    topCell.spinRange = 6;
+    topCell.yAcceleration = 50;
+    topCell.xAcceleration = 0;
+    topCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
+    topCell.scale = 0.03;
+    topCell.alphaSpeed = -0.30;
+    topCell.color =[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5].CGColor;
+    [topCell setName:@"top"];
+    
+    buttonTopLayer.emitterCells = @[topCell];
+    [self.scrollView.layer addSublayer:buttonTopLayer];
+    
+    buttonBottomLayer = [CAEmitterLayer layer];
+    buttonBottomLayer.emitterPosition = CGPointMake(self.orderButton.center.x, self.orderButton.frame.origin.y + self.orderButton.bounds.size.height);
+    buttonBottomLayer.emitterZPosition = -10.0;
+    buttonBottomLayer.emitterSize = CGSizeMake(self.orderButton.bounds.size.width, 1);;
+    buttonBottomLayer.emitterShape = kCAEmitterLayerLine;
+    
+    CAEmitterCell*bottomCell = [CAEmitterCell emitterCell];
+    bottomCell.birthRate = 0;
+    bottomCell.lifetime = 1;
+    bottomCell.emissionLongitude = M_PI_2 + M_PI/2;
+    bottomCell.velocity = 60;
+    bottomCell.velocityRange = 40;
+    bottomCell.emissionRange = M_PI*(10/180);
+    bottomCell.spin = 3;
+    bottomCell.spinRange = 6;
+    bottomCell.yAcceleration = -50;
+    bottomCell.xAcceleration = 0;
+    bottomCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
+    bottomCell.scale = 0.03;
+    bottomCell.alphaSpeed = -0.30;
+    bottomCell.color =[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5].CGColor;
+    [bottomCell setName:@"bottom"];
+    
+    buttonBottomLayer.emitterCells = @[bottomCell];
+    
+    [self.scrollView.layer addSublayer:buttonBottomLayer];
 }
 
 - (void)changeEmitterBirthrateTo:(int)birthRate {
     if (birthRate == 0) {
         [self stopAccelerometerUpdates];
+        
+        _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - self.view.bounds.size.width/2, self.LabelDailyMenuItemName.center.y);
         [_leftEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.left.birthRate"];
         [_leftEmitterLayer setValue:@0 forKeyPath:@"emitterCells.left.yAcceleration"];
+        
+        _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + self.view.bounds.size.width/2, self.LabelDailyMenuItemName.center.y);
         [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
         [_rightEmitterLayer setValue:@0 forKeyPath:@"emitterCells.right.yAcceleration"];
 //        [self enableMotionEffect];
@@ -302,6 +407,7 @@
 - (void)styleStaticData {
     
     self.orderButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.orderButton.layer.zPosition = 100;
     
     self.orderQuantityButton.layer.cornerRadius = 3;
     self.orderQuantityButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
@@ -334,7 +440,7 @@
     [_aajKhaneMeinKyaHai setAttributedText:khanemein];
 
     NSMutableAttributedString *userKaNaam = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Hi %@", _userName]];
-    if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad) {
+    if (![Utilities isiPad]) {
         [userKaNaam addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, userKaNaam.length)];
     }
     [_LabelUserName setAttributedText:userKaNaam];
@@ -420,7 +526,7 @@
         __block UIImage *image = [uiImage applyLightEffect];
         dispatch_async(dispatch_get_main_queue(), ^{
             [UIView transitionWithView:_backgroundImageView
-                              duration:1.0f
+                              duration:0.5f
                                options:UIViewAnimationOptionTransitionCrossDissolve
                             animations:^{
                                 [_backgroundImageView setImage:image];
@@ -468,7 +574,7 @@
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return [NSString stringWithFormat:@"%li",row + 1];
+    return [NSString stringWithFormat:@"%i",row + 1];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
@@ -486,7 +592,7 @@
 }
 
 - (void)updateTotalCost:(NSTimer *)timer {
-    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %li/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 0.5;
@@ -531,7 +637,7 @@
 
     if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
         itemPriceText = [NSString stringWithFormat:@"Rs %@/-",dictionary[keyItemPrice]];
-        totalCostText = [NSString stringWithFormat:@"Rs %li/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
+        totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = YES;
     } else {
@@ -562,7 +668,7 @@
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:response];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
     [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    if ([Utilities isiPad]) {
         [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:25] range:NSMakeRange(0, error.length)];
     }else{
         [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
@@ -613,7 +719,7 @@
     NSError *error;
     NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
     order[@"Quantity"] = _currentOrderNumber;
-    order[@"UserId"] = _userId;
+    order[keyUserId] = _userId;
     order[@"DailyMenuid"] = _dailyMenuId;
     order[@"DeviceInfo"] = @"iPhone";
     NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
@@ -646,6 +752,7 @@
 - (IBAction)onOrderHistory:(UIButton *)sender {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
+//    modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
 //    AppDelegateAccessor.settingsInteractionController = [[InteractiveTransitionController alloc] init];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
@@ -671,7 +778,7 @@
                      animations:^{
                          if(isPickerVisible){
                              [self.scrollView layoutIfNeeded];
-                             self.OrderNumberPicker.alpha = 0;
+                             [self.OrderNumberPicker setAlpha:0];
                          }else{
                              [self.scrollView layoutIfNeeded];
                              [self.OrderNumberPicker setAlpha:1];

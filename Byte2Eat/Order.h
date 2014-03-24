@@ -12,9 +12,9 @@
 
 @interface Order : NSManagedObject
 
-@property (nonatomic, retain) NSNumber * quantity;
-@property (nonatomic, retain) NSDate * orderDate;
-@property (nonatomic, retain) NSString * itemName;
-@property (nonatomic, retain) NSNumber * price;
+@property (nonatomic, retain) NSNumber *quantity;
+@property (nonatomic, retain) NSDate *orderDate;
+@property (nonatomic, retain) NSString *itemName;
+@property (nonatomic, retain) NSNumber *price;
 @property (nonatomic, retain) NSNumber *displayOrder;
 @end

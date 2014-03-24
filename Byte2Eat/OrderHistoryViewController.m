@@ -19,6 +19,12 @@
     UIView *bottomHalfSnapshot;
     UIView *fullSnapShot ;
     CATransform3D transform;
+    BOOL isAscending;
+    NSMutableDictionary *didDisplay;
+    NSMutableArray *insertedIndexPaths;
+    NSMutableArray *updatedIndexPaths;
+    UIRefreshControl *refreshControl ;
+    BOOL firstFetch;
 }
 
 @synthesize managedObjectContext;
@@ -30,19 +36,38 @@
     [self setUpDateFormatter];
     [self setData];
     [self setUpAnimations];
+    isAscending = NO;
+    firstFetch = YES;
     self.historyTitleLabel.layer.zPosition = 2000;
     [self setupGestureRecognizer];
     touchCenter = self.historyTitleLabel.center;
     initialFrame = self.view.frame;
     transform = CATransform3DIdentity;
-    
+    didDisplay = [[NSMutableDictionary alloc] init];
+    insertedIndexPaths = [[NSMutableArray alloc] init];
+    updatedIndexPaths = [[NSMutableArray alloc] init];
     
     self.managedObjectContext = [Utilities getManagedObjectContext];
     
     NSError *error;
-    if (![[self fetchedResultsController:NO ] performFetch:&error]) {
+    if (![[self fetchedResultsController:isAscending ] performFetch:&error]) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     }
+}
+
+-(void)handleRefresh{
+    NSShadow *blueShadow = [[NSShadow alloc] init];
+    UIColor *blueColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:1];
+    blueShadow.shadowColor = blueColor;
+    blueShadow.shadowOffset = CGSizeMake(0, 0);
+    blueShadow.shadowBlurRadius = 2.0;
+    NSMutableAttributedString *itemName = [[NSMutableAttributedString alloc] initWithString:@"Fetching order history"];
+    [itemName addAttribute:NSShadowAttributeName value:blueShadow range:NSMakeRange(0, itemName.length)];
+    [itemName addAttribute:NSForegroundColorAttributeName value:blueColor range:NSMakeRange(0, itemName.length)];
+    [itemName addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:10] range:NSMakeRange(0, itemName.length)];
+    refreshControl.tintColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:1];
+    refreshControl.attributedTitle = itemName;
+    [self fetchOrderHistory:NO];
 }
 
 -(void) setUpDateFormatter{
@@ -72,10 +97,11 @@
     [fetchRequest setEntity:entity];
 
     NSSortDescriptor *sort = [[NSSortDescriptor alloc]
-            initWithKey:@"displayOrder" ascending:YES];
+            initWithKey:@"orderDate" ascending:ascending];
+
     [fetchRequest setSortDescriptors:@[sort]];
 
-    [fetchRequest setFetchBatchSize:20];
+//    [fetchRequest setFetchBatchSize:20];
 
     NSFetchedResultsController *theFetchedResultsController =
             [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
@@ -296,7 +322,7 @@
     [quantity addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, quantity.length)];
     [quantity addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, quantity.length)];
 
-    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [order.price integerValue] * [order.quantity integerValue]]];
+    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %li/-", [order.price integerValue] * [order.quantity integerValue]]];
     [cost addAttribute:NSShadowAttributeName value:greenShadow range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, cost.length)];
@@ -355,6 +381,7 @@
         }
     } else {
         //Checking for deleted or updated records
+        firstFetch = NO;
         for(Order *order in _fetchedResultsController.fetchedObjects){
             BOOL isDeleted = YES;
             for(NSDictionary *orderDict in orderHistoryDictionary){
@@ -414,18 +441,62 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    CATransform3D rotation = CATransform3DMakeScale(.3, .3, .3);
-    cell.layer.transform = rotation;
-    cell.layer.anchorPoint = CGPointMake(0.5, 0.5);
+    //Color flash for inserted cell
+    if ([insertedIndexPaths containsObject:indexPath]) {
+        cell.backgroundColor = [UIColor colorWithRed:180/256.0 green:250/256.0 blue:186/256.0 alpha:1];
+        [UIView animateWithDuration:3
+                         animations:^{
+                             cell.backgroundColor = [UIColor whiteColor];
+                         }
+                         completion:^(BOOL finished){
+                             [insertedIndexPaths removeObject:indexPath];
+                         }];
+    }
+    
+    //Color flash for updated cell
+    if ([updatedIndexPaths containsObject:indexPath]) {
+        OrderHistoryCell *orderCell = (OrderHistoryCell *)cell;
+//        orderCell.labelOrderQty.layer.transform = CATransform3DMakeRotation(M_PI, 0, 0, 1);
+        orderCell.labelOrderQty.layer.transform = CATransform3DMakeScale(4, 4, 4);
+        [UIView animateWithDuration:3
+                              delay:0
+             usingSpringWithDamping:0.1
+              initialSpringVelocity:3
+                            options:UIViewAnimationOptionCurveEaseInOut
+                         animations:^{
+                             orderCell.labelOrderQty.layer.transform = CATransform3DIdentity;
+                         }
+                         completion:nil];
+        
+        cell.backgroundColor = [UIColor colorWithRed:250/256.0 green:244/256.0 blue:162/256.0 alpha:1];
+        [UIView animateWithDuration:3
+                         animations:^{
+                             cell.backgroundColor = [UIColor whiteColor];
+                         }
+                         completion:^(BOOL finished){
+                             [updatedIndexPaths removeObject:indexPath];
+                         }];
+    }
+    
+    // Disable animation for already shown cells
+    if (![didDisplay objectForKey:indexPath]) {
+        
 
-    [UIView animateWithDuration:1
-                          delay:0
-         usingSpringWithDamping:0.5
-          initialSpringVelocity:5
-                        options:UIViewAnimationOptionCurveEaseInOut
-                     animations:^{
-                         cell.layer.transform = CATransform3DIdentity;
-                     } completion:nil];
+        CATransform3D rotation = CATransform3DMakeScale(.3, .3, .3);
+        cell.layer.transform = rotation;
+        cell.layer.anchorPoint = CGPointMake(0.5, 0.5);
+
+        
+        [UIView animateWithDuration:1
+                              delay:0
+             usingSpringWithDamping:0.5
+              initialSpringVelocity:5
+                            options:UIViewAnimationOptionCurveEaseInOut
+                         animations:^{
+                             cell.layer.transform = CATransform3DIdentity;
+                         } completion:nil];
+        [didDisplay setObject:@YES forKey:indexPath];
+    }
 }
 
 - (void)showError:(NSString *)response {
@@ -468,6 +539,7 @@
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    [refreshControl endRefreshing];
     isFetchingHistory = NO;
     [self changeEmitterBirthrateTo:0];
     [self setTitleBack];
@@ -518,12 +590,15 @@
 #pragma FetchedResultsController methods
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
+//    [didDisplay removeAllObjects];
     [self.tableView beginUpdates];
 }
 
 
-- (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
-           atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
+- (void)controller:(NSFetchedResultsController *)controller
+  didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
+           atIndex:(NSUInteger)sectionIndex
+     forChangeType:(NSFetchedResultsChangeType)type {
 
     switch (type) {
         case NSFetchedResultsChangeInsert:
@@ -539,17 +614,26 @@
 }
 
 
-- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject
-       atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
+- (void)controller:(NSFetchedResultsController *)controller
+   didChangeObject:(id)anObject
+       atIndexPath:(NSIndexPath *)indexPath
+     forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath {
-
+    
     UITableView *tableView = self.tableView;
 
     switch (type) {
 
+            
         case NSFetchedResultsChangeInsert:
-            [tableView insertRowsAtIndexPaths:@[newIndexPath]
-                             withRowAnimation:UITableViewRowAnimationLeft];
+            if (!firstFetch) {
+                [insertedIndexPaths addObject:newIndexPath];
+                [tableView insertRowsAtIndexPaths:@[newIndexPath]
+                                 withRowAnimation:UITableViewRowAnimationLeft];
+            }else{
+                [tableView insertRowsAtIndexPaths:@[newIndexPath]
+                                 withRowAnimation:UITableViewRowAnimationTop ];
+            }
             break;
 
         case NSFetchedResultsChangeDelete:
@@ -558,8 +642,9 @@
             break;
 
         case NSFetchedResultsChangeUpdate:
+            [updatedIndexPaths addObject:newIndexPath];
             [tableView reloadRowsAtIndexPaths:@[indexPath]
-                             withRowAnimation:UITableViewRowAnimationFade];
+                             withRowAnimation:UITableViewRowAnimationMiddle];
             break;
 
         case NSFetchedResultsChangeMove:
@@ -585,15 +670,30 @@
 }
 
 - (IBAction)onTopButtonTap:(UIButton *)sender {
-    NSMutableArray *array = [[_fetchedResultsController fetchedObjects] mutableCopy];
+//    [didDisplay removeAllObjects];
+//    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 20, 310) animated:NO];
+//    self.fetchedResultsController = nil;
+//    NSError *error;
+//    if (![[self fetchedResultsController:!isAscending ] performFetch:&error]) {
+//        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+//    }
+//
+//    [self.tableView reloadData];
+//    isAscending = !isAscending;
+    
+//    NSMutableArray *array = [[_fetchedResultsController fetchedObjects] mutableCopy];
+//
+//    for(int j = 0; j <array.count; j++){
+//        Order *order = (Order *) array[(NSUInteger) j];
+//        (order).displayOrder = @(array.count - j);
+//    }
+//
+//    [self.managedObjectContext save:nil];
 
-    for(int j = 0; j <array.count; j++){
-        Order *order = (Order *) array[(NSUInteger) j];
-        (order).displayOrder = @(array.count - j);
-    }
+}
 
-    [self.managedObjectContext save:nil];
-
+- (IBAction)onRefreshTap:(UIButton *)sender {
+    [self fetchOrderHistory:NO];
 }
 
 - (void)setUser:(NSString *)name {

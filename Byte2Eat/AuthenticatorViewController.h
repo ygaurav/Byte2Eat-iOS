@@ -11,6 +11,7 @@
 
 @interface AuthenticatorViewController : UIViewController <UIViewControllerTransitioningDelegate, NSURLConnectionDelegate, UITextFieldDelegate>
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *loginButtonConstraint;
 @property (weak, nonatomic) IBOutlet UIImageView *backgroundView;
 @property (weak, nonatomic) IBOutlet UIButton *loginButton;
 @property (weak, nonatomic) IBOutlet UITextField *userNameTextField;

@@ -10,7 +10,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-
     _userNameTextField.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     _loginButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     _errorLabel.text = @"";
@@ -18,6 +17,12 @@
     self.transitionManager = [[TransitionManager alloc]init];
     self.transitionManager.appearing = YES;
     self.transitionManager.duration = .5;
+    
+//    if(self.view.bounds.size.height < 500){
+//        self.loginButtonConstraint.constant = 100;
+//        [self.scrollView setNeedsUpdateConstraints];
+//        [self.scrollView layoutIfNeeded];
+//    }
 
     [self setTitleStyles];
     [self setMotionEffect];
@@ -29,8 +34,8 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     if([Utilities isUserLoggedIn]){
-        [self goToOrderScreen:[Utilities getUserDetailsFromPlist]];
         [self changeEmitterBirthrateTo:0];
+        [self goToOrderScreen:[Utilities getUserDetailsFromPlist]];
         return;
     }else{
         [self setTitleAnimation];
@@ -39,11 +44,12 @@
 }
 
 - (void)setBackgroundImage {
+    [_backgroundView setImage:[UIImage imageNamed:@"slicedfruitcopy"]];
     dispatch_async(dispatch_queue_create("com.spiderlogic.Byte2Eat", NULL), ^{
         __block UIImage *image = [[UIImage imageNamed:@"slicedfruitcopy"] applyLightEffect];
         dispatch_async(dispatch_get_main_queue(), ^{
             [UIView transitionWithView:_backgroundView
-                              duration:0.5f
+                              duration:3.0f
                                options:UIViewAnimationOptionTransitionCrossDissolve
                             animations:^{
                                 [_backgroundView setImage:image];
@@ -120,13 +126,13 @@
 
 - (void)setEmitterAnimation {
     _leftEmitterLayer = [CAEmitterLayer layer];
-    _leftEmitterLayer.emitterPosition = CGPointMake(self.errorLabel.center.x - self.view.bounds.size.width/2, self.errorLabel.center.y + 12);
+    _leftEmitterLayer.emitterPosition = CGPointMake(self.errorLabel.center.x - self.view.bounds.size.width/2, self.errorLabel.center.y);
     _leftEmitterLayer.emitterZPosition = 10.0;
     _leftEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
 
     _rightEmitterLayer = [CAEmitterLayer layer];
-    _rightEmitterLayer.emitterPosition = CGPointMake(self.errorLabel.center.x  + self.view.bounds.size.width/2, self.errorLabel.center.y + 12);
+    _rightEmitterLayer.emitterPosition = CGPointMake(self.errorLabel.center.x  + self.view.bounds.size.width/2, self.errorLabel.center.y);
     _rightEmitterLayer.emitterZPosition = 10.0;
     _rightEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
@@ -170,8 +176,7 @@
     [_scrollView.layer addSublayer:self.rightEmitterLayer];
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
@@ -236,13 +241,16 @@
     CGPoint point = _errorLabel.center;
     [_errorLabel setCenter:CGPointMake(point.x, point.y - 100)];
     [_errorLabel setAlpha:0];
-
+//    [_errorLabel setAlpha:1];
+//    CATransform3D transform = CATransform3DIdentity;
+//    _errorLabel.layer.transform = CATransform3DScale(transform, 0.1, 0.1, 0.1);
     [UIView animateWithDuration:.5
                               delay:0
              usingSpringWithDamping:0.3
               initialSpringVelocity:8
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
+//                             _errorLabel.layer.transform = CATransform3DScale(transform, 1, 1, 1);
                              [_errorLabel setCenter:point];
                              [_errorLabel setAlpha:1];
                          } completion:^(BOOL finished){

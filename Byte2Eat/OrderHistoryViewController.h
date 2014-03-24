@@ -15,6 +15,7 @@
 
 - (IBAction)onDoneTap:(UIButton *)sender;
 - (IBAction)onTopButtonTap:(UIButton *)sender;
+- (IBAction)onRefreshTap:(UIButton *)sender;
 
 - (void)setUser:(NSString *)name;
 @end
