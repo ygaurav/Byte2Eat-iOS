@@ -6,6 +6,7 @@
 #import "ThanksViewController.h"
 #import "TransitionManager.h"
 #import "Utilities.h"
+#import <POP/POP.h>
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
@@ -17,20 +18,32 @@
     CAEmitterLayer *buttonEmitterLayer;
     CAEmitterLayer *buttonTopLayer;
     CAEmitterLayer *buttonBottomLayer;
+    CAEmitterLayer *itemNameLayer;
+    CGPoint center;
+    CGPoint offsetFromCenter;
+    CGPoint aajKaOffsetFromCenter;
+    CGPoint aajCenter;
+    CATransform3D aajTransform;
+    CATransform3D currentAajTransform;
+    CGFloat currentScale;
+    CGFloat currentRotation;
+    BOOL firstStart;
 }
 
 - (void)viewDidLoad{
     [super viewDidLoad];
-
+    
+    firstStart = YES;
     isFetchingMenu = NO;
     isSettingBackground = NO;
     isCoreMotionTimerValid = false;
     self.transitionManager = [[TransitionManager alloc] init];
-//    self.transitionManager = [[MyInteractiveTransitionManager alloc] init];
+    //    self.transitionManager = [[MyInteractiveTransitionManager alloc] init];
     beforeConstraint = self.totalCostConstraint;
-
-    [self.orderQuantityButton setTitle:@"1" forState:UIControlStateNormal];
-
+    
+    [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
+    [self.orderQuantityButton setEnabled:YES];
+    
     [self initShadows];
     [self setUserInformation];
     [self styleStaticData];
@@ -44,7 +57,194 @@
     [self.orderButton addTarget:self action:@selector(onOrderTouchCancel:) forControlEvents:UIControlEventTouchDragExit];
     [self.orderButton addTarget:self action:@selector(onOrderTouchCancel:) forControlEvents:UIControlEventTouchUpInside];
     [self.orderButton addTarget:self action:@selector(onOrderTouchDown:) forControlEvents:UIControlEventTouchDragEnter];
+    center = self.LabelDailyMenuItemName.center;
     
+    [self addDoubleTapGestureOnItemLabel];
+    [self addPanGestureRecognizerToItemName];
+    [self addGestureRecognizersToAaj];
+}
+
+-(void)addGestureRecognizersToAaj{
+    [self.aajKhaneMeinKyaHai setUserInteractionEnabled:YES];
+    UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
+    pinch.delegate = self;
+    [self.aajKhaneMeinKyaHai addGestureRecognizer:pinch];
+    
+    UIRotationGestureRecognizer *rotate = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotation:)];
+    rotate.delegate = self;
+    [self.aajKhaneMeinKyaHai addGestureRecognizer:rotate];
+    currentScale = 1;
+    currentRotation = 0;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer{
+    if (otherGestureRecognizer == self.scrollView.panGestureRecognizer) {
+        return NO;
+    }
+    return YES;
+}
+
+-(void)handleRotation:(UIRotationGestureRecognizer *)rotate{
+    switch (rotate.state) {
+        case UIGestureRecognizerStateBegan:{
+            break;
+        }
+        case UIGestureRecognizerStateChanged:{
+            currentRotation = rotate.rotation;
+            CATransform3D t = CATransform3DMakeRotation(currentRotation, 0, 0, 1);
+            t = CATransform3DScale(t, currentScale, currentScale, currentScale);
+            self.aajKhaneMeinKyaHai.layer.transform = t;
+            break;
+        }
+        case UIGestureRecognizerStateCancelled:{
+            [UIView animateWithDuration:0.2
+                             animations:^{
+                                 self.aajKhaneMeinKyaHai.layer.transform = CATransform3DIdentity;
+                                 currentScale = 1;
+                                 currentRotation = 0;
+                             }];
+            break;
+        }
+        case UIGestureRecognizerStateEnded:{
+            NSLog(@"Rotate Ended");
+            [UIView animateWithDuration:0.2
+                             animations:^{
+                                 
+                                 self.aajKhaneMeinKyaHai.layer.transform = CATransform3DIdentity;
+                                 currentScale = 1;
+                                 currentRotation = 0;
+                             }];
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+-(void)handlePinch:(UIPinchGestureRecognizer *)pinchRecognizer{
+    switch (pinchRecognizer.state) {
+        case UIGestureRecognizerStateBegan:{
+            NSLog(@"Pinch Began");
+            [self.aajKhaneMeinKyaHai.layer setZPosition:2000];
+            aajKaOffsetFromCenter = CGPointMake(aajCenter.x - [pinchRecognizer locationInView:self.scrollView].x, aajCenter.y - [pinchRecognizer locationInView:self.scrollView].y);
+            break;
+        }
+        case UIGestureRecognizerStateChanged:{
+            currentScale = pinchRecognizer.scale;
+            CATransform3D t = CATransform3DMakeRotation(currentRotation, 0, 0, 1);
+            t = CATransform3DScale(t, currentScale, currentScale, currentScale);
+            self.aajKhaneMeinKyaHai.layer.transform = t;
+            
+            self.aajKhaneMeinKyaHai.center = CGPointMake([pinchRecognizer locationInView:self.scrollView].x + aajKaOffsetFromCenter.x, [pinchRecognizer locationInView:self.scrollView].y + aajKaOffsetFromCenter.y);
+            break;
+        }
+        case UIGestureRecognizerStateCancelled:{
+            [UIView animateWithDuration:0.2
+                             animations:^{
+                                 self.aajKhaneMeinKyaHai.layer.transform = CATransform3DIdentity;
+                                 currentRotation = 0;
+                                 currentScale = 1;
+                                 self.aajKhaneMeinKyaHai.center = aajCenter;
+                             }];
+            break;
+        }
+        case UIGestureRecognizerStateEnded:{
+            NSLog(@"Pinch Ended");
+            [UIView animateWithDuration:0.2
+                             animations:^{
+                                 self.aajKhaneMeinKyaHai.layer.transform = CATransform3DIdentity;
+                                 currentRotation = 0;
+                                 currentScale = 1;
+                                 self.aajKhaneMeinKyaHai.center = aajCenter;
+                                 [self.aajKhaneMeinKyaHai.layer setZPosition:999];
+                             }];
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+-(void)addPanGestureRecognizerToItemName{
+    [self.LabelDailyMenuItemName setUserInteractionEnabled:YES];
+    UILongPressGestureRecognizer *longpressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLong:)];
+    [self.LabelDailyMenuItemName addGestureRecognizer:longpressGesture];
+    self.LabelDailyMenuItemName.layer.zPosition = 1000;
+}
+
+-(void)handleLong:(UILongPressGestureRecognizer *)longPressGestureRecognizer{
+    switch (longPressGestureRecognizer.state) {
+        case UIGestureRecognizerStateBegan:{
+            offsetFromCenter = CGPointMake(center.x - [longPressGestureRecognizer locationInView:self.scrollView].x, center.y - [longPressGestureRecognizer locationInView:self.scrollView].y);
+            CATransform3D transform = self.LabelDailyMenuItemName.layer.transform;
+            [UIView animateWithDuration:0.5
+                             animations:^{
+                                 self.LabelDailyMenuItemName.layer.transform = CATransform3DScale(transform, 1.3, 1.3, 1.3);
+                                 self.LabelDailyMenuItemName.layer.shadowColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:1].CGColor;
+                                 self.LabelDailyMenuItemName.layer.shadowOpacity = 0.7;
+                                 self.LabelDailyMenuItemName.layer.shadowOffset = CGSizeMake(0, 0);
+                                 self.LabelDailyMenuItemName.layer.shadowRadius = 1;
+                             }
+                             completion:nil];
+            break;
+        }
+        case UIGestureRecognizerStateChanged:{
+            CGPoint new = CGPointMake([longPressGestureRecognizer locationInView:self.scrollView].x + offsetFromCenter.x, [longPressGestureRecognizer locationInView:self.scrollView].y + offsetFromCenter.y);
+            self.LabelDailyMenuItemName.center = new;
+            [self changeLayerCenter:new];
+            NSLog(@"Birthrate : %@",[itemNameLayer valueForKeyPath:@"emitterCells.center.birthRate"]);
+            break;
+        }
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateEnded:{
+            [UIView animateWithDuration:0.5
+                                  delay:0
+                 usingSpringWithDamping:0.5
+                  initialSpringVelocity:10
+                                options:UIViewAnimationOptionCurveLinear
+                             animations:^{
+                                 self.LabelDailyMenuItemName.center = center;
+                                 self.LabelDailyMenuItemName.layer.transform = CATransform3DIdentity;
+                                 self.LabelDailyMenuItemName.alpha = 1;
+                                 self.LabelDailyMenuItemName.layer.shadowColor = [UIColor clearColor].CGColor;
+                                 self.LabelDailyMenuItemName.layer.shadowOpacity = 0;
+                                 self.LabelDailyMenuItemName.layer.shadowOffset = CGSizeMake(0, 0);
+                                 self.LabelDailyMenuItemName.layer.shadowRadius = 1;
+                             }
+                             completion:^(BOOL finished){
+                                 CABasicAnimation* z = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+                                 z.fromValue = [NSNumber numberWithFloat: 0];
+                                 z.toValue = [NSNumber numberWithFloat: 1*2*M_PI];
+                                 z.duration = 0.5;
+                                 z.cumulative = YES;
+                                 z.repeatCount = 1;
+                                 z.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+                                 z.removedOnCompletion = NO;
+                                 z.fillMode = kCAFillModeForwards;
+                                 z.delegate = self;
+                                 
+                                 [self.LabelDailyMenuItemName.layer addAnimation:z forKey:nil];
+                             }];
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+-(void)addDoubleTapGestureOnItemLabel{
+    UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleMenuDoubleTap)];
+    [doubleTapGesture setNumberOfTapsRequired:2];
+    [self.LabelDailyMenuItemName addGestureRecognizer:doubleTapGesture];
+}
+
+-(void)handleMenuDoubleTap{
+    NSLog(@"DoubleTap handled");
+    if(!isFetchingMenu){
+        NSLog(@"Already fetching menu...");
+        [self fetchTodayMenu];
+        [self fetchUserDetails];
+    }
 }
 
 -(void)onOrderTouchDown:(UIButton *)button{
@@ -54,7 +254,7 @@
           initialSpringVelocity:5
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
-                        self.orderButton.layer.transform = CATransform3DMakeScale(1.3, 1.3, 1.3);
+                         self.orderButton.layer.transform = CATransform3DMakeScale(1.3, 1.3, 1.3);
                      }
                      completion:nil];
     buttonTopLayer.emitterPosition = CGPointMake(self.orderButton.center.x, self.orderButton.frame.origin.y);
@@ -68,7 +268,7 @@
     self.orderButton.layer.shadowOpacity = 0.5f;
     self.orderButton.layer.shadowOffset = CGSizeMake(0, 0);
     self.orderButton.layer.shadowRadius = 5;
-
+    
     [self changeButtonEmitterBirthrateTo:0];
     [UIView animateWithDuration:0.3
                           delay:0
@@ -82,8 +282,12 @@
 }
 
 - (void)changeButtonEmitterBirthrateTo:(int)birthRate {
-        [buttonBottomLayer setValue:@(birthRate) forKeyPath:@"emitterCells.bottom.birthRate"];
-        [buttonTopLayer setValue:@(birthRate) forKeyPath:@"emitterCells.top.birthRate"];
+    [buttonBottomLayer setValue:@(birthRate) forKeyPath:@"emitterCells.bottom.birthRate"];
+    [buttonTopLayer setValue:@(birthRate) forKeyPath:@"emitterCells.top.birthRate"];
+}
+
+-(void)changeLayerCenter:(CGPoint)newCenter{
+    [itemNameLayer setValue:[NSValue valueWithCGPoint:newCenter] forKeyPath:@"emitterPosition"];
 }
 
 -(void)hidePickerView{
@@ -99,7 +303,7 @@
         self.totalCostConstraint.constant = 162;
     }
     [self.scrollView setNeedsUpdateConstraints];
-
+    
     [UIView animateWithDuration:0.5
                           delay:0
          usingSpringWithDamping:0.5
@@ -158,17 +362,17 @@
     self.shadow.shadowBlurRadius = 3.0;
     self.shadow.shadowColor = [UIColor blackColor];
     self.shadow.shadowOffset = CGSizeMake(0, 0);
-
+    
     self.whiteShadow = [[NSShadow alloc] init];
     self.whiteShadow.shadowBlurRadius = 3.0;
     self.whiteShadow.shadowColor = [UIColor colorWithRed:60 green:71 blue:210 alpha:1];
     self.whiteShadow.shadowOffset = CGSizeMake(0, 0);
-
+    
     self.redShadow = [[NSShadow alloc] init];
     self.redShadow.shadowBlurRadius = 3.0;
     self.redShadow.shadowColor = [UIColor redColor];
     self.redShadow.shadowOffset = CGSizeMake(0, 0);
-
+    
     self.greenShadow = [[NSShadow alloc] init];
     self.greenShadow.shadowBlurRadius = 3.0;
     self.greenShadow.shadowColor = [UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1];
@@ -183,14 +387,36 @@
     [super viewDidAppear:animated];
     [self becomeFirstResponder];
     [self fetchUserDetails];
-
+    aajCenter = CGPointMake(self.LabelDailyMenuItemName.center.x, self.LabelDailyMenuItemName.center.y - 95);
+    NSLog(@"LOCATION : %f. %f",aajCenter.x, aajCenter.y);
 }
 
 - (void)fetchUserDetails {
     NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, _userName];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
-    [request setHTTPMethod:@"GET"];
-    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:usernameURL
+      parameters:nil
+         success:^(AFHTTPRequestOperation *operation, id responseObject) {
+             NSLog(@"JSON: %@", responseObject);
+             [self enableUserInput];
+             [self changeEmitterBirthrateTo:0];
+             BOOL userExists = ![((NSNumber *)responseObject[keyUserId]) isEqualToNumber:@0];
+             if(userExists){
+                 [self setUserInfo:responseObject];
+                 [self setUserInformation];
+             }else{
+                 NSString *response = (NSString *)responseObject[keyResponseMessage];
+                 NSLog(@"Fetch User Detail response message: %@",response);
+             }
+             isFetchingMenu = NO;
+         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+             [self enableUserInput];
+             [self changeEmitterBirthrateTo:0];
+             [self showError:error.localizedDescription];
+             NSLog(@"Error fetching User Details : %@", error);
+             isFetchingMenu = NO;
+         }];
 }
 
 - (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event {
@@ -206,6 +432,54 @@
     }
 }
 
+-(void)shouldChangeItemText:(BOOL)fetching{
+    if(fetching){
+        NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"fetching today's menu"];
+        if ([Utilities isiPad]) {
+            [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:50] range:NSMakeRange(0, itemKaNaam.length)];
+        }else{
+            [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
+        }
+        [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
+        CATransition *animation = [CATransition animation];
+        animation.duration = 1.0;
+        animation.type = kCATransitionFade;
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+        [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
+        [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+        
+    }else{
+        _dailyMenuId = @0;
+        _itemName = @"";
+        _pricePerUnit = @0;
+        
+        NSMutableAttributedString *itemKaNaam = nil;
+        
+        itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N / A"];
+        [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
+        CATransition *animation = [CATransition animation];
+        animation.duration = 1.0;
+        animation.type = kCATransitionFade;
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
+        [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
+        
+        NSString *itemPriceText = @"N/A";
+        NSString *totalCostText = @"N/A";
+        NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:itemPriceText];
+        [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
+        [_LabelPricePerUnit setAttributedText:pricePerUnitString];
+        
+        NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalCostText];
+        [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
+        [_LabelTotalCost setAttributedText:totalCostString];
+    }
+}
+
 - (void)fetchTodayMenu {
     isFetchingMenu = YES;
     if ([Utilities isiPad]) {
@@ -213,43 +487,49 @@
     }else{
         [self changeEmitterBirthrateTo:100];
     }
-
-    NSMutableAttributedString *itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"fetching today's menu"];
-    if ([Utilities isiPad]) {
-        [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:50] range:NSMakeRange(0, itemKaNaam.length)];
-    }else{
-        [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
-    }
-    [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
-    CATransition *animation = [CATransition animation];
-    animation.duration = 1.0;
-    animation.type = kCATransitionFade;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
-    [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
-
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:keyURLDailyMenu] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
-    [request setHTTPMethod:@"GET"];
-    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    [self shouldChangeItemText:YES];
+    
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:keyURLDailyMenu
+      parameters:nil
+         success:^(AFHTTPRequestOperation *operation, id responseObject) {
+             NSLog(@"JSON: %@", responseObject);
+             [self enableUserInput];
+             [self changeEmitterBirthrateTo:0];
+             BOOL itemExists = ![((NSNumber *)responseObject[keyMenuId]) isEqualToNumber:@1];
+             if(itemExists){
+                 [self setTodayMenu:responseObject];
+             }else{
+                 NSString *response = (NSString *)responseObject[keyResponseMessage];
+                 [self showError:response];
+             }
+             isFetchingMenu = NO;
+         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+             [self enableUserInput];
+             [self changeEmitterBirthrateTo:0];
+             [self showError:error.localizedDescription];
+             isFetchingMenu = NO;
+             NSLog(@"Error fetching Daily Menu : %@", error);
+             [self shouldChangeItemText:NO];
+             
+         }];
 }
 
 - (void)setUpAnimations {
     _leftEmitterLayer = [CAEmitterLayer layer];
-//    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y+15);
+    //    _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - 160, self.LabelDailyMenuItemName.center.y+15);
     _leftEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x - self.view.bounds.size.width/2, self.LabelDailyMenuItemName.center.y);
     _leftEmitterLayer.emitterZPosition = 10.0;
     _leftEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _leftEmitterLayer.emitterShape = kCAEmitterLayerSphere;
-
+    
     _rightEmitterLayer = [CAEmitterLayer layer];
-//    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + 160, self.LabelDailyMenuItemName.center.y+15);
+    //    _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + 160, self.LabelDailyMenuItemName.center.y+15);
     _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + self.view.bounds.size.width/2, self.LabelDailyMenuItemName.center.y);
     _rightEmitterLayer.emitterZPosition = 10.0;
     _rightEmitterLayer.emitterSize = CGSizeMake(5, 5);
     _rightEmitterLayer.emitterShape = kCAEmitterLayerSphere;
-
+    
     CAEmitterCell*leftEmitterCell = [CAEmitterCell emitterCell];
     leftEmitterCell.birthRate = 0;
     leftEmitterCell.emissionLongitude = M_PI*2;
@@ -269,7 +549,7 @@
     leftEmitterCell.alphaSpeed = -0.15;
     leftEmitterCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
     [leftEmitterCell setName:@"left"];
-
+    
     CAEmitterCell *rightEmitterCell = [CAEmitterCell emitterCell];
     rightEmitterCell.birthRate = 0;
     rightEmitterCell.emissionLongitude = -M_PI*179/180;
@@ -289,21 +569,21 @@
     rightEmitterCell.alphaSpeed = -0.15;
     rightEmitterCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
     [rightEmitterCell setName:@"right"];
-
+    
     _leftEmitterLayer.emitterCells = @[leftEmitterCell];
     _rightEmitterLayer.emitterCells = @[rightEmitterCell];
-
+    
     [_scrollView.layer addSublayer:self.leftEmitterLayer];
     [_scrollView.layer addSublayer:self.rightEmitterLayer];
-
+    
     self.sparkleEmitterLayer = [CAEmitterLayer layer];
-//    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x + 2, _LabelTotalCost.layer.position.y + 63);
+    //    self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.layer.position.x + 2, _LabelTotalCost.layer.position.y + 63);
     self.sparkleEmitterLayer.emitterPosition = CGPointMake(_LabelTotalCost.frame.origin.x + 28, _LabelTotalCost.frame.origin.y + 15);
     self.sparkleEmitterLayer.emitterZPosition = 10.0;
     self.sparkleEmitterLayer.emitterSize = CGSizeMake(5, 5);
     self.sparkleEmitterLayer.emitterShape = kCAEmitterLayerPoint;
     self.sparkleEmitterLayer.emitterMode = kCAEmitterLayerPoints;
-
+    
     CAEmitterCell*sparkleCell = [CAEmitterCell emitterCell];
     sparkleCell.birthRate = 0;
     sparkleCell.emissionLongitude = M_PI * 2;
@@ -320,10 +600,10 @@
     sparkleCell.alphaSpeed = -0.80;
     sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
     [sparkleCell setName:@"sparkle"];
-
+    
     self.sparkleEmitterLayer.emitterCells = @[sparkleCell];
     [self.scrollView.layer addSublayer:self.sparkleEmitterLayer];
-
+    
     
     buttonTopLayer = [CAEmitterLayer layer];
     buttonTopLayer.emitterPosition = CGPointMake(self.orderButton.center.x, self.orderButton.frame.origin.y);
@@ -390,14 +670,14 @@
         _rightEmitterLayer.emitterPosition = CGPointMake(self.LabelDailyMenuItemName.center.x + self.view.bounds.size.width/2, self.LabelDailyMenuItemName.center.y);
         [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
         [_rightEmitterLayer setValue:@0 forKeyPath:@"emitterCells.right.yAcceleration"];
-//        [self enableMotionEffect];
+        //        [self enableMotionEffect];
     }else{
-//        [self disableMotionEffect];
+        //        [self disableMotionEffect];
         [_leftEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.left.birthRate"];
         [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
         [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(startAccUpdates) userInfo:nil repeats:NO];
     }
-
+    
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
@@ -418,9 +698,9 @@
     self.orderHistoryButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
     self.orderHistoryButton.layer.cornerRadius = 3;
     
-
+    
     UIFont *font;
-
+    
     if ([Utilities isiPad]) {
         font = [UIFont italicSystemFontOfSize:100];
         [self.shadow setShadowBlurRadius:7];
@@ -432,19 +712,23 @@
     }else{
         font = [UIFont italicSystemFontOfSize:40];
     }
-
+    
     NSMutableAttributedString *khanemein = [[NSMutableAttributedString alloc] initWithString:@"Aaj Khane Mein Kya Hai"];
     NSRange range = NSMakeRange(0, [khanemein length]);
     [khanemein addAttribute:NSShadowAttributeName value:self.shadow range:range];
     [khanemein addAttribute:NSFontAttributeName value:font range:range];
     [_aajKhaneMeinKyaHai setAttributedText:khanemein];
-
+    
+    
+    aajTransform = self.LabelDailyMenuItemName.layer.transform;
+    currentAajTransform = aajTransform;
+    
     NSMutableAttributedString *userKaNaam = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Hi %@", _userName]];
     if (![Utilities isiPad]) {
         [userKaNaam addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, userKaNaam.length)];
     }
     [_LabelUserName setAttributedText:userKaNaam];
-
+    
 }
 
 - (void)setUserInformation {
@@ -453,12 +737,12 @@
     NSString *name = _userInfo[keyUserName];
     _remainingBalance = _userInfo[keyBalance];
     _currentOrderNumber = @1;
-
+    
     _userId = _userInfo[keyUserId];
     _todayTotalOrder = _userInfo[keyTodaysOrderQty];
     [_LabelTotalOrder setText:[_todayTotalOrder stringValue]];
     _userName = [name stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[name substringToIndex:1] capitalizedString]];
-
+    
     NSMutableAttributedString *remainingBalanceString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %@/-",_remainingBalance]];
     NSRange range = NSMakeRange(0, remainingBalanceString.length);
     if([_remainingBalance compare:@0] == NSOrderedAscending ){
@@ -467,16 +751,16 @@
         [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:range];
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50 / 256.0 green:193 / 256.0 blue:92 / 256.0 alpha:1] range:range];
     }
-
+    
     if ([Utilities isiPad]) {
         [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:20] range:NSMakeRange(0, remainingBalanceString.length)];
     }else{
-        [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, remainingBalanceString.length)];        
+        [remainingBalanceString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, remainingBalanceString.length)];
     }
     
     [_LabelRemainingBalance setAttributedText:remainingBalanceString];
-
-
+    
+    
 }
 
 - (void)setRandomBackgroundImage {
@@ -490,10 +774,10 @@
     
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit) fromDate:[NSDate date]];
-
+    
     long seconds = [components second];
     int d = seconds%9;
-
+    
     UIImage *uiImage;
     switch(d){
         case 0:
@@ -520,18 +804,23 @@
         default:
             uiImage = [UIImage imageNamed:@"everything"];
     }
-
+    if (firstStart) {
+        [_backgroundImageView setImage:uiImage];
+    }
+    
+    
     dispatch_queue_t queue = dispatch_queue_create("com.spiderlogic.Byte2Eat", NULL);
     dispatch_async(queue, ^{
         __block UIImage *image = [uiImage applyLightEffect];
         dispatch_async(dispatch_get_main_queue(), ^{
             [UIView transitionWithView:_backgroundImageView
-                              duration:0.5f
+                              duration:1.0f
                                options:UIViewAnimationOptionTransitionCrossDissolve
                             animations:^{
                                 [_backgroundImageView setImage:image];
                             } completion:^(BOOL finished){
                                 isSettingBackground = NO;
+                                firstStart = NO;
                                 image = nil;
                             }];
         });
@@ -574,7 +863,7 @@
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    return [NSString stringWithFormat:@"%i",row + 1];
+    return [NSString stringWithFormat:@"%li",row + 1];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
@@ -585,14 +874,28 @@
 
 -(void)updateCurrentOrderTo:(NSNumber *)total{
     _currentOrderNumber = total;
+    
+    CABasicAnimation* z = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    z.fromValue = [NSNumber numberWithFloat: 0];
+    z.toValue = [NSNumber numberWithFloat: 1*2*M_PI];
+    z.duration = 0.5;
+    z.cumulative = YES;
+    z.repeatCount = 1;
+    z.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    z.removedOnCompletion = NO;
+    z.fillMode = kCAFillModeForwards;
+    z.delegate = self;
+    
+    [self.orderQuantityButton.layer addAnimation:z forKey:nil];
     [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
+    
     [_sparkleEmitterLayer setEmitterPosition:_LabelTotalCost.center];
     [_sparkleEmitterLayer setValue:@300 forKeyPath:@"emitterCells.sparkle.birthRate"];
     [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateTotalCost:) userInfo:nil repeats:NO];
 }
 
 - (void)updateTotalCost:(NSTimer *)timer {
-    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-",[_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 0.5;
@@ -600,10 +903,10 @@
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [_LabelTotalCost.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelTotalCost setAttributedText:totalCostString];
-
+    
     [_sparkleEmitterLayer setValue:@0 forKeyPath:@"emitterCells.sparkle.birthRate"];
     [timer invalidate];
-
+    
 }
 
 - (void)setTodayMenu:(NSDictionary *)dictionary {
@@ -621,23 +924,23 @@
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:_itemName];
         self.orderQuantityButton.userInteractionEnabled = YES;
     }
-
+    
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
-    animation.type = kCATransitionFade;
+    animation.type = kCATransitionPush;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
-
+    
     NSString *itemPriceText=nil;
     NSString *totalCostText=nil;
-
+    
     if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
         itemPriceText = [NSString stringWithFormat:@"Rs %@/-",dictionary[keyItemPrice]];
-        totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
+        totalCostText = [NSString stringWithFormat:@"Rs %li/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = YES;
     } else {
@@ -649,7 +952,7 @@
     NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:itemPriceText];
     [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
     [_LabelPricePerUnit setAttributedText:pricePerUnitString];
-
+    
     NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalCostText];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     [_LabelTotalCost setAttributedText:totalCostString];
@@ -663,8 +966,8 @@
     shadow.shadowColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
     shadow.shadowBlurRadius = 2.0;
     shadow.shadowOffset = CGSizeMake(0, 0);
-
-
+    
+    
     NSMutableAttributedString *error = [[NSMutableAttributedString alloc] initWithString:response];
     [error addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, error.length)];
     [error addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, error.length)];
@@ -673,13 +976,13 @@
     }else{
         [error addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Baskerville-SemiBoldItalic" size:15] range:NSMakeRange(0, error.length)];
     }
-
+    
     [_errorLabel setAttributedText:error];
-
+    
     CGPoint point = _errorLabel.center;
     [_errorLabel setCenter:CGPointMake(point.x, point.y - 100)];
     [_errorLabel setAlpha:0];
-
+    
     [UIView animateWithDuration:.5
                           delay:0
          usingSpringWithDamping:0.3
@@ -689,11 +992,12 @@
                          [_errorLabel setCenter:point];
                          [_errorLabel setAlpha:1];
                      } completion:^(BOOL finished){
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:keyErrorMessageTime target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
-    }];
+                         self.timer = [NSTimer scheduledTimerWithTimeInterval:keyErrorMessageTime target:self selector:@selector(removeErrorMessage:) userInfo:nil repeats:NO];
+                     }];
 }
 
 - (void)removeErrorMessage:(NSTimer *)timer {
+    
     [UIView animateWithDuration:1
                           delay:0
                         options:UIViewAnimationOptionCurveLinear
@@ -707,24 +1011,39 @@
     [self.OrderNumberPicker setUserInteractionEnabled:YES];
 }
 
--(void)disableUserInput{
+- (void)disableUserInput{
     [self.OrderNumberPicker setUserInteractionEnabled:NO];
 }
 
 - (void)postOrderRequest {
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:keyURLPostOrder]];
-    request.HTTPMethod = @"POST";
-    request.timeoutInterval = 10;
-    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-    NSError *error;
+    
     NSMutableDictionary *order = [[NSMutableDictionary alloc] init];
     order[@"Quantity"] = _currentOrderNumber;
     order[keyUserId] = _userId;
     order[@"DailyMenuid"] = _dailyMenuId;
     order[@"DeviceInfo"] = @"iPhone";
-    NSData *requestBodyData =   [NSJSONSerialization dataWithJSONObject:order options:NSJSONWritingPrettyPrinted error:&error];
-    request.HTTPBody = requestBodyData;
-    [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager POST:keyURLPostOrder
+       parameters:order
+          success:^(AFHTTPRequestOperation *operation, id responseObject) {
+              NSString *response = (NSString *) responseObject[keyResponseMessage];
+              NSNumber *boolValue = (NSNumber *)responseObject[keyBoolValue];
+              
+              if([boolValue boolValue]){
+                  [self updateCurrentOrderTo:@(1)];
+                  [self.OrderNumberPicker selectRow:0 inComponent:0 animated:YES];
+                  [self goToThankYouScreen];
+              }else{
+                  [self showError:response];
+              }
+              [self enableUserInput];
+              [self changeEmitterBirthrateTo:0];
+          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+              [self enableUserInput];
+              [self changeEmitterBirthrateTo:0];
+              NSLog(@"Error posting Order  : %@",error.localizedDescription);
+          }];
 }
 
 - (IBAction)onOrder:(UIButton *)sender {
@@ -737,8 +1056,8 @@
                                               otherButtonTitles:@"OK", nil];
         [alert setTag:keyAlertOrderConfirm];
         [alert show];
-
-
+        
+        
         if ([Utilities isiPad]) {
             [self changeEmitterBirthrateTo:300];
         }else{
@@ -752,15 +1071,14 @@
 - (IBAction)onOrderHistory:(UIButton *)sender {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryScreen"];
-//    modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
-//    AppDelegateAccessor.settingsInteractionController = [[InteractiveTransitionController alloc] init];
+    //    modal = [storyboard instantiateViewControllerWithIdentifier:@"IDOrderHistoryCollectionScreen"];
+    //    AppDelegateAccessor.settingsInteractionController = [[InteractiveTransitionController alloc] init];
     modal.transitioningDelegate = self;
     modal.modalPresentationStyle = UIModalPresentationCustom;
     [modal setUser:_userName];
     [self presentViewController:modal animated:YES completion:nil];
     
 }
-
 - (IBAction)onQuantityChangeButton:(UIButton *)sender {
     self.orderQuantityButton.userInteractionEnabled = NO;
     if(isPickerVisible){
@@ -790,134 +1108,26 @@
 }
 - (IBAction)onLogout:(UIButton *)sender {
     [Utilities logUserOut];
-
+    
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self enableUserInput];
-    NSError *error = nil;
-    NSURL *url = connection.currentRequest.URL;
-    NSLog(@"URL : %@", url);
-    if([[url absoluteString] rangeOfString:@"menu"].location != NSNotFound){
-        //Menu
-
-        NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        BOOL itemExists = ![((NSNumber *)jsonArray[keyMenuId]) isEqualToNumber:@1];
-        if(itemExists){
-            [self setTodayMenu:jsonArray];
-        }else{
-            NSString *response = (NSString *)jsonArray[keyResponseMessage];
-            [self showError:response];
-        }
-    }else if([[url absoluteString] rangeOfString:@"user"].location != NSNotFound){
-        //User
-        NSError *error = nil;
-        NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        BOOL userExists = ![((NSNumber *)jsonArray[keyUserId]) isEqualToNumber:@0];
-        if(userExists){
-            [self setUserInfo:jsonArray];
-            [self setUserInformation];
-        }else{
-            NSString *response = (NSString *)jsonArray[keyResponseMessage];
-            NSLog(@"Response : %@",response);
-        }
-    }else{
-        //Order
-        NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        NSString *response = (NSString *) responseDict[keyResponseMessage];
-        NSNumber *boolValue = (NSNumber *)responseDict[keyBoolValue];
-
-        if([boolValue boolValue]){
-            [self goToThankYouScreen];
-        }else{
-            [self showError:response];
-        }
-    }
-    
-
-
-}
 
 - (void)goToThankYouScreen {
-//    self.transitionManager.scaleFactor = 1;
+    [self fetchUserDetails];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     ThanksViewController *thanksViewController = [storyboard instantiateViewControllerWithIdentifier:@"IDThankYouController"];
     thanksViewController.transitioningDelegate = self;
     thanksViewController.modalPresentationStyle = UIModalPresentationCustom;
-    [self presentViewController:thanksViewController animated:YES completion:^{
-    }];
+    [self presentViewController:thanksViewController animated:YES completion:nil];
 }
-
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
-    return nil;
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    isFetchingMenu = NO;
-    [self.OrderNumberPicker selectRow:0 inComponent:0 animated:YES];
-    [self updateCurrentOrderTo:@1];
-    [self changeEmitterBirthrateTo:0];
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    [self changeEmitterBirthrateTo:0];
-    isFetchingMenu = NO;
-    [self enableUserInput];
-    if ([connection.currentRequest.HTTPMethod isEqualToString:@"GET"]){
-        [self showError:[NSString stringWithFormat:@"%@",error.localizedDescription]];
-        
-        _dailyMenuId = @0;
-        _itemName = @"";
-        _pricePerUnit = @0;
-        
-        NSMutableAttributedString *itemKaNaam = nil;
-
-        itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N / A"];
-        [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
-        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
-        [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
-        CATransition *animation = [CATransition animation];
-        animation.duration = 1.0;
-        animation.type = kCATransitionFade;
-        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
-        [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
-        
-        NSString *itemPriceText = @"N/A";
-        NSString *totalCostText = @"N/A";
-        NSMutableAttributedString *pricePerUnitString = [[NSMutableAttributedString alloc] initWithString:itemPriceText];
-        [pricePerUnitString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, pricePerUnitString.length)];
-        [_LabelPricePerUnit setAttributedText:pricePerUnitString];
-        
-        NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalCostText];
-        [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
-        [_LabelTotalCost setAttributedText:totalCostString];
-        
-        [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
-        self.orderQuantityButton.userInteractionEnabled = NO;
-        
-    } else {
-        [self showError:error.localizedDescription];
-    }
-    NSLog(@"Seriously what happend : %@", error.localizedDescription);
-    
-}
-
-#pragma NSURLConnection Delegate Methods end
-
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
                                                                    presentingController:(UIViewController *)presenting
                                                                        sourceController:(UIViewController *)source{
     self.transitionManager.appearing = YES;
     self.transitionManager.cornerRadius = 5;
-    self.transitionManager.scaleFactor = 0.9;
+    self.transitionManager.scaleFactor = 1;
     return self.transitionManager;
 }
 
@@ -928,11 +1138,11 @@
 }
 
 //- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-//    
+//
 //    if(AppDelegateAccessor.settingsInteractionController){
 //        [AppDelegateAccessor.settingsInteractionController prepareTransitionController:presented];
 //    }
-//    
+//
 //    self.transitionManager.reverse = NO;
 //    return self.transitionManager;
 //}

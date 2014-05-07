@@ -17,6 +17,7 @@
     self.transitionManager = [[TransitionManager alloc]init];
     self.transitionManager.appearing = YES;
     self.transitionManager.duration = .5;
+    self.backgroundView.contentMode = UIViewContentModeScaleAspectFill;
     
 //    if(self.view.bounds.size.height < 500){
 //        self.loginButtonConstraint.constant = 100;
@@ -200,19 +201,47 @@
         if (whiteSpaceRange.location != NSNotFound) {
             [self showError:@"Username cannot have space"];
         }else{
-            [self disableUserInput];
-            _errorLabel.text = @"";
-
-            [self changeEmitterBirthrateTo:100];
-            NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
-            [request setHTTPMethod:@"GET"];
-            [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+            [self authenticateUserNameAndGotoOrderScreen:userName];
         }
     }
     else{
         [self showError:@"Username cannot be empty" ];
     }
+}
+
+-(void) authenticateUserNameAndGotoOrderScreen:(NSString *)userName{
+    [self disableUserInput];
+    _errorLabel.text = @"";
+    
+    [self changeEmitterBirthrateTo:100];
+    NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
+    
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:usernameURL
+      parameters:nil
+         success:^(AFHTTPRequestOperation *operation, id responseObject) {
+             NSLog(@"JSON: %@", responseObject);
+             [self enableUserInput];
+             BOOL userExists = ![((NSNumber *)responseObject[keyUserId]) isEqualToNumber:@0];
+             NSNumber *userId = (NSNumber *)responseObject[keyUserId];
+             NSLog(@"--- %d -- %@", userExists, userId);
+             if(userExists){
+                 [Utilities setUserDetailsInPlist:responseObject];
+                 [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:12*60*60];
+                 [self goToOrderScreen:responseObject];
+             }else{
+                 NSString *response = (NSString *)responseObject[keyResponseMessage];
+                 [self showError:response];
+                 NSLog(@"%@",response);
+             }
+             [self changeEmitterBirthrateTo:0];
+             
+         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+             [self enableUserInput];
+             [self changeEmitterBirthrateTo:0];
+             [self showError:error.localizedDescription];
+             NSLog(@"Error: %@", error);
+         }];
 }
 
 - (void)showError:(NSString *)message {
@@ -241,16 +270,12 @@
     CGPoint point = _errorLabel.center;
     [_errorLabel setCenter:CGPointMake(point.x, point.y - 100)];
     [_errorLabel setAlpha:0];
-//    [_errorLabel setAlpha:1];
-//    CATransform3D transform = CATransform3DIdentity;
-//    _errorLabel.layer.transform = CATransform3DScale(transform, 0.1, 0.1, 0.1);
     [UIView animateWithDuration:.5
                               delay:0
              usingSpringWithDamping:0.3
               initialSpringVelocity:8
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
-//                             _errorLabel.layer.transform = CATransform3DScale(transform, 1, 1, 1);
                              [_errorLabel setCenter:point];
                              [_errorLabel setAlpha:1];
                          } completion:^(BOOL finished){
@@ -291,16 +316,10 @@
         if (whiteSpaceRange.location != NSNotFound) {
             [self showError:@"Username cannot have space"];
         }else{
-            [self disableUserInput];
-            _errorLabel.text = @"";
-
-            [self changeEmitterBirthrateTo:100];
-            NSString *usernameURL = [NSString stringWithFormat:keyURLUserAuth, userName];
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:usernameURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
-            [request setHTTPMethod:@"GET"];
-            [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+            [self authenticateUserNameAndGotoOrderScreen:userName];
         }
-    }else{
+    }
+    else{
         [_userNameTextField setText:@""];
     }
     return YES;
@@ -339,29 +358,6 @@
     [timer invalidate];
 }
 
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self enableUserInput];
-    NSError *error = nil;
-    NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    BOOL userExists = ![((NSNumber *)jsonArray[keyUserId]) isEqualToNumber:@0];
-    NSNumber *userId = (NSNumber *)jsonArray[keyUserId];
-    NSLog(@"--- %d -- %@", userExists, userId);
-    if(userExists){
-        [Utilities setUserDetailsInPlist:jsonArray];
-        [self goToOrderScreen:jsonArray];
-    }else{
-        NSString *response = (NSString *)jsonArray[keyResponseMessage];
-        [self showError:response];
-        NSLog(@"%@",response);
-    }
-}
-
 - (void)enableUserInput {
     [_userNameTextField setEnabled:YES];
     [_loginButton setEnabled:YES];
@@ -370,23 +366,6 @@
 - (void)disableUserInput {
     [_loginButton setEnabled:NO];
     [_userNameTextField setEnabled:NO];
-}
-
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
-                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
-    return nil;
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [self enableUserInput];
-    [self changeEmitterBirthrateTo:0];
-    
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    [self enableUserInput];
-    NSString *message = [NSString stringWithFormat:@"%@ %@", error.localizedDescription, @"Please try again later."];
-    [self showError:message];
 }
 
 @end

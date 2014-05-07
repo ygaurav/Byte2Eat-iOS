@@ -9,7 +9,7 @@
 
 @class TransitionManager;
 
-@interface AuthenticatorViewController : UIViewController <UIViewControllerTransitioningDelegate, NSURLConnectionDelegate, UITextFieldDelegate>
+@interface AuthenticatorViewController : UIViewController <UIViewControllerTransitioningDelegate, UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *loginButtonConstraint;
 @property (weak, nonatomic) IBOutlet UIImageView *backgroundView;
@@ -24,6 +24,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 @property (nonatomic, strong) NSDictionary *jsonArray;
 - (IBAction)onTextFieldTouch:(UITextField *)sender;
+@property (weak, nonatomic) IBOutlet UIImageView *testImage;
 
 @property (nonatomic) CAEmitterLayer *leftEmitterLayer;
 @property (nonatomic) CAEmitterLayer *rightEmitterLayer;

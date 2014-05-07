@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="scrollViewTableCell" rowHeight="68" id="KGk-i7-Jjw" customClass="TableViewCellWithButtons">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="96"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="95"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kIL-Ro-KUw">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="95"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </scrollView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="kIL-Ro-KUw" secondAttribute="bottom" id="2mN-HF-dZ8"/>
+                    <constraint firstItem="kIL-Ro-KUw" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="KRg-mr-Z6L"/>
+                    <constraint firstItem="kIL-Ro-KUw" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="YJ1-l1-sNK"/>
+                    <constraint firstAttribute="trailing" secondItem="kIL-Ro-KUw" secondAttribute="trailing" id="f4I-P3-yeu"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="testScrollView" destination="kIL-Ro-KUw" id="scZ-S7-ceT"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+</document>

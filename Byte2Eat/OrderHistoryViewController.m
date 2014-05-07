@@ -4,6 +4,10 @@
 #import "OrderHistoryCell.h"
 #import "AppDelegate.h"
 #import "Utilities.h"
+#import "TableViewCellWithButtons.h"
+
+@interface OrderHistoryViewController () <ScrollingCellDelegate>
+@end
 
 @implementation OrderHistoryViewController {
     NSString *userName;
@@ -23,12 +27,26 @@
     NSMutableDictionary *didDisplay;
     NSMutableArray *insertedIndexPaths;
     NSMutableArray *updatedIndexPaths;
-    UIRefreshControl *refreshControl ;
     BOOL firstFetch;
+    
+    NSIndexPath *pinchedIndexPath;
+    CGFloat initialPinchedHeight;
+    NSMutableArray *rowHeights;
+    NSMutableArray *rowColor;
 }
 
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
+
+-(void)scrollingCellDidBeginPulling:(TableViewCellWithButtons *)cell{
+    NSLog(@"Pulling !!");
+}
+-(void)scrollingCell:(TableViewCellWithButtons *)cell didChangePullOffset:(CGFloat)offset{
+    
+}
+-(void)scrollingCellDidEndPulling:(TableViewCellWithButtons *)cell{
+    
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -46,6 +64,9 @@
     didDisplay = [[NSMutableDictionary alloc] init];
     insertedIndexPaths = [[NSMutableArray alloc] init];
     updatedIndexPaths = [[NSMutableArray alloc] init];
+    rowHeights = [[NSMutableArray alloc]init];
+    rowColor = [[NSMutableArray alloc] init];
+    [self.tableView registerNib:[UINib nibWithNibName:@"TableViewCellWithButtons" bundle:nil] forCellReuseIdentifier:@"scrollViewTableCell"];
     
     self.managedObjectContext = [Utilities getManagedObjectContext];
     
@@ -53,24 +74,84 @@
     if (![[self fetchedResultsController:isAscending ] performFetch:&error]) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     }
+//    id <NSFetchedResultsSectionInfo> sectionInfo = [_fetchedResultsController sections][0];
+//    NSInteger count = [sectionInfo numberOfObjects];
+//    if (count != 0) {
+//        for (int i = 0; i < count; i++) {
+//            rowHeights[i] = @60;
+//            rowColor[i] = [UIColor colorWithRed:arc4random()%256/256.0 green:arc4random()%256/256.0 blue:arc4random()%256/256.0 alpha:.5];
+//        }
+//    }
+//    
+//    UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
+//    
+//    [self.tableView addGestureRecognizer:pinchRecognizer];
+//    
+    
 }
 
--(void)handleRefresh{
-    NSShadow *blueShadow = [[NSShadow alloc] init];
-    UIColor *blueColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:1];
-    blueShadow.shadowColor = blueColor;
-    blueShadow.shadowOffset = CGSizeMake(0, 0);
-    blueShadow.shadowBlurRadius = 2.0;
-    NSMutableAttributedString *itemName = [[NSMutableAttributedString alloc] initWithString:@"Fetching order history"];
-    [itemName addAttribute:NSShadowAttributeName value:blueShadow range:NSMakeRange(0, itemName.length)];
-    [itemName addAttribute:NSForegroundColorAttributeName value:blueColor range:NSMakeRange(0, itemName.length)];
-    [itemName addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:10] range:NSMakeRange(0, itemName.length)];
-    refreshControl.tintColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:1];
-    refreshControl.attributedTitle = itemName;
-    [self fetchOrderHistory:NO];
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 95;
+//    return [rowHeights[indexPath.row] floatValue];
 }
 
--(void) setUpDateFormatter{
+-(void) updateForPinchScale:(CGFloat)scale atIndexPath:(NSIndexPath *)indexPath{
+
+    if (indexPath && indexPath.section != NSNotFound && indexPath.row != NSNotFound) {
+        CGFloat newHeight;
+        if(initialPinchedHeight*scale < 60){
+            newHeight = 60;
+        }else if(initialPinchedHeight*scale > 95){
+            newHeight = 95;
+        }else{
+            newHeight = initialPinchedHeight*scale;
+        }
+        
+        NSLog(@"Height : %f", newHeight);
+        
+        [self setHeight:@(newHeight) forRowAtIndexPath:indexPath];
+
+        BOOL animationEnabled = [UIView areAnimationsEnabled];
+        [UIView setAnimationsEnabled:NO];
+        [self.tableView beginUpdates];
+        [self.tableView endUpdates];
+        [UIView setAnimationsEnabled:animationEnabled];
+    }
+}
+
+-(void)setHeight:(id)height forRowAtIndexPath:(NSIndexPath *)indexPath{
+    rowHeights[indexPath.row] = height;
+}
+
+-(void)handlePinch:(UIPinchGestureRecognizer *)pinch{
+    switch (pinch.state) {
+        case UIGestureRecognizerStateBegan:{
+            CGPoint pinchLocation = [pinch locationInView:self.tableView];
+            pinchedIndexPath = [self.tableView indexPathForRowAtPoint:pinchLocation];
+            initialPinchedHeight = [self tableView:self.tableView heightForRowAtIndexPath:pinchedIndexPath];
+            [self updateForPinchScale:pinch.scale atIndexPath:pinchedIndexPath];
+            break;
+        }
+        case UIGestureRecognizerStateChanged:{
+            [self updateForPinchScale:pinch.scale atIndexPath:pinchedIndexPath];
+            break;
+        }
+        case UIGestureRecognizerStateCancelled:{
+            pinchedIndexPath = nil;
+            initialPinchedHeight = 0;
+            break;
+        }
+        case UIGestureRecognizerStateEnded:{
+            pinchedIndexPath = nil;
+            initialPinchedHeight = 0;
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+- (void)setUpDateFormatter{
     shortDateFormatter = [[NSDateFormatter alloc] init];
     [shortDateFormatter setDateStyle:NSDateFormatterMediumStyle];
     dateFromJSONFormatter = [[NSDateFormatter alloc] init];
@@ -105,8 +186,9 @@
 
     NSFetchedResultsController *theFetchedResultsController =
             [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-                                                managedObjectContext:managedObjectContext sectionNameKeyPath:nil
-                                                           cacheName:@"Root"];
+                                                managedObjectContext:managedObjectContext
+                                                  sectionNameKeyPath:nil
+                                                           cacheName:nil];
     self.fetchedResultsController = theFetchedResultsController;
     _fetchedResultsController.delegate = self;
 
@@ -116,13 +198,6 @@
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
-}
-
--(void) setBackgroundImage:(UIImage *)backgroundImage{
-    [self.tableView setBackgroundColor:[UIColor clearColor]];
-    UIImageView *imageView = [[UIImageView alloc]initWithImage:backgroundImage];
-    imageView.layer.zPosition = -1;
-    [self.view addSubview:imageView];
 }
 
 - (NSArray *)getSavedOrderHistory {
@@ -258,9 +333,30 @@
     [_operationLabel setAttributedText:historyTitle];
 
     NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory, userName];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[[NSURL alloc] initWithString:orderHistoryURL] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];
-    [request setHTTPMethod:@"GET"];
-    [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:orderHistoryURL
+      parameters:nil
+         success:^(AFHTTPRequestOperation *operation, id responseObject) {
+             isFetchingHistory = NO;
+             [self changeEmitterBirthrateTo:0];
+             [self setTitleBack];
+             
+             BOOL userExists = ![((NSNumber *) responseObject[keyUserId]) isEqualToNumber:@1];
+             
+             if (userExists) {
+                 [self setOrderHistory:responseObject];
+             } else {
+                 NSString *response = (NSString *) responseObject[keyResponseMessage];
+                 [self showError:response];
+                 NSLog(@"Response : %@", response);
+             }
+         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+             isFetchingHistory = NO;
+             [self changeEmitterBirthrateTo:0];
+             [self setTitleBack];
+             [self showError:error.localizedDescription];
+             NSLog(@"Error : %@", error.localizedDescription);
+         }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -268,7 +364,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return [[_fetchedResultsController sections] count];
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -282,7 +378,42 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     OrderHistoryCell *historyCell = [tableView dequeueReusableCellWithIdentifier:@"OrderHistoryCell" forIndexPath:indexPath];
     [self configureCell:historyCell atIndexPath:indexPath];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    [historyCell addGestureRecognizer:tap];
+//    TableViewCellWithButtons *historyCell = [tableView dequeueReusableCellWithIdentifier:@"scrollViewTableCell" forIndexPath:indexPath];
+//    [self configCustomCell:historyCell atIndexPath:indexPath];
     return historyCell;
+}
+
+
+-(void)configCustomCell:(TableViewCellWithButtons *)cell atIndexPath:(NSIndexPath *)indexPath{
+    Order *order = [_fetchedResultsController objectAtIndexPath:indexPath];
+    
+    cell.scrollDelegate = self;
+    cell.testScrollView.showsHorizontalScrollIndicator = YES;
+    cell.testScrollView.showsVerticalScrollIndicator = NO;
+    cell.testScrollView.contentSize = CGSizeMake(CGRectGetWidth(cell.frame), CGRectGetHeight(cell.frame));
+    cell.labelItemName.text = order.itemName;
+    cell.labelOrderDate.text = [NSString stringWithFormat:@"%d",indexPath.row];
+    cell.testScrollView.backgroundColor = rowColor[indexPath.row];
+}
+
+-(void)handleTap:(UITapGestureRecognizer *)tap{
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[tap locationInView:self.tableView]];
+
+    CGFloat height = [self tableView:self.tableView heightForRowAtIndexPath:indexPath];
+    CGFloat newHeight;
+    if (height < 70) {
+        newHeight = 95;
+        [self setHeight:@(95) forRowAtIndexPath:indexPath];
+    }else{
+        newHeight = 60;
+        [self setHeight:@(60) forRowAtIndexPath:indexPath];
+    }
+    NSLog(@"Handle tap on %ld, old %f , new %f",(long)indexPath.row, height, newHeight);
+    
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
@@ -322,7 +453,7 @@
     [quantity addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, quantity.length)];
     [quantity addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, quantity.length)];
 
-    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %li/-", [order.price integerValue] * [order.quantity integerValue]]];
+    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [order.price integerValue] * [order.quantity integerValue]]];
     [cost addAttribute:NSShadowAttributeName value:greenShadow range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, cost.length)];
@@ -337,21 +468,9 @@
     historyCell.labelOrderCost.attributedText = cost;
     historyCell.labelOrderQty.attributedText = quantity;
     historyCell.labelOrderDate.attributedText = date;
-
+    
     historyCell.alpha = 0.3;
 
-}
-
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    NSLog(@"Response - %@", response);
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    NSLog(@"Received %lu bytes of data", (unsigned long)[data length]);
-    if (data != nil) {
-        [totalData appendData:data];
-    }
 }
 
 - (void)setOrderHistory:(NSDictionary *)dictionary {
@@ -386,7 +505,11 @@
             BOOL isDeleted = YES;
             for(NSDictionary *orderDict in orderHistoryDictionary){
                 if([[dateFromJSONFormatter dateFromString:(NSString *) orderDict[@"OrderDate"]] compare:order.orderDate] == NSOrderedSame){
-                    if(order.quantity != orderDict[@"Quantity"]){
+                    NSNumber *saved = order.quantity;
+                    NSNumber *fetched = orderDict[@"Quantity"];
+                    
+                    if([saved compare:fetched] != NSOrderedSame){
+                        NSLog(@"Saved Quantity %@  == %@ Fetched Quantity",order.quantity,orderDict[@"Quantity"]);
                         order.quantity = orderDict[@"Quantity"];
                     }
                     isDeleted = NO;
@@ -456,9 +579,9 @@
     //Color flash for updated cell
     if ([updatedIndexPaths containsObject:indexPath]) {
         OrderHistoryCell *orderCell = (OrderHistoryCell *)cell;
-//        orderCell.labelOrderQty.layer.transform = CATransform3DMakeRotation(M_PI, 0, 0, 1);
-        orderCell.labelOrderQty.layer.transform = CATransform3DMakeScale(4, 4, 4);
-        [UIView animateWithDuration:3
+        orderCell.labelOrderQty.layer.transform = CATransform3DMakeRotation(M_PI, 0, 0, 1);
+//        orderCell.labelOrderQty.layer.transform = CATransform3DMakeScale(4, 4, 4);
+        [UIView animateWithDuration:2
                               delay:0
              usingSpringWithDamping:0.1
               initialSpringVelocity:3
@@ -479,8 +602,9 @@
     }
     
     // Disable animation for already shown cells
-    if (![didDisplay objectForKey:indexPath]) {
-        
+//    if (![didDisplay objectForKey:indexPath]) {
+    if(true){
+    
 
         CATransform3D rotation = CATransform3DMakeScale(.3, .3, .3);
         cell.layer.transform = rotation;
@@ -491,7 +615,7 @@
                               delay:0
              usingSpringWithDamping:0.5
               initialSpringVelocity:5
-                            options:UIViewAnimationOptionCurveEaseInOut
+                            options:UIViewAnimationOptionAllowUserInteraction
                          animations:^{
                              cell.layer.transform = CATransform3DIdentity;
                          } completion:nil];
@@ -534,32 +658,6 @@
     [timer invalidate];
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-    return nil;
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [refreshControl endRefreshing];
-    isFetchingHistory = NO;
-    [self changeEmitterBirthrateTo:0];
-    [self setTitleBack];
-
-    NSError *error = nil;
-    NSDictionary *jsonArray = [NSJSONSerialization JSONObjectWithData:totalData options:NSJSONReadingMutableContainers error:&error];
-    BOOL userExists = ![((NSNumber *) jsonArray[keyUserId]) isEqualToNumber:@1];
-
-    if (error != nil) {
-        NSLog(@"Error parsing JSON Data : %@", [[NSString alloc] initWithData:totalData encoding:NSUTF8StringEncoding]);
-    }
-    if (userExists) {
-        [self setOrderHistory:jsonArray];
-    } else {
-        NSString *response = (NSString *) jsonArray[keyResponseMessage];
-        [self showError:response];
-        NSLog(@"Response : %@", response);
-    }
-}
-
 - (void)setTitleBack {
     NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@""];
     [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
@@ -578,16 +676,7 @@
     [_rightEmitterLayer setValue:@(birthRate) forKeyPath:@"emitterCells.right.birthRate"];
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    isFetchingHistory = NO;
-    [self changeEmitterBirthrateTo:0];
-    [self setTitleBack];
-    [self showError:error.localizedDescription];
-    NSLog(@"Error : %@", error.localizedDescription);
-}
-
-
-#pragma FetchedResultsController methods
+#pragma mark FetchedResultsController methods
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
 //    [didDisplay removeAllObjects];
@@ -661,9 +750,7 @@
     [self.tableView endUpdates];
 }
 
-
-#pragma FetchedResultController methods end
-
+#pragma mark IBActions
 
 - (IBAction)onDoneTap:(UIButton *)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -700,7 +787,7 @@
     userName = name;
 }
 
-#pragma Folding animation code
+#pragma mark Folding animation code
 
 -(void)setupGestureRecognizer{
     UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(onPanGesture:)];
