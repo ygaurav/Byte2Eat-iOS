@@ -5,7 +5,7 @@
 @class MyInteractiveTransitionManager;
 @class TransitionManager;
 
-@interface OrderViewController : UIViewController  <UITextViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, NSURLConnectionDelegate, UIViewControllerTransitioningDelegate>
+@interface OrderViewController : UIViewController  <UIGestureRecognizerDelegate,UITextViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, UIViewControllerTransitioningDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *LabelRemainingBalance;
 @property (weak, nonatomic) IBOutlet UILabel *LabelUserName;
@@ -51,6 +51,8 @@
 @property (nonatomic,strong) CMMotionManager *coreMotionManager;
 
 @property(nonatomic, strong) NSTimer *timer;
+
+- (void)setTodayMenu:(NSDictionary *)dictionary;
 
 - (IBAction)onLogout:(UIButton *)sender;
 - (IBAction)onOrder:(UIButton *)sender;

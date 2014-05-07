@@ -121,8 +121,11 @@
             for (Order *order in fetchedRecords) {
                 [managedObjectContext deleteObject:order];
             }
+            [managedObjectContext save:&error];
+            if (error) {
+                NSLog(@"%@",error.localizedDescription);
+            }
         }
-
     }
     else {
         NSLog(@"Something happened while logging out saving username in plist");
