@@ -46,7 +46,7 @@
               initialSpringVelocity:6
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
-                                toView.transform = CGAffineTransformMakeScale(self.scaleFactor, self.scaleFactor);
+                             toView.transform = CGAffineTransformMakeScale(self.scaleFactor, self.scaleFactor);
                          } completion:^(BOOL finished){
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]] ;
             NSLog(@"Toview after completion Frame : %f,%f -- %f,%f",toView.frame.origin.x, toView.frame.origin.y, toView.frame.size.height, toView.frame.size.width);
@@ -61,6 +61,7 @@
                             options:UIViewAnimationOptionCurveLinear
                          animations:^{
                              fromView.transform = CGAffineTransformMakeScale(0.0, 0.0);
+                             fromView.alpha = 0;
                          } completion:^(BOOL finished){
             [fromView removeFromSuperview];
             toView.userInteractionEnabled = YES;

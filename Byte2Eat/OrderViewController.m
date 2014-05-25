@@ -886,7 +886,16 @@
     z.fillMode = kCAFillModeForwards;
     z.delegate = self;
     
-    [self.orderQuantityButton.layer addAnimation:z forKey:nil];
+    CATransition *t = [CATransition animation];
+    t.duration = 0.5;
+    t.type = kCATransitionFade;
+    t.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    
+    CAAnimationGroup *g = [CAAnimationGroup animation];
+    [g setAnimations:@[t,z]];
+    [g setDuration:0.5f];
+    
+    [self.orderQuantityButton.layer addAnimation:g forKey:nil];
     [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
     
     [_sparkleEmitterLayer setEmitterPosition:_LabelTotalCost.center];
@@ -895,18 +904,18 @@
 }
 
 - (void)updateTotalCost:(NSTimer *)timer {
-    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-",[_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %li/-",[_pricePerUnit integerValue] * [_currentOrderNumber integerValue]]];
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 0.5;
     animation.type = kCATransitionFade;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    [_LabelTotalCost.layer addAnimation:animation forKey:@"changeTextTransition"];
+    
+    [_LabelTotalCost.layer addAnimation:animation forKey:nil];
     [_LabelTotalCost setAttributedText:totalCostString];
     
     [_sparkleEmitterLayer setValue:@0 forKeyPath:@"emitterCells.sparkle.birthRate"];
     [timer invalidate];
-    
 }
 
 - (void)setTodayMenu:(NSDictionary *)dictionary {
@@ -916,7 +925,7 @@
     
     
     NSMutableAttributedString *itemKaNaam = nil;
-    if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N / A"]) {
+    if ([_itemName isEqualToString:@""]||[_itemName isEqualToString:@"N/A"]) {
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"nothing today :("];
         [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = NO;
@@ -1001,7 +1010,7 @@
     [UIView animateWithDuration:1
                           delay:0
                         options:UIViewAnimationOptionCurveLinear
-                     animations:^{
+                        animations:^{
                          _errorLabel.alpha = 0;
                      } completion:nil];
     [timer invalidate];
