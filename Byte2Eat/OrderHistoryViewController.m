@@ -153,7 +153,7 @@
 
 - (void)setUpDateFormatter{
     shortDateFormatter = [[NSDateFormatter alloc] init];
-    [shortDateFormatter setDateStyle:NSDateFormatterMediumStyle];
+    [shortDateFormatter setDateStyle:NSDateFormatterLongStyle];
     dateFromJSONFormatter = [[NSDateFormatter alloc] init];
     
     [NSDateFormatter setDefaultFormatterBehavior:NSDateFormatterBehavior10_4];
