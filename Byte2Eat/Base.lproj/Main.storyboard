@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="fww-Kk-YZf">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="fww-Kk-YZf">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -812,38 +812,41 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Z3b-Eq-BrI">
-                                <rect key="frame" x="268" y="14" width="46" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FGm-JW-gYZ">
+                                <rect key="frame" x="11" y="18" width="25" height="25"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <state key="normal" title="  !  ">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="onTopButtonTap:" destination="wGH-M3-Nza" eventType="touchUpInside" id="SLh-Jh-vP8"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FGm-JW-gYZ">
-                                <rect key="frame" x="6" y="18" width="46" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                <state key="normal" title="Refresh">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="TMJ-Rt-dRv"/>
+                                    <constraint firstAttribute="width" constant="25" id="j61-f3-Dxf"/>
+                                </constraints>
+                                <state key="normal" image="Refresh">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="onRefreshTap:" destination="wGH-M3-Nza" eventType="touchUpInside" id="z2d-w9-tu2"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ttq-kj-bhq">
+                                <rect key="frame" x="285" y="20" width="10" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="pV3-PY-VOG" secondAttribute="trailing" id="30N-B4-75t"/>
                             <constraint firstAttribute="trailing" secondItem="vAe-SN-FYB" secondAttribute="trailing" id="4qH-he-40A"/>
+                            <constraint firstItem="Ttq-kj-bhq" firstAttribute="centerY" secondItem="FGm-JW-gYZ" secondAttribute="centerY" id="6Cb-a2-lOe"/>
                             <constraint firstItem="DLd-EJ-Vta" firstAttribute="top" secondItem="cbH-k9-6ml" secondAttribute="bottom" id="8iz-gV-hf4"/>
+                            <constraint firstItem="FGm-JW-gYZ" firstAttribute="top" secondItem="cbH-k9-6ml" secondAttribute="bottom" constant="18" id="B77-uk-Xp4"/>
                             <constraint firstAttribute="trailing" secondItem="DLd-EJ-Vta" secondAttribute="trailing" id="CHy-F9-b7B"/>
+                            <constraint firstAttribute="trailing" secondItem="Ttq-kj-bhq" secondAttribute="trailing" constant="25" id="F9C-hj-ySI"/>
                             <constraint firstItem="vAe-SN-FYB" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="JbO-fQ-soZ"/>
                             <constraint firstItem="DLd-EJ-Vta" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="ZFV-hs-ceI"/>
                             <constraint firstItem="pV3-PY-VOG" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="aaU-va-Q1F"/>
+                            <constraint firstItem="FGm-JW-gYZ" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" constant="11" id="fpg-Uq-SOW"/>
                             <constraint firstItem="pV3-PY-VOG" firstAttribute="top" secondItem="DLd-EJ-Vta" secondAttribute="bottom" id="hjb-Ll-jJz"/>
                             <constraint firstItem="vAe-SN-FYB" firstAttribute="top" secondItem="pV3-PY-VOG" secondAttribute="bottom" id="mzd-Qt-xJ0"/>
                             <constraint firstItem="7HU-Dh-OYf" firstAttribute="top" secondItem="vAe-SN-FYB" secondAttribute="bottom" id="nSP-tF-Xha"/>
@@ -853,8 +856,9 @@
                     <connections>
                         <outlet property="doneButton" destination="vAe-SN-FYB" id="C7g-pd-YCl"/>
                         <outlet property="historyTitleLabel" destination="DLd-EJ-Vta" id="dGY-jd-7U2"/>
-                        <outlet property="onSortingButton" destination="Z3b-Eq-BrI" id="hnK-WN-s4t"/>
+                        <outlet property="labelTotalOrder" destination="Ttq-kj-bhq" id="2OM-Wm-ZeB"/>
                         <outlet property="operationLabel" destination="dEl-xQ-hZs" id="018-gK-qQG"/>
+                        <outlet property="refreshButton" destination="FGm-JW-gYZ" id="YWm-Nb-nJd"/>
                         <outlet property="tableView" destination="pV3-PY-VOG" id="XHg-WY-Rr3"/>
                     </connections>
                 </viewController>
@@ -863,6 +867,9 @@
             <point key="canvasLocation" x="965" y="-443"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="Refresh" width="256" height="256"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

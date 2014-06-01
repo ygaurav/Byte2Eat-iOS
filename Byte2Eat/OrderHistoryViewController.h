@@ -9,11 +9,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 @property (weak, nonatomic) IBOutlet UILabel *operationLabel;
 @property (nonatomic,retain) NSManagedObjectContext* managedObjectContext;
-@property (weak, nonatomic) IBOutlet UIButton *onSortingButton;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+@property (weak, nonatomic) IBOutlet UILabel *labelTotalOrder;
+@property (weak, nonatomic) IBOutlet UIButton *refreshButton;
 
 - (IBAction)onDoneTap:(UIButton *)sender;
-- (IBAction)onTopButtonTap:(UIButton *)sender;
 - (IBAction)onRefreshTap:(UIButton *)sender;
 
 - (void)setUser:(NSString *)name;

@@ -142,7 +142,7 @@ int layoutId = 1;
     [quantity addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, quantity.length)];
     [quantity addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, quantity.length)];
 
-    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [order.price integerValue] * [order.quantity integerValue]]];
+    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %li/-", [order.price integerValue] * [order.quantity integerValue]]];
     [cost addAttribute:NSShadowAttributeName value:greenShadow range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, cost.length)];
@@ -163,12 +163,12 @@ int layoutId = 1;
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     return CGSizeMake(210, 234);                      //For Every other Layout
-//    return CGSizeMake(320, 100);                        //For Springy Layout
+//    return CGSizeMake(320, 100);                                  //For Springy Layout
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(50, 55, 50, 55);          //For Every other layout
-//    return UIEdgeInsetsMake(0, 0, 0, 0);                //For Springy Layout
+//    return UIEdgeInsetsMake(0, 0, 0, 0);                              //For Springy Layout
 }
 
 - (IBAction)changeCollectionLayout:(UIButton *)sender {
@@ -285,7 +285,7 @@ int layoutId = 1;
         if (error) {
             NSLog(@"Error occured : %@", error.localizedDescription);
         } else {
-            displayOrder = [NSNumber numberWithInt:[displayOrder integerValue] + 1];
+            displayOrder = @(displayOrder.integerValue + 1);
             NSLog(@"Order saved : %@", dailyMenu[@"ItemName"]);
         }
     }

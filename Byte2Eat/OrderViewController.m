@@ -30,6 +30,10 @@
     BOOL firstStart;
 }
 
+UIColor * GetColor(int red, int green, int blue, float alpha){
+    return [UIColor colorWithRed:red/256.0 green:green/256.0 blue:blue/256.0 alpha:alpha];
+}
+
 - (void)viewDidLoad{
     [super viewDidLoad];
     
@@ -180,7 +184,7 @@
             [UIView animateWithDuration:0.5
                              animations:^{
                                  self.LabelDailyMenuItemName.layer.transform = CATransform3DScale(transform, 1.3, 1.3, 1.3);
-                                 self.LabelDailyMenuItemName.layer.shadowColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:1].CGColor;
+                                 self.LabelDailyMenuItemName.layer.shadowColor = GetColor(0, 0, 0, 1).CGColor;
                                  self.LabelDailyMenuItemName.layer.shadowOpacity = 0.7;
                                  self.LabelDailyMenuItemName.layer.shadowOffset = CGSizeMake(0, 0);
                                  self.LabelDailyMenuItemName.layer.shadowRadius = 1;
@@ -365,7 +369,7 @@
     
     self.whiteShadow = [[NSShadow alloc] init];
     self.whiteShadow.shadowBlurRadius = 3.0;
-    self.whiteShadow.shadowColor = [UIColor colorWithRed:60 green:71 blue:210 alpha:1];
+    self.whiteShadow.shadowColor = GetColor(256, 256, 256, 1);
     self.whiteShadow.shadowOffset = CGSizeMake(0, 0);
     
     self.redShadow = [[NSShadow alloc] init];
@@ -375,7 +379,7 @@
     
     self.greenShadow = [[NSShadow alloc] init];
     self.greenShadow.shadowBlurRadius = 3.0;
-    self.greenShadow.shadowColor = [UIColor colorWithRed:50/256.0 green:193/256.0 blue:92/256.0 alpha:1];
+    self.greenShadow.shadowColor = GetColor(50, 193, 92, 1);
     self.greenShadow.shadowOffset = CGSizeMake(0, 0);
 }
 
@@ -441,11 +445,11 @@
             [itemKaNaam addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:30] range:NSMakeRange(0, itemKaNaam.length)];
         }
         [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
-        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:GetColor(256, 256, 256, 1) range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
         CATransition *animation = [CATransition animation];
         animation.duration = 1.0;
-        animation.type = kCATransitionFade;
+        animation.type = @"rippleEffect";
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
         [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
         [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
@@ -459,11 +463,11 @@
         
         itemKaNaam = [[NSMutableAttributedString alloc] initWithString:@"N / A"];
         [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
-        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+        [itemKaNaam addAttribute:NSForegroundColorAttributeName value:GetColor(256, 256, 256, 1) range:NSMakeRange(0, itemKaNaam.length)];
         [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
         CATransition *animation = [CATransition animation];
         animation.duration = 1.0;
-        animation.type = kCATransitionFade;
+        animation.type = @"rippleEffect";
         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
         [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
@@ -477,6 +481,9 @@
         NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalCostText];
         [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
         [_LabelTotalCost setAttributedText:totalCostString];
+        
+        self.orderQuantityButton.userInteractionEnabled = NO;
+        [self.orderQuantityButton setTitle:@"n/a" forState:UIControlStateNormal];
     }
 }
 
@@ -547,7 +554,7 @@
     leftEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     leftEmitterCell.scale = 0.03;
     leftEmitterCell.alphaSpeed = -0.15;
-    leftEmitterCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+    leftEmitterCell.color = GetColor(0, 0, 256, 0.5).CGColor;
     [leftEmitterCell setName:@"left"];
     
     CAEmitterCell *rightEmitterCell = [CAEmitterCell emitterCell];
@@ -567,7 +574,7 @@
     rightEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     rightEmitterCell.scale = 0.03;
     rightEmitterCell.alphaSpeed = -0.15;
-    rightEmitterCell.color =[UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
+    rightEmitterCell.color = GetColor(256, 0, 0, 0.5).CGColor;
     [rightEmitterCell setName:@"right"];
     
     _leftEmitterLayer.emitterCells = @[leftEmitterCell];
@@ -598,7 +605,7 @@
     sparkleCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     sparkleCell.scale = 0.03;
     sparkleCell.alphaSpeed = -0.80;
-    sparkleCell.color =[UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+    sparkleCell.color =GetColor(0, 0, 256, 0.5).CGColor;
     [sparkleCell setName:@"sparkle"];
     
     self.sparkleEmitterLayer.emitterCells = @[sparkleCell];
@@ -625,7 +632,7 @@
     topCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     topCell.scale = 0.03;
     topCell.alphaSpeed = -0.30;
-    topCell.color =[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5].CGColor;
+    topCell.color =GetColor(256, 256, 256, 0.5).CGColor;
     [topCell setName:@"top"];
     
     buttonTopLayer.emitterCells = @[topCell];
@@ -651,7 +658,7 @@
     bottomCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     bottomCell.scale = 0.03;
     bottomCell.alphaSpeed = -0.30;
-    bottomCell.color =[UIColor colorWithRed:1 green:1 blue:1 alpha:0.5].CGColor;
+    bottomCell.color =GetColor(256, 256, 256, 0.5).CGColor;
     [bottomCell setName:@"bottom"];
     
     buttonBottomLayer.emitterCells = @[bottomCell];
@@ -686,16 +693,16 @@
 
 - (void)styleStaticData {
     
-    self.orderButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.orderButton.backgroundColor = GetColor(256, 256, 256, 0.3);
     self.orderButton.layer.zPosition = 100;
     
     self.orderQuantityButton.layer.cornerRadius = 3;
-    self.orderQuantityButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.orderQuantityButton.backgroundColor = GetColor(256, 256, 256, 0.3);
     
-    self.logoutButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.logoutButton.backgroundColor = GetColor(256, 256, 256, 0.3);
     self.logoutButton.layer.cornerRadius = 3;
     
-    self.orderHistoryButton.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.3];
+    self.orderHistoryButton.backgroundColor = GetColor(256, 256, 256, 0.3);
     self.orderHistoryButton.layer.cornerRadius = 3;
     
     
@@ -749,7 +756,7 @@
         [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:range];
     }else{
         [remainingBalanceString addAttribute:NSShadowAttributeName value:self.greenShadow range:range];
-        [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:50 / 256.0 green:193 / 256.0 blue:92 / 256.0 alpha:1] range:range];
+        [remainingBalanceString addAttribute:NSForegroundColorAttributeName value:GetColor(50, 193, 92, 1) range:range];
     }
     
     if ([Utilities isiPad]) {
@@ -908,7 +915,7 @@
     [totalCostString addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, totalCostString.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 0.5;
-    animation.type = kCATransitionFade;
+    animation.type = @"oglFlip";
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     
     [_LabelTotalCost.layer addAnimation:animation forKey:nil];
@@ -935,11 +942,12 @@
     }
     
     [itemKaNaam addAttribute:NSShadowAttributeName value:self.whiteShadow range:NSMakeRange(0, itemKaNaam.length)];
-    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:60 green:71 blue:210 alpha:1] range:NSMakeRange(0, itemKaNaam.length)];
+    [itemKaNaam addAttribute:NSForegroundColorAttributeName value:GetColor(256, 256, 256, 1) range:NSMakeRange(0, itemKaNaam.length)];
     [itemKaNaam addAttribute:NSStrokeWidthAttributeName value:@-3.0f range:NSMakeRange(0, [itemKaNaam length])];
     CATransition *animation = [CATransition animation];
-    animation.duration = 1.0;
-    animation.type = kCATransitionPush;
+    animation.duration = 2.0;
+    animation.type = @"rippleEffect";
+    animation.subtype = kCATransitionFromTop;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [_LabelDailyMenuItemName.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_LabelDailyMenuItemName setAttributedText:itemKaNaam];
@@ -949,7 +957,7 @@
     
     if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
         itemPriceText = [NSString stringWithFormat:@"Rs %@/-",dictionary[keyItemPrice]];
-        totalCostText = [NSString stringWithFormat:@"Rs %li/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
+        totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = YES;
     } else {
@@ -972,7 +980,7 @@
 - (void)showError:(NSString *)response {
     [self.timer invalidate];
     NSShadow *shadow = [[NSShadow alloc] init];
-    shadow.shadowColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
+    shadow.shadowColor = GetColor(256, 256, 256, 0.7);
     shadow.shadowBlurRadius = 2.0;
     shadow.shadowOffset = CGSizeMake(0, 0);
     

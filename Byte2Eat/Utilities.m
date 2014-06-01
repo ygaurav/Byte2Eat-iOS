@@ -29,7 +29,7 @@
                           format:&format
                 errorDescription:&errorDesc];
     if (!temp) {
-        NSLog(@"Error reading plist: %@, format: %u", errorDesc, format);
+        NSLog(@"Error reading plist: %@, format: %lu", errorDesc, format);
     }
     NSString *personName = temp[@"UserName"];
     NSLog(@"User : %@", personName);
@@ -81,7 +81,7 @@
                           format:&format
                 errorDescription:&errorDesc];
     if (!temp) {
-        NSLog(@"Error reading plist: %@, format: %u", errorDesc, format);
+        NSLog(@"Error reading plist: %@, format: %lu", errorDesc, format);
     }
     return temp;
 }

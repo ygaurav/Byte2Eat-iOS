@@ -6,15 +6,11 @@
 #import "Utilities.h"
 #import "TableViewCellWithButtons.h"
 
-@interface OrderHistoryViewController () <ScrollingCellDelegate>
-@end
-
 @implementation OrderHistoryViewController {
     NSString *userName;
     BOOL isFetchingHistory;
     CAEmitterLayer *_leftEmitterLayer;
     CAEmitterLayer *_rightEmitterLayer;
-    NSMutableData *totalData;
     NSDateFormatter *shortDateFormatter;
     NSDateFormatter *dateFromJSONFormatter;
     CGPoint touchCenter;
@@ -33,20 +29,25 @@
     CGFloat initialPinchedHeight;
     NSMutableArray *rowHeights;
     NSMutableArray *rowColor;
+    
+    NSShadow *blueShadow;
+    NSShadow *greenShadow;
+    NSShadow *redShadow;
+    NSShadow *blackShadow;
+    
+    UIColor *blueColor;
+    UIColor *green;
+    UIColor *redColor;
+    
+    long totalOrderCount;
+}
+
+UIColor * GetUIColor(int red, int green, int blue, float alpha){
+    return [UIColor colorWithRed:red/256.0 green:green/256.0 blue:blue/256.0 alpha:alpha];
 }
 
 @synthesize managedObjectContext;
 @synthesize fetchedResultsController = _fetchedResultsController;
-
--(void)scrollingCellDidBeginPulling:(TableViewCellWithButtons *)cell{
-    NSLog(@"Pulling !!");
-}
--(void)scrollingCell:(TableViewCellWithButtons *)cell didChangePullOffset:(CGFloat)offset{
-    
-}
--(void)scrollingCellDidEndPulling:(TableViewCellWithButtons *)cell{
-    
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -71,28 +72,45 @@
     self.managedObjectContext = [Utilities getManagedObjectContext];
     
     NSError *error;
+    self.refreshButton.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.refreshButton.layer.shadowOffset = CGSizeMake(0, 0);
+    self.refreshButton.layer.shadowRadius = 3.0;
+    self.refreshButton.layer.shadowOpacity = 1;
     if (![[self fetchedResultsController:isAscending ] performFetch:&error]) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     }
-//    id <NSFetchedResultsSectionInfo> sectionInfo = [_fetchedResultsController sections][0];
-//    NSInteger count = [sectionInfo numberOfObjects];
-//    if (count != 0) {
-//        for (int i = 0; i < count; i++) {
-//            rowHeights[i] = @60;
-//            rowColor[i] = [UIColor colorWithRed:arc4random()%256/256.0 green:arc4random()%256/256.0 blue:arc4random()%256/256.0 alpha:.5];
-//        }
-//    }
-//    
-//    UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
-//    
-//    [self.tableView addGestureRecognizer:pinchRecognizer];
-//    
+    [self initShadowColors];
+    [self setTotalOrder];
+}
+
+- (void) initShadowColors{
+    blueShadow = [[NSShadow alloc] init];
+    blueColor = GetUIColor(102, 153, 255, 1);
+    blueShadow.shadowColor = blueColor;
+    blueShadow.shadowOffset = CGSizeMake(0, 0);
+    blueShadow.shadowBlurRadius = 2.0;
     
+    greenShadow = [[NSShadow alloc] init];
+    greenShadow.shadowOffset = CGSizeMake(0, 0);
+    greenShadow.shadowBlurRadius = 1.0;
+    green = GetUIColor(131, 204, 57, 1);
+    greenShadow.shadowColor = green;
+    
+    redShadow = [[NSShadow alloc] init];
+    redShadow.shadowBlurRadius = 2.0;
+    redShadow.shadowOffset = CGSizeMake(0, 0);
+    redColor = GetUIColor(220, 92, 75, 1);
+    redShadow.shadowColor = redColor;
+    
+    
+    blackShadow = [[NSShadow alloc] init];
+    blackShadow.shadowBlurRadius = 3.0;
+    blackShadow.shadowOffset = CGSizeMake(0, 0);
+    blackShadow.shadowColor = [UIColor blackColor];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return 95;
-//    return [rowHeights[indexPath.row] floatValue];
 }
 
 -(void) updateForPinchScale:(CGFloat)scale atIndexPath:(NSIndexPath *)indexPath{
@@ -173,22 +191,18 @@
     }
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [NSEntityDescription
-            entityForName:@"Order" inManagedObjectContext:managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Order" inManagedObjectContext:managedObjectContext];
     [fetchRequest setEntity:entity];
 
-    NSSortDescriptor *sort = [[NSSortDescriptor alloc]
-            initWithKey:@"orderDate" ascending:ascending];
+    NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"orderDate" ascending:ascending];
 
     [fetchRequest setSortDescriptors:@[sort]];
 
-//    [fetchRequest setFetchBatchSize:20];
-
-    NSFetchedResultsController *theFetchedResultsController =
-            [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-                                                managedObjectContext:managedObjectContext
-                                                  sectionNameKeyPath:nil
-                                                           cacheName:nil];
+    NSFetchedResultsController *theFetchedResultsController = [[NSFetchedResultsController alloc]
+                                                               initWithFetchRequest:fetchRequest
+                                                               managedObjectContext:managedObjectContext
+                                                                 sectionNameKeyPath:nil
+                                                                          cacheName:nil];
     self.fetchedResultsController = theFetchedResultsController;
     _fetchedResultsController.delegate = self;
 
@@ -200,19 +214,6 @@
     return YES;
 }
 
-- (NSArray *)getSavedOrderHistory {
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Order"
-                                              inManagedObjectContext:self.managedObjectContext];
-    [fetchRequest setEntity:entity];
-    NSError *error;
-
-    NSArray *fetchedRecords = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-
-    return fetchedRecords;
-}
-
 - (void)setData {
     self.operationLabel.text = @"";
     
@@ -220,11 +221,6 @@
     self.shadow.shadowBlurRadius = 3.0;
     self.shadow.shadowColor = [UIColor blackColor];
     self.shadow.shadowOffset = CGSizeMake(0, 0);
-
-    NSShadow *blueShadow = [[NSShadow alloc] init];
-    blueShadow.shadowColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:0.5];
-    blueShadow.shadowOffset = CGSizeMake(0, 0);
-    blueShadow.shadowBlurRadius = 3.0;
 
     NSMutableAttributedString *doneButton = [[NSMutableAttributedString alloc] initWithString:@"Done"];
     [doneButton addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, doneButton.length)];
@@ -274,7 +270,7 @@
     leftEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     leftEmitterCell.scale = 0.03;
     leftEmitterCell.alphaSpeed = -0.12;
-    leftEmitterCell.color = [UIColor colorWithRed:0 green:0 blue:1 alpha:0.5].CGColor;
+    leftEmitterCell.color = GetUIColor(0, 0, 256, 0.5).CGColor;
     [leftEmitterCell setName:@"left"];
 
     CAEmitterCell *rightEmitterCell = [CAEmitterCell emitterCell];
@@ -290,7 +286,7 @@
     rightEmitterCell.contents = (__bridge id) [[UIImage imageNamed:@"smoke.png"] CGImage];
     rightEmitterCell.scale = 0.03;
     rightEmitterCell.alphaSpeed = -0.12;
-    rightEmitterCell.color = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.5].CGColor;
+    rightEmitterCell.color = GetUIColor(256, 0, 0, 0.5).CGColor;
     [rightEmitterCell setName:@"right"];
 
     _leftEmitterLayer.emitterCells = @[leftEmitterCell];
@@ -319,12 +315,11 @@
 - (void)fetchOrderHistory:(bool)isFirstFetch {
     isFetchingHistory = YES;
     [self changeEmitterBirthrateTo:100];
-    totalData = [[NSMutableData alloc] init];
 
     NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@"fetching data..."];
     [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
     [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];
-    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0 green:0 blue:1 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:GetUIColor(0, 0, 256, 1) range:NSMakeRange(0, historyTitle.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
     animation.type = kCATransitionFade;
@@ -332,11 +327,14 @@
     [_operationLabel.layer addAnimation:animation forKey:@"changeTextTransition"];
     [_operationLabel setAttributedText:historyTitle];
 
+    NSDate *start = [[NSDate alloc] init];
     NSString *orderHistoryURL = [NSString stringWithFormat:keyURLOrderHistory, userName];
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager GET:orderHistoryURL
       parameters:nil
          success:^(AFHTTPRequestOperation *operation, id responseObject) {
+             NSDate *end = [[NSDate alloc] init];
+             NSLog(@"Request Time : %f",(end.timeIntervalSince1970 - start.timeIntervalSince1970));
              isFetchingHistory = NO;
              [self changeEmitterBirthrateTo:0];
              [self setTitleBack];
@@ -364,7 +362,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return [_fetchedResultsController sections].count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -380,22 +378,7 @@
     [self configureCell:historyCell atIndexPath:indexPath];
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     [historyCell addGestureRecognizer:tap];
-//    TableViewCellWithButtons *historyCell = [tableView dequeueReusableCellWithIdentifier:@"scrollViewTableCell" forIndexPath:indexPath];
-//    [self configCustomCell:historyCell atIndexPath:indexPath];
     return historyCell;
-}
-
-
--(void)configCustomCell:(TableViewCellWithButtons *)cell atIndexPath:(NSIndexPath *)indexPath{
-    Order *order = [_fetchedResultsController objectAtIndexPath:indexPath];
-    
-    cell.scrollDelegate = self;
-    cell.testScrollView.showsHorizontalScrollIndicator = YES;
-    cell.testScrollView.showsVerticalScrollIndicator = NO;
-    cell.testScrollView.contentSize = CGSizeMake(CGRectGetWidth(cell.frame), CGRectGetHeight(cell.frame));
-    cell.labelItemName.text = order.itemName;
-    cell.labelOrderDate.text = [NSString stringWithFormat:@"%ld",(long)indexPath.row];
-    cell.testScrollView.backgroundColor = rowColor[indexPath.row];
 }
 
 -(void)handleTap:(UITapGestureRecognizer *)tap{
@@ -419,24 +402,6 @@
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     Order *order = [_fetchedResultsController objectAtIndexPath:indexPath];
     OrderHistoryCell *historyCell = (OrderHistoryCell *) cell;
-
-    NSShadow *blueShadow = [[NSShadow alloc] init];
-    UIColor *blueColor = [UIColor colorWithRed:102 / 256.0 green:153 / 256.0 blue:255 / 256.0 alpha:1];
-    blueShadow.shadowColor = blueColor;
-    blueShadow.shadowOffset = CGSizeMake(0, 0);
-    blueShadow.shadowBlurRadius = 2.0;
-
-    NSShadow *greenShadow = [[NSShadow alloc] init];
-    greenShadow.shadowOffset = CGSizeMake(0, 0);
-    greenShadow.shadowBlurRadius = 1.0;
-    UIColor *green = [UIColor colorWithRed:131 / 256.0 green:204 / 256.0 blue:57 / 256.0 alpha:1];
-    greenShadow.shadowColor = green;
-
-    NSShadow *redShadow = [[NSShadow alloc] init];
-    redShadow.shadowBlurRadius = 2.0;
-    redShadow.shadowOffset = CGSizeMake(0, 0);
-    UIColor *redColor = [UIColor colorWithRed:220 / 256.0 green:92 / 256.0 blue:75 / 256.0 alpha:1];
-    redShadow.shadowColor = redColor;
 
     NSMutableAttributedString *itemName = [[NSMutableAttributedString alloc] initWithString:order.itemName];
     [itemName addAttribute:NSShadowAttributeName value:blueShadow range:NSMakeRange(0, itemName.length)];
@@ -474,6 +439,7 @@
 }
 
 - (void)setOrderHistory:(NSDictionary *)dictionary {
+    NSDate *start = [[NSDate alloc] init];
     NSArray *orderHistoryDictionary = dictionary[keyOrderHistory];
     if ([_fetchedResultsController fetchedObjects].count == 0) {
         NSLog(@"Saving order History for first time.");
@@ -489,14 +455,6 @@
             orderObject.price = dailyMenu[keyItemPrice];
             orderObject.orderDate = [dateFromJSONFormatter dateFromString:(NSString *) order[@"OrderDate"]];
             orderObject.displayOrder = displayOrder;
-
-            NSError *error;
-            [(self.managedObjectContext) save:&error];
-            if (error) {
-                NSLog(@"Error occured : %@", error.localizedDescription);
-            } else {
-                displayOrder = @([displayOrder integerValue] + 1);
-            }
         }
     } else {
         //Checking for deleted or updated records
@@ -544,14 +502,43 @@
             }
         }
     }
+    NSDate *end = [[NSDate alloc] init];
+    NSLog(@"Total Time : %f",(end.timeIntervalSince1970 - start.timeIntervalSince1970));
     NSError *error;
     [(self.managedObjectContext) save:&error];
     if (error) {
         NSLog(@"Error occured : %@", error.localizedDescription);
     }
     [_fetchedResultsController performFetch:&error];
-    NSLog(@"Count after save = %lu", (unsigned long)[_fetchedResultsController fetchedObjects].count);
+    
+    [self setTotalOrder];
+
     [self.managedObjectContext processPendingChanges];
+}
+
+- (void) setTotalOrder {
+    NSString *totalText = [NSString stringWithFormat:@"%lu",(unsigned long)[_fetchedResultsController fetchedObjects].count];
+    NSMutableAttributedString *totalCount = [[NSMutableAttributedString alloc] initWithString:totalText];
+    [totalCount addAttribute:NSShadowAttributeName value:blackShadow range:NSMakeRange(0, totalText.length)];
+    [totalCount addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, totalText.length)];
+    [totalCount addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:20] range:NSMakeRange(0, totalText.length)];
+    
+    [self.labelTotalOrder setAttributedText:totalCount];
+
+    CABasicAnimation* zRotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    zRotationAnimation.fromValue = @0.0f;
+    zRotationAnimation.toValue = [NSNumber numberWithFloat: 2*2*M_PI];
+    zRotationAnimation.duration = 0.5;
+    zRotationAnimation.cumulative = YES;
+    zRotationAnimation.repeatCount = 1;
+    zRotationAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    zRotationAnimation.removedOnCompletion = NO;
+    zRotationAnimation.fillMode = kCAFillModeForwards;
+    zRotationAnimation.delegate = self;
+    
+    [self.labelTotalOrder.layer addAnimation:zRotationAnimation forKey:nil];
+    
+    NSLog(@"Count after save = %lu", (unsigned long)[_fetchedResultsController fetchedObjects].count);
 }
 
 - (NSManagedObjectContext *)managedObjectContext {
@@ -566,7 +553,7 @@
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     //Color flash for inserted cell
     if ([insertedIndexPaths containsObject:indexPath]) {
-        cell.backgroundColor = [UIColor colorWithRed:180/256.0 green:250/256.0 blue:186/256.0 alpha:1];
+        cell.backgroundColor = GetUIColor(180, 250, 186, 1);
         [UIView animateWithDuration:3
                          animations:^{
                              cell.backgroundColor = [UIColor whiteColor];
@@ -580,7 +567,6 @@
     if ([updatedIndexPaths containsObject:indexPath]) {
         OrderHistoryCell *orderCell = (OrderHistoryCell *)cell;
         orderCell.labelOrderQty.layer.transform = CATransform3DMakeRotation(M_PI, 0, 0, 1);
-//        orderCell.labelOrderQty.layer.transform = CATransform3DMakeScale(4, 4, 4);
         [UIView animateWithDuration:2
                               delay:0
              usingSpringWithDamping:0.1
@@ -591,7 +577,7 @@
                          }
                          completion:nil];
         
-        cell.backgroundColor = [UIColor colorWithRed:250/256.0 green:244/256.0 blue:162/256.0 alpha:1];
+        cell.backgroundColor = GetUIColor(250, 244, 162, 1);
         [UIView animateWithDuration:3
                          animations:^{
                              cell.backgroundColor = [UIColor whiteColor];
@@ -600,12 +586,6 @@
                              [updatedIndexPaths removeObject:indexPath];
                          }];
     }
-    
-    // Disable animation for already shown cells
-//    if (![didDisplay objectForKey:indexPath]) {
-    if(true){
-    
-
         CATransform3D rotation = CATransform3DMakeScale(.3, .3, .3);
         cell.layer.transform = rotation;
         cell.layer.anchorPoint = CGPointMake(0.5, 0.5);
@@ -619,22 +599,14 @@
                          animations:^{
                              cell.layer.transform = CATransform3DIdentity;
                          } completion:nil];
-        [didDisplay setObject:@YES forKey:indexPath];
-    }
+        didDisplay[indexPath] = @YES;
 }
 
 - (void)showError:(NSString *)response {
-
-    NSShadow *redShadow = [[NSShadow alloc] init];
-    redShadow.shadowBlurRadius = 2.0;
-    redShadow.shadowOffset = CGSizeMake(0, 0);
-    UIColor *redColor = [UIColor colorWithRed:220 / 256.0 green:92 / 256.0 blue:75 / 256.0 alpha:1];
-    redShadow.shadowColor = redColor;
-
     NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ Try again later.", response]];
     [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
     [historyTitle addAttribute:NSShadowAttributeName value:redShadow range:NSMakeRange(0, historyTitle.length)];
-    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:220 / 256.0 green:92 / 256.0 blue:75 / 256.0 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:GetUIColor(220, 92, 75, 1) range:NSMakeRange(0, historyTitle.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
     animation.type = kCATransitionFade;
@@ -648,7 +620,7 @@
 - (void)removeErrorMessage:(NSTimer *)timer {
     NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@""];
     [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
-    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:220 / 256.0 green:92 / 256.0 blue:75 / 256.0 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:GetUIColor(220, 92, 75, 1) range:NSMakeRange(0, historyTitle.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
     animation.type = kCATransitionFade;
@@ -662,7 +634,7 @@
     NSMutableAttributedString *historyTitle = [[NSMutableAttributedString alloc] initWithString:@""];
     [historyTitle addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:10] range:NSMakeRange(0, historyTitle.length)];
     [historyTitle addAttribute:NSShadowAttributeName value:self.shadow range:NSMakeRange(0, historyTitle.length)];
-    [historyTitle addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:0 green:0 blue:1 alpha:1] range:NSMakeRange(0, historyTitle.length)];
+    [historyTitle addAttribute:NSForegroundColorAttributeName value:GetUIColor(0, 0, 256, 1) range:NSMakeRange(0, historyTitle.length)];
     CATransition *animation = [CATransition animation];
     animation.duration = 1.0;
     animation.type = kCATransitionFade;
@@ -679,7 +651,6 @@
 #pragma mark FetchedResultsController methods
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
-//    [didDisplay removeAllObjects];
     [self.tableView beginUpdates];
 }
 
@@ -712,8 +683,6 @@
     UITableView *tableView = self.tableView;
 
     switch (type) {
-
-            
         case NSFetchedResultsChangeInsert:
             if (!firstFetch) {
                 [insertedIndexPaths addObject:newIndexPath];
@@ -754,29 +723,6 @@
 
 - (IBAction)onDoneTap:(UIButton *)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (IBAction)onTopButtonTap:(UIButton *)sender {
-//    [didDisplay removeAllObjects];
-//    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 20, 310) animated:NO];
-//    self.fetchedResultsController = nil;
-//    NSError *error;
-//    if (![[self fetchedResultsController:!isAscending ] performFetch:&error]) {
-//        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-//    }
-//
-//    [self.tableView reloadData];
-//    isAscending = !isAscending;
-    
-//    NSMutableArray *array = [[_fetchedResultsController fetchedObjects] mutableCopy];
-//
-//    for(int j = 0; j <array.count; j++){
-//        Order *order = (Order *) array[(NSUInteger) j];
-//        (order).displayOrder = @(array.count - j);
-//    }
-//
-//    [self.managedObjectContext save:nil];
-
 }
 
 - (IBAction)onRefreshTap:(UIButton *)sender {
@@ -820,13 +766,11 @@
                                                               afterScreenUpdates:NO
                                                                    withCapInsets:UIEdgeInsetsZero];
         [self.tableView setAlpha:0];
-        [self.onSortingButton setAlpha:0];
         [self.historyTitleLabel setAlpha:0];
 
         [self.view addSubview:topHalfSnapshot];
         bottomHalfSnapshot.center = CGPointMake(bottomHalfSnapshot.center.x, bottomHalfSnapshot.center.y + bottomHalfSnapshot.bounds.size.height);
         [self.view addSubview:bottomHalfSnapshot];
-//        [self.view insertSubview:bottomHalfSnapshot belowSubview:topHalfSnapshot];
 
         topHalfSnapshot.layer.anchorPoint = CGPointMake(0.5, 1);
         topHalfSnapshot.layer.position = [self getLayerPosition:topHalfSnapshot.layer];
@@ -850,9 +794,7 @@
                              [bottomHalfSnapshot removeFromSuperview];
                              [self.tableView setAlpha:1];
                              [self.historyTitleLabel setAlpha:1];
-                             [self.onSortingButton setAlpha:1];
                          }];
-//        [bottomHalfSnapshot removeFromSuperview];
     }
 }
 
