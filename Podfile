@@ -2,5 +2,5 @@ platform :ios, '7.0'
 
 xcodeproj 'Byte2Eat.xcodeproj'
 
-pod "AFNetworking", "~> 2.0"
+pod 'RestKit', '~> 0.22.0', :inhibit_warnings => true
 pod "pop"
