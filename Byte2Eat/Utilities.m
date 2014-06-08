@@ -90,7 +90,7 @@
     AppDelegate *appDelegate = (AppDelegate *) [UIApplication sharedApplication].delegate;
     return appDelegate.managedObjectContext;
 }
-
+    
 + (void) logUserOut{
     NSString *error;
 

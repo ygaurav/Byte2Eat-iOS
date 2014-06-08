@@ -12,6 +12,7 @@
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (weak, nonatomic) IBOutlet UILabel *labelTotalOrder;
 @property (weak, nonatomic) IBOutlet UIButton *refreshButton;
+@property (weak, nonatomic) IBOutlet UILabel *labelTotalCost;
 
 - (IBAction)onDoneTap:(UIButton *)sender;
 - (IBAction)onRefreshTap:(UIButton *)sender;

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="fww-Kk-YZf">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="fww-Kk-YZf">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--Authenticator View Controller-->
@@ -826,11 +827,17 @@
                                     <action selector="onRefreshTap:" destination="wGH-M3-Nza" eventType="touchUpInside" id="z2d-w9-tu2"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ttq-kj-bhq">
-                                <rect key="frame" x="285" y="20" width="10" height="21"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ttq-kj-bhq">
+                                <rect key="frame" x="288" y="15" width="7" height="15"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0/-" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gWR-3r-GsC">
+                                <rect key="frame" x="284" y="30" width="16" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -838,24 +845,27 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="pV3-PY-VOG" secondAttribute="trailing" id="30N-B4-75t"/>
                             <constraint firstAttribute="trailing" secondItem="vAe-SN-FYB" secondAttribute="trailing" id="4qH-he-40A"/>
-                            <constraint firstItem="Ttq-kj-bhq" firstAttribute="centerY" secondItem="FGm-JW-gYZ" secondAttribute="centerY" id="6Cb-a2-lOe"/>
+                            <constraint firstItem="Ttq-kj-bhq" firstAttribute="bottom" secondItem="FGm-JW-gYZ" secondAttribute="centerY" id="6Cb-a2-lOe"/>
                             <constraint firstItem="DLd-EJ-Vta" firstAttribute="top" secondItem="cbH-k9-6ml" secondAttribute="bottom" id="8iz-gV-hf4"/>
                             <constraint firstItem="FGm-JW-gYZ" firstAttribute="top" secondItem="cbH-k9-6ml" secondAttribute="bottom" constant="18" id="B77-uk-Xp4"/>
                             <constraint firstAttribute="trailing" secondItem="DLd-EJ-Vta" secondAttribute="trailing" id="CHy-F9-b7B"/>
                             <constraint firstAttribute="trailing" secondItem="Ttq-kj-bhq" secondAttribute="trailing" constant="25" id="F9C-hj-ySI"/>
                             <constraint firstItem="vAe-SN-FYB" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="JbO-fQ-soZ"/>
+                            <constraint firstItem="Ttq-kj-bhq" firstAttribute="centerX" secondItem="gWR-3r-GsC" secondAttribute="centerX" id="Z3z-3D-ZED"/>
                             <constraint firstItem="DLd-EJ-Vta" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="ZFV-hs-ceI"/>
                             <constraint firstItem="pV3-PY-VOG" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" id="aaU-va-Q1F"/>
                             <constraint firstItem="FGm-JW-gYZ" firstAttribute="leading" secondItem="3Nq-77-Kt8" secondAttribute="leading" constant="11" id="fpg-Uq-SOW"/>
                             <constraint firstItem="pV3-PY-VOG" firstAttribute="top" secondItem="DLd-EJ-Vta" secondAttribute="bottom" id="hjb-Ll-jJz"/>
                             <constraint firstItem="vAe-SN-FYB" firstAttribute="top" secondItem="pV3-PY-VOG" secondAttribute="bottom" id="mzd-Qt-xJ0"/>
                             <constraint firstItem="7HU-Dh-OYf" firstAttribute="top" secondItem="vAe-SN-FYB" secondAttribute="bottom" id="nSP-tF-Xha"/>
+                            <constraint firstItem="gWR-3r-GsC" firstAttribute="top" secondItem="Ttq-kj-bhq" secondAttribute="bottom" id="oyH-ux-29A"/>
                         </constraints>
                     </view>
                     <nil key="simulatedStatusBarMetrics"/>
                     <connections>
                         <outlet property="doneButton" destination="vAe-SN-FYB" id="C7g-pd-YCl"/>
                         <outlet property="historyTitleLabel" destination="DLd-EJ-Vta" id="dGY-jd-7U2"/>
+                        <outlet property="labelTotalCost" destination="gWR-3r-GsC" id="b3M-Y3-6E9"/>
                         <outlet property="labelTotalOrder" destination="Ttq-kj-bhq" id="2OM-Wm-ZeB"/>
                         <outlet property="operationLabel" destination="dEl-xQ-hZs" id="018-gK-qQG"/>
                         <outlet property="refreshButton" destination="FGm-JW-gYZ" id="YWm-Nb-nJd"/>

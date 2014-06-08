@@ -418,7 +418,7 @@ UIColor * GetUIColor(int red, int green, int blue, float alpha){
     [quantity addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, quantity.length)];
     [quantity addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, quantity.length)];
 
-    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %li/-", [order.price integerValue] * [order.quantity integerValue]]];
+    NSMutableAttributedString *cost = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Rs %i/-", [order.price integerValue] * [order.quantity integerValue]]];
     [cost addAttribute:NSShadowAttributeName value:greenShadow range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSForegroundColorAttributeName value:green range:NSMakeRange(0, cost.length)];
     [cost addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:15] range:NSMakeRange(0, cost.length)];
@@ -521,22 +521,40 @@ UIColor * GetUIColor(int red, int green, int blue, float alpha){
     NSMutableAttributedString *totalCount = [[NSMutableAttributedString alloc] initWithString:totalText];
     [totalCount addAttribute:NSShadowAttributeName value:blackShadow range:NSMakeRange(0, totalText.length)];
     [totalCount addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, totalText.length)];
-    [totalCount addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:20] range:NSMakeRange(0, totalText.length)];
+    [totalCount addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, totalText.length)];
     
+    if (![self.labelTotalOrder.text isEqualToString:[totalCount string]]) {
+        CATransition *zRotationAnimation = [CATransition animation];
+        zRotationAnimation.duration = 1.0;
+        zRotationAnimation.type = @"alignedCube";
+        zRotationAnimation.subtype = kCATransitionFromTop;
+        zRotationAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [self.labelTotalOrder.layer addAnimation:zRotationAnimation forKey:nil];
+    }
     [self.labelTotalOrder setAttributedText:totalCount];
-
-    CABasicAnimation* zRotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    zRotationAnimation.fromValue = @0.0f;
-    zRotationAnimation.toValue = [NSNumber numberWithFloat: 2*2*M_PI];
-    zRotationAnimation.duration = 0.5;
-    zRotationAnimation.cumulative = YES;
-    zRotationAnimation.repeatCount = 1;
-    zRotationAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    zRotationAnimation.removedOnCompletion = NO;
-    zRotationAnimation.fillMode = kCAFillModeForwards;
-    zRotationAnimation.delegate = self;
     
-    [self.labelTotalOrder.layer addAnimation:zRotationAnimation forKey:nil];
+    NSArray *orders = [_fetchedResultsController fetchedObjects];
+    int totalPaid = 0;
+    for (Order *order in orders) {
+        totalPaid += [order.price intValue] * [order.quantity intValue];
+    }
+    
+    NSString *totalPaidString = [NSString stringWithFormat:@"Rs %i /-",totalPaid];
+    
+    NSMutableAttributedString *totalCostString = [[NSMutableAttributedString alloc] initWithString:totalPaidString];
+    [totalCostString addAttribute:NSShadowAttributeName value:blackShadow range:NSMakeRange(0, totalCostString.length)];
+    [totalCostString addAttribute:NSForegroundColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, totalCostString.length)];
+    [totalCostString addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:12] range:NSMakeRange(0, totalCostString.length)];
+    
+    if (![self.labelTotalCost.text isEqualToString:totalPaidString]) {
+        CATransition *animation = [CATransition animation];
+        animation.duration = 1.0;
+        animation.type = @"alignedCube";
+        animation.subtype = kCATransitionFromBottom;
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [self.labelTotalCost.layer addAnimation:animation forKey:nil];
+    }
+    [self.labelTotalCost setAttributedText:totalCostString];
     
     NSLog(@"Count after save = %lu", (unsigned long)[_fetchedResultsController fetchedObjects].count);
 }
