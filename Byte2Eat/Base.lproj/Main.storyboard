@@ -706,15 +706,15 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="94"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sandwich" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Swa-LW-EFm">
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Sandwich" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Swa-LW-EFm">
                                                     <rect key="frame" x="11" y="20" width="87" height="24"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                     <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22nd Jan 2014 12:30 pm" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Nb-KX-hMy">
-                                                    <rect key="frame" x="143" y="26" width="161" height="17"/>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22nd Jan 2014 12:30 pm" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Nb-KX-hMy">
+                                                    <rect key="frame" x="98" y="26" width="206" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <color key="textColor" red="0.91342474489795922" green="0.030472052407245386" blue="0.12245660348746899" alpha="1" colorSpace="calibratedRGB"/>
@@ -767,6 +767,7 @@
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="baseline" secondItem="uNJ-zi-063" secondAttribute="baseline" id="5RW-Dp-dFS"/>
                                                 <constraint firstItem="uNJ-zi-063" firstAttribute="leading" secondItem="6Pf-dX-YYb" secondAttribute="trailing" constant="75" id="8EL-RE-iuI"/>
                                                 <constraint firstItem="zmo-R2-AYq" firstAttribute="leading" secondItem="9UH-Xw-NHq" secondAttribute="trailing" constant="7" id="BaP-a5-ElT"/>
+                                                <constraint firstItem="7Nb-KX-hMy" firstAttribute="leading" secondItem="Swa-LW-EFm" secondAttribute="trailing" id="Bpk-Hi-4dF"/>
                                                 <constraint firstItem="Swa-LW-EFm" firstAttribute="leading" secondItem="9UH-Xw-NHq" secondAttribute="leading" id="C6N-ox-e4E"/>
                                                 <constraint firstItem="Swa-LW-EFm" firstAttribute="top" secondItem="JiQ-KC-tmt" secondAttribute="top" constant="20" id="LWP-wT-4Iy"/>
                                                 <constraint firstItem="9UH-Xw-NHq" firstAttribute="top" secondItem="Swa-LW-EFm" secondAttribute="bottom" constant="15" id="One-MU-yvC"/>
