@@ -6,7 +6,6 @@
 #import "ThanksViewController.h"
 #import "TransitionManager.h"
 #import "Utilities.h"
-#import <POP/POP.h>
 
 @implementation OrderViewController{
     BOOL isFetchingMenu;
