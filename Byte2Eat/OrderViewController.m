@@ -957,7 +957,7 @@ UIColor * GetColor(int red, int green, int blue, float alpha){
     
     if (_pricePerUnit && ![_pricePerUnit  isEqual: @0]) {
         itemPriceText = [NSString stringWithFormat:@"Rs %@/-",dictionary[keyItemPrice]];
-        totalCostText = [NSString stringWithFormat:@"Rs %i/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
+        totalCostText = [NSString stringWithFormat:@"Rs %li/-", [_pricePerUnit integerValue] * [_currentOrderNumber integerValue]];
         [self.orderQuantityButton setTitle:[NSString stringWithFormat:@"%@",_currentOrderNumber] forState:UIControlStateNormal];
         self.orderQuantityButton.userInteractionEnabled = YES;
     } else {
