@@ -31,4 +31,12 @@
     XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
 }
 
+-(void)testFirstTest{
+    XCTAssertTrue(true, @"It is true my friend");
+}
+
+- (void)testFirstFalse{
+    XCTAssertNil(nil, @"It is nil my friend");
+}
+
 @end
